@@ -1,0 +1,4 @@
+source,licence,case_count,image_count,notes
+DDI,TO VERIFY (https://ddi-dataset.github.io/),,,image-only baselines and skin-tone analysis
+Fitzpatrick17k,TO VERIFY (https://github.com/mattgroh/fitzpatrick17k),,,image-only baselines and skin-tone analysis
+SCIN,SCIN Data Use License (https://github.com/google-research-datasets/scin/blob/main/LICENSE),5033,10407,release 1.0.0; gs://dx-scin-public-data; audited 2026-10-07; split by case_id
