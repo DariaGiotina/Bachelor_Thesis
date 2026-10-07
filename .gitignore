@@ -71,3 +71,7 @@ wandb/
 *.blg
 *.synctex.gz
 ~$*.docx
+
+# --- Claude Code local ---
+.claude/settings.local.json
+*.tgz
