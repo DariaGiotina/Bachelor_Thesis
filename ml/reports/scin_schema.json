@@ -1,0 +1,1074 @@
+{
+  "dataset": "SCIN",
+  "primary_key": "case_id",
+  "n_cases": 5033,
+  "fields": [
+    {
+      "name": "case_id",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "identifier",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 5033,
+      "role": "primary_key",
+      "examples": [
+        "-1000600354148496558",
+        "-1002039107727665188",
+        "-1003358831658393077"
+      ]
+    },
+    {
+      "name": "source",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 1,
+      "values": {
+        "SCIN": 5033
+      }
+    },
+    {
+      "name": "release",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 1,
+      "values": {
+        "1.0.0": 5033
+      }
+    },
+    {
+      "name": "year",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "numeric",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 1,
+      "values": {
+        "2023": 5033
+      }
+    },
+    {
+      "name": "age_group",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5032,
+      "missing": 1,
+      "missing_pct": 0.02,
+      "n_unique": 7,
+      "values": {
+        "AGE_UNKNOWN": 2864,
+        "AGE_18_TO_29": 769,
+        "AGE_40_TO_49": 435,
+        "AGE_30_TO_39": 422,
+        "AGE_50_TO_59": 322,
+        "AGE_60_TO_69": 165,
+        "AGE_70_TO_79": 55
+      }
+    },
+    {
+      "name": "sex_at_birth",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5032,
+      "missing": 1,
+      "missing_pct": 0.02,
+      "n_unique": 3,
+      "values": {
+        "OTHER_OR_UNSPECIFIED": 2559,
+        "FEMALE": 1666,
+        "MALE": 807
+      }
+    },
+    {
+      "name": "fitzpatrick_skin_type",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 2503,
+      "missing": 2530,
+      "missing_pct": 50.27,
+      "n_unique": 7,
+      "values": {
+        "FST3": 661,
+        "FST2": 542,
+        "FST4": 427,
+        "NONE_IDENTIFIED": 328,
+        "FST5": 214,
+        "FST1": 188,
+        "FST6": 143
+      }
+    },
+    {
+      "name": "race_ethnicity_american_indian_or_alaska_native",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 73,
+      "missing": 4960,
+      "missing_pct": 98.55,
+      "n_unique": 1,
+      "values": {
+        "YES": 73
+      }
+    },
+    {
+      "name": "race_ethnicity_asian",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 96,
+      "missing": 4937,
+      "missing_pct": 98.09,
+      "n_unique": 1,
+      "values": {
+        "YES": 96
+      }
+    },
+    {
+      "name": "race_ethnicity_black_or_african_american",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 298,
+      "missing": 4735,
+      "missing_pct": 94.08,
+      "n_unique": 1,
+      "values": {
+        "YES": 298
+      }
+    },
+    {
+      "name": "race_ethnicity_hispanic_latino_or_spanish_origin",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 290,
+      "missing": 4743,
+      "missing_pct": 94.24,
+      "n_unique": 1,
+      "values": {
+        "YES": 290
+      }
+    },
+    {
+      "name": "race_ethnicity_middle_eastern_or_north_african",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 7,
+      "missing": 5026,
+      "missing_pct": 99.86,
+      "n_unique": 1,
+      "values": {
+        "YES": 7
+      }
+    },
+    {
+      "name": "race_ethnicity_native_hawaiian_or_pacific_islander",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 4,
+      "missing": 5029,
+      "missing_pct": 99.92,
+      "n_unique": 1,
+      "values": {
+        "YES": 4
+      }
+    },
+    {
+      "name": "race_ethnicity_white",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 1873,
+      "missing": 3160,
+      "missing_pct": 62.79,
+      "n_unique": 1,
+      "values": {
+        "YES": 1873
+      }
+    },
+    {
+      "name": "race_ethnicity_other_race",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 16,
+      "missing": 5017,
+      "missing_pct": 99.68,
+      "n_unique": 1,
+      "values": {
+        "YES": 16
+      }
+    },
+    {
+      "name": "race_ethnicity_prefer_not_to_answer",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 34,
+      "missing": 4999,
+      "missing_pct": 99.32,
+      "n_unique": 1,
+      "values": {
+        "YES": 34
+      }
+    },
+    {
+      "name": "textures_raised_or_bumpy",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "textures",
+      "non_null": 2915,
+      "missing": 2118,
+      "missing_pct": 42.08,
+      "n_unique": 1,
+      "values": {
+        "YES": 2915
+      }
+    },
+    {
+      "name": "textures_flat",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "textures",
+      "non_null": 822,
+      "missing": 4211,
+      "missing_pct": 83.67,
+      "n_unique": 1,
+      "values": {
+        "YES": 822
+      }
+    },
+    {
+      "name": "textures_rough_or_flaky",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "textures",
+      "non_null": 1032,
+      "missing": 4001,
+      "missing_pct": 79.5,
+      "n_unique": 1,
+      "values": {
+        "YES": 1032
+      }
+    },
+    {
+      "name": "textures_fluid_filled",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "textures",
+      "non_null": 629,
+      "missing": 4404,
+      "missing_pct": 87.5,
+      "n_unique": 1,
+      "values": {
+        "YES": 629
+      }
+    },
+    {
+      "name": "body_parts_head_or_neck",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 737,
+      "missing": 4296,
+      "missing_pct": 85.36,
+      "n_unique": 1,
+      "values": {
+        "YES": 737
+      }
+    },
+    {
+      "name": "body_parts_arm",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 1707,
+      "missing": 3326,
+      "missing_pct": 66.08,
+      "n_unique": 1,
+      "values": {
+        "YES": 1707
+      }
+    },
+    {
+      "name": "body_parts_palm",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 215,
+      "missing": 4818,
+      "missing_pct": 95.73,
+      "n_unique": 1,
+      "values": {
+        "YES": 215
+      }
+    },
+    {
+      "name": "body_parts_back_of_hand",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 521,
+      "missing": 4512,
+      "missing_pct": 89.65,
+      "n_unique": 1,
+      "values": {
+        "YES": 521
+      }
+    },
+    {
+      "name": "body_parts_torso_front",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 795,
+      "missing": 4238,
+      "missing_pct": 84.2,
+      "n_unique": 1,
+      "values": {
+        "YES": 795
+      }
+    },
+    {
+      "name": "body_parts_torso_back",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 652,
+      "missing": 4381,
+      "missing_pct": 87.05,
+      "n_unique": 1,
+      "values": {
+        "YES": 652
+      }
+    },
+    {
+      "name": "body_parts_genitalia_or_groin",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 222,
+      "missing": 4811,
+      "missing_pct": 95.59,
+      "n_unique": 1,
+      "values": {
+        "YES": 222
+      }
+    },
+    {
+      "name": "body_parts_buttocks",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 391,
+      "missing": 4642,
+      "missing_pct": 92.23,
+      "n_unique": 1,
+      "values": {
+        "YES": 391
+      }
+    },
+    {
+      "name": "body_parts_leg",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 1694,
+      "missing": 3339,
+      "missing_pct": 66.34,
+      "n_unique": 1,
+      "values": {
+        "YES": 1694
+      }
+    },
+    {
+      "name": "body_parts_foot_top_or_side",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 415,
+      "missing": 4618,
+      "missing_pct": 91.75,
+      "n_unique": 1,
+      "values": {
+        "YES": 415
+      }
+    },
+    {
+      "name": "body_parts_foot_sole",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 104,
+      "missing": 4929,
+      "missing_pct": 97.93,
+      "n_unique": 1,
+      "values": {
+        "YES": 104
+      }
+    },
+    {
+      "name": "body_parts_other",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "body_parts",
+      "non_null": 543,
+      "missing": 4490,
+      "missing_pct": 89.21,
+      "n_unique": 1,
+      "values": {
+        "YES": 543
+      }
+    },
+    {
+      "name": "condition_symptoms_bothersome_appearance",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 1530,
+      "missing": 3503,
+      "missing_pct": 69.6,
+      "n_unique": 1,
+      "values": {
+        "YES": 1530
+      }
+    },
+    {
+      "name": "condition_symptoms_bleeding",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 225,
+      "missing": 4808,
+      "missing_pct": 95.53,
+      "n_unique": 1,
+      "values": {
+        "YES": 225
+      }
+    },
+    {
+      "name": "condition_symptoms_increasing_size",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 1013,
+      "missing": 4020,
+      "missing_pct": 79.87,
+      "n_unique": 1,
+      "values": {
+        "YES": 1013
+      }
+    },
+    {
+      "name": "condition_symptoms_darkening",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 385,
+      "missing": 4648,
+      "missing_pct": 92.35,
+      "n_unique": 1,
+      "values": {
+        "YES": 385
+      }
+    },
+    {
+      "name": "condition_symptoms_itching",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 2712,
+      "missing": 2321,
+      "missing_pct": 46.12,
+      "n_unique": 1,
+      "values": {
+        "YES": 2712
+      }
+    },
+    {
+      "name": "condition_symptoms_burning",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 988,
+      "missing": 4045,
+      "missing_pct": 80.37,
+      "n_unique": 1,
+      "values": {
+        "YES": 988
+      }
+    },
+    {
+      "name": "condition_symptoms_pain",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 734,
+      "missing": 4299,
+      "missing_pct": 85.42,
+      "n_unique": 1,
+      "values": {
+        "YES": 734
+      }
+    },
+    {
+      "name": "condition_symptoms_no_relevant_experience",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "condition_symptoms",
+      "non_null": 308,
+      "missing": 4725,
+      "missing_pct": 93.88,
+      "n_unique": 1,
+      "values": {
+        "YES": 308
+      }
+    },
+    {
+      "name": "other_symptoms_fever",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 90,
+      "missing": 4943,
+      "missing_pct": 98.21,
+      "n_unique": 1,
+      "values": {
+        "YES": 90
+      }
+    },
+    {
+      "name": "other_symptoms_chills",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 120,
+      "missing": 4913,
+      "missing_pct": 97.62,
+      "n_unique": 1,
+      "values": {
+        "YES": 120
+      }
+    },
+    {
+      "name": "other_symptoms_fatigue",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 415,
+      "missing": 4618,
+      "missing_pct": 91.75,
+      "n_unique": 1,
+      "values": {
+        "YES": 415
+      }
+    },
+    {
+      "name": "other_symptoms_joint_pain",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 300,
+      "missing": 4733,
+      "missing_pct": 94.04,
+      "n_unique": 1,
+      "values": {
+        "YES": 300
+      }
+    },
+    {
+      "name": "other_symptoms_mouth_sores",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 96,
+      "missing": 4937,
+      "missing_pct": 98.09,
+      "n_unique": 1,
+      "values": {
+        "YES": 96
+      }
+    },
+    {
+      "name": "other_symptoms_shortness_of_breath",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 139,
+      "missing": 4894,
+      "missing_pct": 97.24,
+      "n_unique": 1,
+      "values": {
+        "YES": 139
+      }
+    },
+    {
+      "name": "other_symptoms_no_relevant_symptoms",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "other_symptoms",
+      "non_null": 2841,
+      "missing": 2192,
+      "missing_pct": 43.55,
+      "n_unique": 1,
+      "values": {
+        "YES": 2841
+      }
+    },
+    {
+      "name": "related_category",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 3779,
+      "missing": 1254,
+      "missing_pct": 24.92,
+      "n_unique": 9,
+      "values": {
+        "RASH": 2876,
+        "OTHER_ISSUE_DESCRIPTION": 414,
+        "LOOKS_HEALTHY": 290,
+        "ACNE": 74,
+        "GROWTH_OR_MOLE": 45,
+        "PIGMENTARY_PROBLEM": 37,
+        "NAIL_PROBLEM": 20,
+        "OTHER_HAIR_PROBLEM": 12,
+        "HAIR_LOSS": 11
+      }
+    },
+    {
+      "name": "condition_duration",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 4036,
+      "missing": 997,
+      "missing_pct": 19.81,
+      "n_unique": 9,
+      "values": {
+        "LESS_THAN_ONE_WEEK": 1386,
+        "ONE_TO_FOUR_WEEKS": 960,
+        "ONE_DAY": 784,
+        "ONE_TO_THREE_MONTHS": 318,
+        "THREE_TO_TWELVE_MONTHS": 237,
+        "MORE_THAN_ONE_YEAR": 201,
+        "MORE_THAN_FIVE_YEARS": 91,
+        "UNKNOWN": 39,
+        "SINCE_CHILDHOOD": 20
+      }
+    },
+    {
+      "name": "image_1_path",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "text",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 5013,
+      "examples": [
+        "dataset/images/-3205742176803893704.png",
+        "dataset/images/-4762289084741430925.png",
+        "dataset/images/-4027806997035329030.png"
+      ]
+    },
+    {
+      "name": "image_2_path",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "text",
+      "family": null,
+      "non_null": 3085,
+      "missing": 1948,
+      "missing_pct": 38.7,
+      "n_unique": 3079,
+      "examples": [
+        "dataset/images/-6353431708064969797.png",
+        "dataset/images/-5881426422999442186.png",
+        "dataset/images/6164754101533643044.png"
+      ]
+    },
+    {
+      "name": "image_3_path",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "text",
+      "family": null,
+      "non_null": 2289,
+      "missing": 2744,
+      "missing_pct": 54.52,
+      "n_unique": 2288,
+      "examples": [
+        "dataset/images/742075435141960831.png",
+        "dataset/images/5854025080806696361.png",
+        "dataset/images/7125798012232703466.png"
+      ]
+    },
+    {
+      "name": "image_1_shot_type",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 3,
+      "values": {
+        "CLOSE_UP": 3082,
+        "AT_AN_ANGLE": 1139,
+        "AT_DISTANCE": 812
+      }
+    },
+    {
+      "name": "image_2_shot_type",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 3085,
+      "missing": 1948,
+      "missing_pct": 38.7,
+      "n_unique": 3,
+      "values": {
+        "CLOSE_UP": 1201,
+        "AT_AN_ANGLE": 1110,
+        "AT_DISTANCE": 774
+      }
+    },
+    {
+      "name": "image_3_shot_type",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 2290,
+      "missing": 2743,
+      "missing_pct": 54.5,
+      "n_unique": 3,
+      "values": {
+        "AT_DISTANCE": 778,
+        "AT_AN_ANGLE": 766,
+        "CLOSE_UP": 746
+      }
+    },
+    {
+      "name": "combined_race",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 2652,
+      "missing": 2381,
+      "missing_pct": 47.31,
+      "n_unique": 15,
+      "values": {
+        "WHITE": 1762,
+        "BLACK_OR_AFRICAN_AMERICAN": 267,
+        "HISPANIC_LATINO_OR_SPANISH_ORIGIN": 224,
+        "ASIAN": 85,
+        "TWO_OR_MORE_AFTER_MITIGATION": 83,
+        "HISPANIC_LATINO_OR_SPANISH_ORIGIN,WHITE": 55,
+        "AMERICAN_INDIAN_OR_ALASKA_NATIVE": 48,
+        "PREFER_NOT_TO_ANSWER": 34,
+        "AMERICAN_INDIAN_OR_ALASKA_NATIVE,WHITE": 25,
+        "BLACK_OR_AFRICAN_AMERICAN,WHITE": 20,
+        "OTHER_RACE": 16,
+        "BLACK_OR_AFRICAN_AMERICAN,HISPANIC_LATINO_OR_SPANISH_ORIGIN": 11,
+        "ASIAN,WHITE": 11,
+        "MIDDLE_EASTERN_OR_NORTH_AFRICAN": 7,
+        "NATIVE_HAWAIIAN_OR_PACIFIC_ISLANDER": 4
+      }
+    },
+    {
+      "name": "race_ethnicity_two_or_more_after_mitigation",
+      "source_file": "scin_cases.csv",
+      "inferred_type": "categorical",
+      "family": "race_ethnicity",
+      "non_null": 83,
+      "missing": 4950,
+      "missing_pct": 98.35,
+      "n_unique": 1,
+      "values": {
+        "YES": 83
+      }
+    },
+    {
+      "name": "dermatologist_gradable_for_skin_condition_1",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 3,
+      "values": {
+        "DEFAULT_YES_IMAGE_QUALITY_SUFFICIENT": 3049,
+        "NO_IMAGE_QUALITY_INSUFFICIENT": 1925,
+        "YES_IMAGE_QUALITY_SUFFICIENT_NO_DISCERNIBLE_PATHOLOGY": 59
+      }
+    },
+    {
+      "name": "dermatologist_gradable_for_skin_condition_2",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 716,
+      "missing": 4317,
+      "missing_pct": 85.77,
+      "n_unique": 3,
+      "values": {
+        "DEFAULT_YES_IMAGE_QUALITY_SUFFICIENT": 464,
+        "NO_IMAGE_QUALITY_INSUFFICIENT": 245,
+        "YES_IMAGE_QUALITY_SUFFICIENT_NO_DISCERNIBLE_PATHOLOGY": 7
+      }
+    },
+    {
+      "name": "dermatologist_gradable_for_skin_condition_3",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 716,
+      "missing": 4317,
+      "missing_pct": 85.77,
+      "n_unique": 3,
+      "values": {
+        "DEFAULT_YES_IMAGE_QUALITY_SUFFICIENT": 461,
+        "NO_IMAGE_QUALITY_INSUFFICIENT": 243,
+        "YES_IMAGE_QUALITY_SUFFICIENT_NO_DISCERNIBLE_PATHOLOGY": 12
+      }
+    },
+    {
+      "name": "dermatologist_skin_condition_on_label_name",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "text",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 1715,
+      "examples": [
+        "['Inflicted skin lesions', 'Eczema', 'Irritant Contact Dermatitis']",
+        "['Prurigo nodularis', 'Actinic Keratosis', 'SCC/SCCIS']",
+        "['Impetigo', 'Herpes Zoster', 'Bullous dermatitis']"
+      ]
+    },
+    {
+      "name": "dermatologist_skin_condition_confidence",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "text",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 547,
+      "examples": [
+        "[4, 4, 3]",
+        "[4, 3, 4]",
+        "[2, 1, 1]"
+      ]
+    },
+    {
+      "name": "weighted_skin_condition_label",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "text",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 1942,
+      "examples": [
+        "{'Inflicted skin lesions': 0.41, 'Eczema': 0.41, 'Irritant Contact Dermatitis': 0.18}",
+        "{'Prurigo nodularis': 0.41, 'SCC/SCCIS': 0.41, 'Actinic Keratosis': 0.18}",
+        "{'Impetigo': 0.55, 'Herpes Zoster': 0.23, 'Bullous dermatitis': 0.23}"
+      ]
+    },
+    {
+      "name": "dermatologist_gradable_for_fitzpatrick_skin_type_1",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5033,
+      "missing": 0,
+      "missing_pct": 0.0,
+      "n_unique": 2,
+      "values": {
+        "YES": 4302,
+        "NO": 731
+      }
+    },
+    {
+      "name": "dermatologist_gradable_for_fitzpatrick_skin_type_2",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 716,
+      "missing": 4317,
+      "missing_pct": 85.77,
+      "n_unique": 2,
+      "values": {
+        "YES": 634,
+        "NO": 82
+      }
+    },
+    {
+      "name": "dermatologist_gradable_for_fitzpatrick_skin_type_3",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 716,
+      "missing": 4317,
+      "missing_pct": 85.77,
+      "n_unique": 2,
+      "values": {
+        "YES": 631,
+        "NO": 85
+      }
+    },
+    {
+      "name": "dermatologist_fitzpatrick_skin_type_label_1",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 4302,
+      "missing": 731,
+      "missing_pct": 14.52,
+      "n_unique": 6,
+      "values": {
+        "FST2": 1432,
+        "FST3": 1332,
+        "FST4": 719,
+        "FST1": 391,
+        "FST5": 359,
+        "FST6": 69
+      }
+    },
+    {
+      "name": "dermatologist_fitzpatrick_skin_type_label_2",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 634,
+      "missing": 4399,
+      "missing_pct": 87.4,
+      "n_unique": 6,
+      "values": {
+        "FST2": 243,
+        "FST3": 172,
+        "FST4": 119,
+        "FST5": 52,
+        "FST1": 42,
+        "FST6": 6
+      }
+    },
+    {
+      "name": "dermatologist_fitzpatrick_skin_type_label_3",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 631,
+      "missing": 4402,
+      "missing_pct": 87.46,
+      "n_unique": 5,
+      "values": {
+        "FST2": 234,
+        "FST3": 190,
+        "FST4": 119,
+        "FST5": 58,
+        "FST1": 30
+      }
+    },
+    {
+      "name": "gradable_for_monk_skin_tone_india",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5023,
+      "missing": 10,
+      "missing_pct": 0.2,
+      "n_unique": 2,
+      "values": {
+        "True": 5019,
+        "False": 4
+      }
+    },
+    {
+      "name": "gradable_for_monk_skin_tone_us",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "categorical",
+      "family": null,
+      "non_null": 5023,
+      "missing": 10,
+      "missing_pct": 0.2,
+      "n_unique": 2,
+      "values": {
+        "True": 5005,
+        "False": 18
+      }
+    },
+    {
+      "name": "monk_skin_tone_label_india",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "numeric",
+      "family": null,
+      "non_null": 5019,
+      "missing": 14,
+      "missing_pct": 0.28,
+      "n_unique": 9,
+      "values": {
+        "2": 2427,
+        "3": 1591,
+        "4": 522,
+        "1": 187,
+        "5": 177,
+        "6": 63,
+        "7": 35,
+        "8": 14,
+        "9": 3
+      }
+    },
+    {
+      "name": "monk_skin_tone_label_us",
+      "source_file": "scin_labels.csv",
+      "inferred_type": "numeric",
+      "family": null,
+      "non_null": 5005,
+      "missing": 28,
+      "missing_pct": 0.56,
+      "n_unique": 10,
+      "values": {
+        "2": 1660,
+        "3": 1265,
+        "4": 687,
+        "1": 577,
+        "5": 361,
+        "6": 248,
+        "7": 137,
+        "8": 57,
+        "9": 11,
+        "10": 2
+      }
+    }
+  ],
+  "key_integrity": {
+    "cases_rows": 5033,
+    "labels_rows": 5033,
+    "cases_null_ids": 0,
+    "labels_null_ids": 0,
+    "cases_duplicate_ids": 0,
+    "labels_duplicate_ids": 0,
+    "only_in_cases": 0,
+    "only_in_labels": 0,
+    "in_both": 5033
+  }
+}
