@@ -2,6 +2,53 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Evaluation harness (Task 2.3)
+
+- **Done:** `ml/src/skinconcern/metrics.py` extended (macro-F1, balanced accuracy, per-class precision/recall/F1 via sklearn; ECE with configurable bins and a reliability table; risk-coverage table and AURC; case-level bootstrap CI for any metric; eFST/eMST grouping) and new `ml/evaluate.py` (reads a predictions CSV, evaluates every split x seed x missing_pct slice, overall and per eFST/eMST group, worst group, across-seed mean/sd/min/max; writes `metrics_summary.json`, `metrics_summary.csv`, `risk_coverage.csv`). Tests in `ml/tests/test_metrics.py` (60 tests pass in total).
+- **Wiring:** `engine.evaluate` now returns the confidence (max softmax) and eMST; the dataset item carries eMST. `train.py` writes `predictions.csv` (best model on validation, and on test at every missing rate) in the standard format and runs `evaluate.py` on it; the old per-rate CSVs are replaced by the harness outputs.
+- **Decisions:** bootstrap resamples `case_id` (all rows of a drawn case kept). Worst group: only tone groups with at least 20 cases are eligible ("missing" is never a tone group); excluded small groups are listed. ECE uses 15 equal-width bins. A fast numpy path computes the bootstrap metrics from the confusion matrix; a test checks it equals the sklearn definitions. Duplicate case rows within a slice are rejected.
+- **Checked:** a 2-epoch fusion smoke run produced all files end to end (numbers not recorded).
+- **Docs:** thesis 5.10 and paper 3.9 extended (per-class metrics, calibration/ECE, risk-coverage/AURC, worst group on eFST and eMST, case-level bootstrap, across-seed summary); references: Guo et al. 2017, Geifman and El-Yaniv 2017, Sagawa et al. 2020.
+
+## 2026-10-08: Staged fine-tuning of the image-only baseline (Task 2.2)
+
+- **Done:** `ml/models/image_model.py` (`SkinImageBaseline`: timm EfficientNet-B0 or MobileNetV3, `set_stage(1|2|3)`, `get_optimizer_param_groups(base_lr)`), wired into `train.py --model image_only [--backbone ...] [--stages 1,2]`. Config block `image_baseline` in `configs/base.yaml`. Tests in `ml/tests/test_image_model.py` (8; 51 in total pass).
+- **Recipe:** stage 1 head only (lr 1e-3, 5 epochs); stage 2 head + neck + top 2 blocks (head 3e-4, backbone 3e-5, 15 epochs); stage 3 optional, all layers (1e-4 / 1e-5, 10 epochs). Each stage reloads the best checkpoint so far and has its own early-stopping patience. `log.csv` records the stage, both learning rates and the number of trainable parameters.
+- **Design decisions:** the backbone is handled as units `stem`, `blocks.0..K`, `neck` (EfficientNet: conv_head + bn2; MobileNetV3: conv_head after pooling), which works for both timm families. Frozen BatchNorm layers stay in eval mode so ImageNet statistics are not overwritten (tested: stage 1 leaves the whole backbone state unchanged). Biases and norm weights get no weight decay.
+- **Found:** timm's default head init for these models scales by fan-out (4 outputs), giving a start loss of about 4.5 instead of about ln 4 = 1.4. The new head is initialised with std 0.01; start loss is now 1.28 and early validation macro-F1 rises faster. Smoke runs only (1-2 epochs per stage), numbers not recorded.
+- **Open (important for RQ1):** the fusion model still trains in one phase with all layers open. For a fair comparison it must use the same staged recipe; planned for the fusion task.
+- **Docs:** thesis 5.8 and paper 3.8 extended (backbones, staged fine-tuning, catastrophic forgetting, frozen BatchNorm, head init); reference: MobileNetV3 (Howard et al. 2019).
+
+## 2026-10-08: Review of the whole ML pipeline (fixes and improvements)
+
+- **Leakage found and fixed:** MD5 hashes of all 4,089 downloaded images (all 3,886 of the used cases) show 5 groups of 2-3 cases (12 cases) sharing identical photos, most likely resubmissions. In the old seed-0 split four such photos were in different splits. New `ml/scripts/find_duplicate_images.py` writes `ml/splits/duplicate_image_groups.csv`; `make_splits.py` now splits on these groups, and `test_no_leakage.py` checks it. New sizes: 3,522-3,525 / 754-757 / 754-756 per seed; used cases for seed 0: 1,266 / 273 / 270. One group has the same photos labelled redness_rosacea, eczema_dermatitis and excluded (label noise, kept and reported).
+- **Images were distorted:** most SCIN photos are portrait 3:4 (median 810x1080, some 0.45:1); `Resize(224,224)` stretched them. Now letterbox (`LongestMaxSize` + black `PadIfNeeded`) for every split.
+- **Model inference bug:** with no questionnaire the model sent zeros and an "answered" flag, unlike training. `FusionClassifier` now takes `q_vec` and `q_mask`; a missing questionnaire is zero features + all-ones mask, the same as in training. The old availability flag and in-model dropout were removed (answers are hidden in `train.py`). Grad-CAM wrapper updated.
+- **Evaluation matched the text only partly:** the 25/50/75% test hid whole questionnaires per case, while the thesis says fields. It now hides each field with probability r (on top of natural missingness); r = 1 hides all.
+- **Metrics:** per-group macro-F1 over the classes present in that group; 95% bootstrap CI (1,000 resamples) for every group; the tone gap now excludes the "missing" eFST group.
+- **Focal loss:** weighted mean now divides by the summed target weights, like `nn.CrossEntropyLoss(weight)`, so gamma = 0 gives exactly the weighted CE (tested).
+- **Smaller fixes:** `log.csv` logged the next epoch's learning rate; `get_dataloaders` accepts a config dict (no temp files); a warning lists cases with no image file; `results.json` reports failed images.
+- **Speed:** a profile showed Windows re-spawning DataLoader workers each epoch (about 6 s per worker), not image decoding, was the bottleneck. The epoch counter is now a shared-memory tensor, so persistent workers keep the per-epoch image draw (tested). Plus a 448 px lossless image cache (`scripts/resize_image_cache.py`). Epoch time dropped from 62 s to 5 s after a one-time start; epoch-0 numbers are identical with and without the change.
+- **Checked and unchanged:** label derivation, questionnaire encoding, audit numbers, stratification logic, engine AMP/early stopping. Considered, not changed: 35 used cases whose first dermatologist rated the image quality insufficient (they still have labels from the weighted label; 1.9%).
+- **Docs:** thesis 5.6-5.10 and paper 3.6-3.9 updated (new split numbers, duplicate grouping, letterbox, missing-questionnaire representation, field-level hiding, bootstrap CIs; reference: Efron and Tibshirani 1993). `ml/README.md` now lists the pipeline order. 43 tests pass.
+
+## 2026-10-08: Reusable training/evaluation engine (Task 2.1)
+
+- **Done:** `ml/engine.py` (`train_one_epoch`, `evaluate`, `EarlyStopping`; AMP via `torch.autocast` + `GradScaler`; model-agnostic through an `adapt(batch, training)` function that maps a batch to the model's keyword arguments), `ml/losses.py` (class-weighted cross-entropy and focal loss) and a refactored `ml/train.py` (`--model dummy|image_only|fusion`, early stopping on validation macro-F1, `runs/<exp_name>/best_model.pt` and `log.csv` with train_loss, val_loss, val_macro_f1, epoch_time). Tests in `ml/tests/test_engine.py`.
+- **Decisions:** early stopping and checkpointing use validation macro-F1 (patience 5), not accuracy, because the classes are imbalanced. Loss is chosen in `configs/base.yaml` (`loss_type`) or with `--loss-type`. The default model is a tiny `dummy` CNN so the pipeline can be tested fast; EfficientNet image-only (Task 2.2) and fusion are already selectable.
+- **Checked:** smoke runs of `dummy` and `fusion` (focal loss, 2 epochs, 4-5 batches) ran end to end on the GPU and wrote the log and results files. These numbers are meaningless and not recorded. No real results exist yet.
+- **Downloads:** all 3,886 images of the 1,809 training cases are now on disk (`ml/data/scin/images/`, git-ignored).
+- **Docs:** engine, loss options, AMP and early stopping added to thesis 5.8 and paper 3.8; reference added: Focal Loss (Lin et al. 2017).
+- **Open:** first real runs on seed 0 (image-only vs fusion), then the five seeds.
+
+## 2026-10-08: Training script with modality dropout (Task 1.6, no results yet)
+
+- **Done:** `ml/train.py` trains the late-fusion model (EfficientNet-B0 from timm + questionnaire branch) for one split seed, keeps the best-validation checkpoint and evaluates once on test, overall and per eFST group, with 0/25/50/75/100% of questionnaire fields hidden. `--image-only` trains the photo-only baseline. Defaults live in the `train:` block of `ml/configs/base.yaml`. Tests in `ml/tests/test_train_utils.py`.
+- **Decisions:** the model input is `[q_vec, q_mask]` (46 numbers). Modality dropout hides the whole questionnaire with p = 0.3 and each field with p = 0.15; a hidden field gets features 0 and mask 1, like a real missing answer (no imputation). Class-weighted cross-entropy because of the imbalance (44 redness_rosacea vs 1,068 eczema_dermatitis). AdamW, lr 3e-4, cosine decay, 15 epochs, mixed precision.
+- **Checked:** a 2-epoch, 5-batch smoke run on the images downloaded so far ran end to end (numbers meaningless, not recorded). No real results exist yet.
+- **Docs:** thesis 5.8 and 5.10, paper 3.8 and 3.9 filled with the method; references added: EfficientNet, timm, AdamW, SGDR (all with URLs).
+- **Open:** wait for the image download (about 2,000 of 3,886 done), then a short real run on seed 0, then 5 seeds for both models. Run outputs go to the git-ignored `ml/runs/`.
+
 ## 2026-10-08: Data loading, augmentation and config utilities (Task 1.5)
 
 - **Done:** `ml/configs/base.yaml`, `ml/utils/seed.py` (`seed_everything`), `ml/data_loading.py` (`SCINDataset`, `get_dataloaders`, sanity grid), `ml/scripts/download_scin_images.py`, tests in `ml/tests/test_data_loading.py`.

@@ -4,6 +4,7 @@ paths:
   features: features/questionnaire_features.parquet
   splits: splits/train_val_test_splits.json
   images_dir: data/scin/images        # SCIN image files (git-ignored), named by file name only
+  image_cache_dir: data/scin/images_448  # downscaled copies (scripts/resize_image_cache.py), read first
   cases_csv: data/scin/scin_cases.csv # holds image_1_path .. image_3_path per case_id
 
 data:
@@ -18,7 +19,7 @@ loader:
   batch_size: 32
   num_workers: 4
   pin_memory: true
-  persistent_workers: false
+  persistent_workers: true            # keep workers alive between epochs (much faster on Windows)
 
 normalize:                            # ImageNet statistics, applied to every split
   mean: [0.485, 0.456, 0.406]
@@ -38,3 +39,35 @@ augment:
     contrast: 0.2
     saturation: 0.2
     hue: 0.02                         # kept small so skin colour is not distorted
+
+# Training defaults (override on the command line of train.py).
+train:
+  backbone: efficientnet_b0
+  pretrained: true
+  epochs: 15
+  early_stopping_patience: 5  # epochs without a better validation macro-F1
+  loss_type: weighted_ce      # weighted_ce | focal
+  focal_gamma: 2.0
+  grad_clip: 1.0
+  amp: true                   # mixed precision (GPU only)
+  lr: 0.0003
+  weight_decay: 0.01
+  q_hidden: 64
+  p_modality_drop: 0.3   # whole questionnaire hidden for a sample (all masks set to 1)
+  p_field_drop: 0.15     # each answered field hidden independently
+  eval_missing_rates: [0.0, 0.25, 0.5, 0.75, 1.0]
+
+# Image-only baseline (train.py --model image_only): staged fine-tuning of a timm backbone.
+# Stage 1: head only; 2: head + neck + top `top_blocks` backbone blocks; 3: all layers.
+# `lr` is the head rate; unfrozen backbone layers train at lr * backbone_lr_mult. Each stage
+# starts from the best checkpoint so far and has its own early-stopping patience.
+image_baseline:
+  backbone: efficientnet_b0        # or mobilenetv3_large_100
+  top_blocks: 2
+  backbone_lr_mult: 0.1
+  drop_rate: 0.2
+  run_stages: [1, 2, 3]            # stage 3 is optional: use [1, 2] to skip it
+  stages:
+    1: {epochs: 5, lr: 1.0e-3}
+    2: {epochs: 15, lr: 3.0e-4}
+    3: {epochs: 10, lr: 1.0e-4}
