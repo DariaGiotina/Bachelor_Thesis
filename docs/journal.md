@@ -2,6 +2,29 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Questionnaire schema, missingness mask and encoder (Task 1.3)
+
+- **Done:** `ml/features/questionnaire_schema.yaml`, `field_mapping.md`, `encode_questionnaire.py` and `questionnaire_features.parquet` (5,033 rows indexed by `case_id`, 40 feature columns + 6 mask columns, no NaN). Test in `ml/tests/test_encode_questionnaire.py`.
+- **Decisions:** no imputation (missing field = 0 plus mask 1); explicit unknown answers keep their own indicator (mask 0); a multi-select question is missing only if no box is ticked; body area is multi-hot (the question is select-all), age and skin type are one-hot, duration is ordinal 1-8.
+- **Found by validation:** duration has two values not in the first draft, `SINCE_CHILDHOOD` (ranked 8, longest) and `UNKNOWN` (own indicator).
+- **Excluded:** sex, race/ethnicity (fairness only), systemic symptoms, `related_category` (contains ACNE, would leak the label).
+- **Missing rates:** body area 18.8%, symptoms 25.1%, texture 19.0%, duration 19.8%, skin type 50.3%.
+- **Repo:** the parquet is committed through a `.gitignore` exception; other parquet files stay ignored.
+- **Open:** the app has no questionnaire screen yet; `field_mapping.md` proposes its keys.
+
+## 2026-10-08: Skin-tone scales explained in thesis and paper
+
+- **Done:** thesis section 5.3 and paper section 3.3 define FST, eFST and eMST and what each group (I-II, III-IV, V-VI; 1-3, 4-6, 7-10) means. Sources: Fitzpatrick 1988 (doi 10.1001/archderm.1988.01670060015008) and the Monk Skin Tone Scale (https://skintone.google/).
+- **Why:** a reader of the tables cannot interpret the groups without the scale definitions. Rule going forward: every new term is explained where it first appears.
+
+## 2026-10-08: Label derivation and class-set freeze (Task 1.2)
+
+- **Done:** `ml/labels/label_map.yaml` (5 target categories, explicit string-to-category dictionary, `min_weight` 0.40) and `ml/labels/build_labels.py`. Outputs `scin_labels.csv` and `class_counts_by_tone.csv` in `ml/labels/` (the raw SCIN file of the same name lives in git-ignored `ml/data/scin/`).
+- **Rule:** per `case_id`, weights of strings in the same category are summed; the largest sum is the primary label if >= `min_weight`. Ties, sub-threshold cases and unmapped strings become `excluded`.
+- **Result (US eMST pool):** acne 144, eczema_dermatitis 1,068, redness_rosacea 44, normal_other 553, excluded 3,224 (1,972 have no weighted label). eFST V-VI: acne 10, redness_rosacea 1.
+- **Assumptions:** folliculitis grouped with acne; seborrheic dermatitis and lichen simplex chronicus with eczema_dermatitis; unlisted strings (254 distinct, 884 mentions) go to `excluded`; eMST pool = US (CLI `--mst-pool`).
+- **Open:** redness_rosacea is too small for per-tone results; consider merging it or reporting it descriptively only. Confirm eMST pool.
+
 ## 2026-10-07: SCIN download, licence check, metadata audit (Task 1.1)
 
 - **Done:** downloaded the SCIN v1.0.0 metadata CSVs (`scin_cases`, `scin_labels`, plus the two question-description files) from `gs://dx-scin-public-data` into `ml/data/scin/` (git-ignored). Added `ml/scripts/audit_scin.py`, which writes `ml/reports/scin_schema.json`, `ml/reports/scin_audit_report.md` and the SCIN row of `ml/data_sources.csv`.

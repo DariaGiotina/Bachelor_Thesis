@@ -1,0 +1,119 @@
+# Questionnaire encoding spec (self-reported SCIN fields -> feature vector + missingness mask).
+# Read by ml/features/encode_questionnaire.py. Excluded on purpose: sex_at_birth, race/ethnicity
+# (sensitive, kept for fairness analysis only), other_symptoms (systemic, not requested),
+# related_category (partly mirrors the target categories, e.g. ACNE, so it would leak the label).
+# Multi-select questions are stored as YES/blank columns; blank = not ticked, so a question is
+# "not answered" only when none of its options is ticked.
+version: 1
+source: SCIN v1.0.0 scin_cases.csv
+key: case_id
+feature_prefix: f__
+mask_prefix: m__
+mask_convention: 1 = missing / not answered, 0 = present. Feature values of a missing field are 0 (placeholder, not imputation);
+  models must read the mask.
+unknown_convention: 'An explicit ''unknown / unspecified / none of the above'' answer is a present answer: its own indicator
+  column is 1 and the mask is 0.'
+fields:
+- name: age_group
+  encoding: onehot
+  column: age_group
+  missing_when: blank
+  categories:
+  - AGE_18_TO_29
+  - AGE_30_TO_39
+  - AGE_40_TO_49
+  - AGE_50_TO_59
+  - AGE_60_TO_69
+  - AGE_70_TO_79
+  unknown:
+    AGE_UNKNOWN: age_unknown
+- name: body_area
+  encoding: multihot
+  missing_when: no option ticked
+  options:
+  - name: head_or_neck
+    column: body_parts_head_or_neck
+  - name: arm
+    column: body_parts_arm
+  - name: palm
+    column: body_parts_palm
+  - name: back_of_hand
+    column: body_parts_back_of_hand
+  - name: torso_front
+    column: body_parts_torso_front
+  - name: torso_back
+    column: body_parts_torso_back
+  - name: genitalia_or_groin
+    column: body_parts_genitalia_or_groin
+  - name: buttocks
+    column: body_parts_buttocks
+  - name: leg
+    column: body_parts_leg
+  - name: foot_top_or_side
+    column: body_parts_foot_top_or_side
+  - name: foot_sole
+    column: body_parts_foot_sole
+  - name: other
+    column: body_parts_other
+- name: symptoms
+  encoding: multihot
+  missing_when: no option ticked
+  options:
+  - name: bothersome_appearance
+    column: condition_symptoms_bothersome_appearance
+  - name: bleeding
+    column: condition_symptoms_bleeding
+  - name: increasing_size
+    column: condition_symptoms_increasing_size
+  - name: darkening
+    column: condition_symptoms_darkening
+  - name: itching
+    column: condition_symptoms_itching
+  - name: burning
+    column: condition_symptoms_burning
+  - name: pain
+    column: condition_symptoms_pain
+  - name: no_relevant_experience
+    column: condition_symptoms_no_relevant_experience
+- name: texture
+  encoding: multihot
+  missing_when: no option ticked
+  options:
+  - name: raised_or_bumpy
+    column: textures_raised_or_bumpy
+  - name: flat
+    column: textures_flat
+  - name: rough_or_flaky
+    column: textures_rough_or_flaky
+  - name: fluid_filled
+    column: textures_fluid_filled
+- name: duration
+  encoding: ordinal
+  column: condition_duration
+  missing_when: blank
+  order:
+  - ONE_DAY
+  - LESS_THAN_ONE_WEEK
+  - ONE_TO_FOUR_WEEKS
+  - ONE_TO_THREE_MONTHS
+  - THREE_TO_TWELVE_MONTHS
+  - MORE_THAN_ONE_YEAR
+  - MORE_THAN_FIVE_YEARS
+  - SINCE_CHILDHOOD
+  rank_start: 1
+  missing_fill: 0
+  unknown:
+    UNKNOWN: unknown
+- name: skin_type
+  encoding: onehot
+  column: fitzpatrick_skin_type
+  missing_when: blank
+  categories:
+  - FST1
+  - FST2
+  - FST3
+  - FST4
+  - FST5
+  - FST6
+  unknown:
+    NONE_IDENTIFIED: none_identified

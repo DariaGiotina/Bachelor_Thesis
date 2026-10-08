@@ -72,6 +72,10 @@ wandb/
 *.synctex.gz
 ~$*.docx
 
-# --- Claude Code local ---
-.claude/settings.local.json
+# --- Local tooling / private notes ---
+.claude/
+CLAUDE.md
+docs/thesis_context_card.txt
 *.tgz
+
+!ml/features/questionnaire_features.parquet
