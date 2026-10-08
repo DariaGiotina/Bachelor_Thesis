@@ -2,6 +2,15 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Staged fine-tuning of the image-only baseline (Task 2.2)
+
+- **Done:** `ml/models/image_model.py` (`SkinImageBaseline`: timm EfficientNet-B0 or MobileNetV3, `set_stage(1|2|3)`, `get_optimizer_param_groups(base_lr)`), wired into `train.py --model image_only [--backbone ...] [--stages 1,2]`. Config block `image_baseline` in `configs/base.yaml`. Tests in `ml/tests/test_image_model.py` (8; 51 in total pass).
+- **Recipe:** stage 1 head only (lr 1e-3, 5 epochs); stage 2 head + neck + top 2 blocks (head 3e-4, backbone 3e-5, 15 epochs); stage 3 optional, all layers (1e-4 / 1e-5, 10 epochs). Each stage reloads the best checkpoint so far and has its own early-stopping patience. `log.csv` records the stage, both learning rates and the number of trainable parameters.
+- **Design decisions:** the backbone is handled as units `stem`, `blocks.0..K`, `neck` (EfficientNet: conv_head + bn2; MobileNetV3: conv_head after pooling), which works for both timm families. Frozen BatchNorm layers stay in eval mode so ImageNet statistics are not overwritten (tested: stage 1 leaves the whole backbone state unchanged). Biases and norm weights get no weight decay.
+- **Found:** timm's default head init for these models scales by fan-out (4 outputs), giving a start loss of about 4.5 instead of about ln 4 = 1.4. The new head is initialised with std 0.01; start loss is now 1.28 and early validation macro-F1 rises faster. Smoke runs only (1-2 epochs per stage), numbers not recorded.
+- **Open (important for RQ1):** the fusion model still trains in one phase with all layers open. For a fair comparison it must use the same staged recipe; planned for the fusion task.
+- **Docs:** thesis 5.8 and paper 3.8 extended (backbones, staged fine-tuning, catastrophic forgetting, frozen BatchNorm, head init); reference: MobileNetV3 (Howard et al. 2019).
+
 ## 2026-10-08: Review of the whole ML pipeline (fixes and improvements)
 
 - **Leakage found and fixed:** MD5 hashes of all 4,089 downloaded images (all 3,886 of the used cases) show 5 groups of 2-3 cases (12 cases) sharing identical photos, most likely resubmissions. In the old seed-0 split four such photos were in different splits. New `ml/scripts/find_duplicate_images.py` writes `ml/splits/duplicate_image_groups.csv`; `make_splits.py` now splits on these groups, and `test_no_leakage.py` checks it. New sizes: 3,522-3,525 / 754-757 / 754-756 per seed; used cases for seed 0: 1,266 / 273 / 270. One group has the same photos labelled redness_rosacea, eczema_dermatitis and excluded (label noise, kept and reported).

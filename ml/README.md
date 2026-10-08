@@ -28,8 +28,8 @@ Datasets go in `ml/data/` (git-ignored). SCIN images must not be redistributed
 | 8. Sanity batch | `python data_loading.py` | `sanity_batch.png` (ignored: shows SCIN photos) |
 | 9. Train + test | `python train.py --model fusion --seed 0` | `runs/<exp_name>/` (ignored) |
 
-`train.py --model` is `dummy` (pipeline check), `image_only` (photo-only baseline) or `fusion`
-(photo + questionnaire). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,
+`train.py --model` is `dummy` (pipeline check), `image_only` (photo-only baseline, staged fine-tuning,
+`--backbone efficientnet_b0|mobilenetv3_large_100`, `--stages 1,2,3`) or `fusion` (photo + questionnaire). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,
 `results.json` and `test_by_efst_missing_<rate>.csv` (macro-F1 with 95% bootstrap CI per eFST group,
 at each share of hidden questionnaire fields).
 

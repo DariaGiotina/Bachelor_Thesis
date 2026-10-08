@@ -5,6 +5,8 @@ absent from a group (e.g. no rosacea case in eFST V-VI) has no defined F1 there.
 of an absent class still lower the score, through the recall of the classes that were missed.
 Small groups get a bootstrap 95% confidence interval (cases resampled with replacement).
 """
+import warnings
+
 import numpy as np
 import pandas as pd
 from sklearn.metrics import balanced_accuracy_score, f1_score
@@ -34,7 +36,10 @@ def stratified_report(y_true, y_pred, groups, n_boot: int = 1000, seed: int = 0)
         m = np.ones(len(y_true), bool) if g == "ALL" else groups == g
         yt, yp = y_true[m], y_pred[m]
         lo, hi = bootstrap_ci(yt, yp, n_boot, seed=seed)
-        rows.append((g, int(m.sum()), len(np.unique(yt)), macro_f1(yt, yp), lo, hi, balanced_accuracy_score(yt, yp)))
+        with warnings.catch_warnings():  # a group may lack some classes; that is expected here
+            warnings.filterwarnings("ignore", message="y_pred contains classes not in y_true")
+            bal = balanced_accuracy_score(yt, yp)
+        rows.append((g, int(m.sum()), len(np.unique(yt)), macro_f1(yt, yp), lo, hi, bal))
     return pd.DataFrame(rows, columns=["group", "n", "n_classes", "macro_f1", "ci_low", "ci_high", "balanced_acc"])
 
 

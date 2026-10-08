@@ -56,3 +56,18 @@ train:
   p_modality_drop: 0.3   # whole questionnaire hidden for a sample (all masks set to 1)
   p_field_drop: 0.15     # each answered field hidden independently
   eval_missing_rates: [0.0, 0.25, 0.5, 0.75, 1.0]
+
+# Image-only baseline (train.py --model image_only): staged fine-tuning of a timm backbone.
+# Stage 1: head only; 2: head + neck + top `top_blocks` backbone blocks; 3: all layers.
+# `lr` is the head rate; unfrozen backbone layers train at lr * backbone_lr_mult. Each stage
+# starts from the best checkpoint so far and has its own early-stopping patience.
+image_baseline:
+  backbone: efficientnet_b0        # or mobilenetv3_large_100
+  top_blocks: 2
+  backbone_lr_mult: 0.1
+  drop_rate: 0.2
+  run_stages: [1, 2, 3]            # stage 3 is optional: use [1, 2] to skip it
+  stages:
+    1: {epochs: 5, lr: 1.0e-3}
+    2: {epochs: 15, lr: 3.0e-4}
+    3: {epochs: 10, lr: 1.0e-4}
