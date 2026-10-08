@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Questionnaire schema, missingness mask and encoder (Task 1.3)
+
+- **Done:** `ml/features/questionnaire_schema.yaml`, `field_mapping.md`, `encode_questionnaire.py` and `questionnaire_features.parquet` (5,033 rows indexed by `case_id`, 40 feature columns + 6 mask columns, no NaN). Test in `ml/tests/test_encode_questionnaire.py`.
+- **Decisions:** no imputation (missing field = 0 plus mask 1); explicit unknown answers keep their own indicator (mask 0); a multi-select question is missing only if no box is ticked; body area is multi-hot (the question is select-all), age and skin type are one-hot, duration is ordinal 1-8.
+- **Found by validation:** duration has two values not in the first draft, `SINCE_CHILDHOOD` (ranked 8, longest) and `UNKNOWN` (own indicator).
+- **Excluded:** sex, race/ethnicity (fairness only), systemic symptoms, `related_category` (contains ACNE, would leak the label).
+- **Missing rates:** body area 18.8%, symptoms 25.1%, texture 19.0%, duration 19.8%, skin type 50.3%.
+- **Repo:** the parquet is committed through a `.gitignore` exception; other parquet files stay ignored.
+- **Open:** the app has no questionnaire screen yet; `field_mapping.md` proposes its keys.
+
 ## 2026-10-08: Skin-tone scales explained in thesis and paper
 
 - **Done:** thesis section 5.3 and paper section 3.3 define FST, eFST and eMST and what each group (I-II, III-IV, V-VI; 1-3, 4-6, 7-10) means. Sources: Fitzpatrick 1988 (doi 10.1001/archderm.1988.01670060015008) and the Monk Skin Tone Scale (https://skintone.google/).
