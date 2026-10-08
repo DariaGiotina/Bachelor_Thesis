@@ -2,6 +2,15 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Reusable training/evaluation engine (Task 2.1)
+
+- **Done:** `ml/engine.py` (`train_one_epoch`, `evaluate`, `EarlyStopping`; AMP via `torch.autocast` + `GradScaler`; model-agnostic through an `adapt(batch, training)` function that maps a batch to the model's keyword arguments), `ml/losses.py` (class-weighted cross-entropy and focal loss) and a refactored `ml/train.py` (`--model dummy|image_only|fusion`, early stopping on validation macro-F1, `runs/<exp_name>/best_model.pt` and `log.csv` with train_loss, val_loss, val_macro_f1, epoch_time). Tests in `ml/tests/test_engine.py`.
+- **Decisions:** early stopping and checkpointing use validation macro-F1 (patience 5), not accuracy, because the classes are imbalanced. Loss is chosen in `configs/base.yaml` (`loss_type`) or with `--loss-type`. The default model is a tiny `dummy` CNN so the pipeline can be tested fast; EfficientNet image-only (Task 2.2) and fusion are already selectable.
+- **Checked:** smoke runs of `dummy` and `fusion` (focal loss, 2 epochs, 4-5 batches) ran end to end on the GPU and wrote the log and results files. These numbers are meaningless and not recorded. No real results exist yet.
+- **Downloads:** all 3,886 images of the 1,809 training cases are now on disk (`ml/data/scin/images/`, git-ignored).
+- **Docs:** engine, loss options, AMP and early stopping added to thesis 5.8 and paper 3.8; reference added: Focal Loss (Lin et al. 2017).
+- **Open:** first real runs on seed 0 (image-only vs fusion), then the five seeds.
+
 ## 2026-10-08: Training script with modality dropout (Task 1.6, no results yet)
 
 - **Done:** `ml/train.py` trains the late-fusion model (EfficientNet-B0 from timm + questionnaire branch) for one split seed, keeps the best-validation checkpoint and evaluates once on test, overall and per eFST group, with 0/25/50/75/100% of questionnaire fields hidden. `--image-only` trains the photo-only baseline. Defaults live in the `train:` block of `ml/configs/base.yaml`. Tests in `ml/tests/test_train_utils.py`.

@@ -1,19 +1,21 @@
-"""Train and evaluate the photo (+ questionnaire) skin-concern classifier on one split seed.
+"""Train and evaluate a skin-concern classifier on one split seed.
 
-The model is the late-fusion network of ``skinconcern.model``: an image backbone plus a
-questionnaire branch. The questionnaire input is ``[q_vec, q_mask]`` (features + per-field
-missing flags). During training, answers are hidden on purpose (modality dropout): a whole
-questionnaire with probability ``p_modality_drop`` and single fields with ``p_field_drop``;
-hidden fields get zero features and mask 1, exactly like a real missing answer.
+Loads ``configs/base.yaml``, builds the DataLoaders, a model, the loss (class-weighted
+cross-entropy or focal), and runs the epoch loop of ``engine.py`` with early stopping on validation
+macro-F1. Writes to ``runs/<exp_name>/``: ``best_model.pt``, ``log.csv`` (train_loss, val_loss,
+val_macro_f1, epoch_time, ...) and, after training, test results by eFST group.
 
-After training, the best-validation checkpoint is evaluated once on the test split, overall and
-per eFST group, at several simulated missing-answer rates.
+Models (``--model``):
+  dummy       tiny CNN, image only (placeholder to test the pipeline)
+  image_only  EfficientNet-B0 backbone, image only
+  fusion      EfficientNet-B0 + questionnaire branch; questionnaire input is [q_vec, q_mask] and
+              answers are hidden at random during training (modality dropout, never imputed)
 
 Usage::
 
-    python train.py --seed 0                       # questionnaire model, config defaults
-    python train.py --seed 0 --image-only          # photo-only baseline
-    python train.py --epochs 2 --max-batches 5 --only-available --num-workers 0   # smoke test
+    python train.py --model dummy --epochs 3
+    python train.py --model fusion --seed 0 --loss-type focal
+    python train.py --model dummy --epochs 2 --max-batches 5 --only-available --num-workers 0
 """
 from __future__ import annotations
 
@@ -21,17 +23,17 @@ import argparse
 import json
 import logging
 import sys
-import time
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
-from sklearn.metrics import balanced_accuracy_score, f1_score
+import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 from data_loading import ROOT, get_dataloaders, load_config  # noqa: E402
+from engine import EarlyStopping, evaluate, image_only_adapt, timed, train_one_epoch  # noqa: E402
+from losses import build_loss  # noqa: E402
 from skinconcern.metrics import max_gap, stratified_report  # noqa: E402
 from skinconcern.model import FusionClassifier  # noqa: E402
 from utils.seed import seed_everything  # noqa: E402
@@ -40,6 +42,7 @@ log = logging.getLogger("train")
 EFST_NAMES = {1: "I-II", 2: "I-II", 3: "III-IV", 4: "III-IV", 5: "V-VI", 6: "V-VI"}
 
 
+# ------------------------------------------------------------------ missing-answer simulation
 def field_index(q_cols: list[str], m_cols: list[str]) -> list[torch.Tensor]:
     """For each mask column m__<field>, the indices of its feature columns f__<field>__*."""
     out = []
@@ -61,43 +64,58 @@ def hide_answers(q_vec, q_mask, fields, p_modality: float, p_field: float, gen: 
     return q_vec, q_mask
 
 
-def model_input(batch, fields, p_modality, p_field, device, gen=None):
-    q_vec, q_mask = batch["q_vec"], batch["q_mask"]
-    if p_modality > 0 or p_field > 0:
-        q_vec, q_mask = hide_answers(q_vec, q_mask, fields, p_modality, p_field, gen)
-    return torch.cat([q_vec, q_mask], dim=1).to(device)
-
-
-@torch.no_grad()
-def predict(model, loader, fields, device, p_missing: float, use_q: bool, seed: int, max_batches=None):
-    model.eval()
+def make_fusion_adapt(fields, p_modality_train: float, p_field_train: float,
+                      p_modality_eval: float = 0.0, seed: int = 0):
+    """Batch -> model kwargs for the fusion model; hides answers (train: random, eval: fixed rate)."""
     gen = torch.Generator().manual_seed(seed)
-    ys, ps, ef = [], [], []
-    for b, batch in enumerate(loader):
-        if max_batches and b >= max_batches:
-            break
-        q = model_input(batch, fields, p_missing, 0.0, device, gen) if use_q else None
-        logits = model(batch["image"].to(device), q)
-        ys.append(batch["label"].numpy())
-        ps.append(logits.argmax(1).cpu().numpy())
-        ef.append(batch["eFST"].numpy())
-    return np.concatenate(ys), np.concatenate(ps), np.concatenate(ef)
+
+    def adapt(batch: dict, training: bool) -> dict:
+        pm, pf = (p_modality_train, p_field_train) if training else (p_modality_eval, 0.0)
+        q_vec, q_mask = batch["q_vec"], batch["q_mask"]
+        if pm > 0 or pf > 0:
+            q_vec, q_mask = hide_answers(q_vec, q_mask, fields, pm, pf, gen)
+        return {"image": batch["image"], "questionnaire": torch.cat([q_vec, q_mask], dim=1)}
+
+    return adapt
 
 
-def scores(y, p) -> dict:
-    return {"macro_f1": float(f1_score(y, p, average="macro")),
-            "balanced_acc": float(balanced_accuracy_score(y, p)), "n": int(len(y))}
+# --------------------------------------------------------------------------------------- models
+class DummyCNN(nn.Module):
+    """Placeholder image classifier (3 conv blocks + linear head), only for pipeline checks."""
+
+    def __init__(self, n_classes: int):
+        super().__init__()
+        blocks, c = [], 3
+        for out in (16, 32, 64):
+            blocks += [nn.Conv2d(c, out, 3, stride=2, padding=1), nn.BatchNorm2d(out), nn.ReLU()]
+            c = out
+        self.net = nn.Sequential(*blocks, nn.AdaptiveAvgPool2d(1), nn.Flatten(), nn.Linear(c, n_classes))
+
+    def forward(self, image):
+        return self.net(image)
 
 
+def build_model(name: str, tc: dict, n_classes: int, n_q: int) -> nn.Module:
+    if name == "dummy":
+        return DummyCNN(n_classes)
+    if name in ("image_only", "fusion"):
+        return FusionClassifier(n_classes, n_q, tc["backbone"], tc["pretrained"], tc["q_hidden"],
+                                p_dropout=0.0, use_questionnaire=(name == "fusion"))
+    raise ValueError(f"unknown model {name!r}")
+
+
+# -------------------------------------------------------------------------------------- main
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--config", type=Path, default=ROOT / "configs" / "base.yaml")
+    ap.add_argument("--model", choices=["dummy", "image_only", "fusion"], default="dummy")
     ap.add_argument("--seed", type=int, default=0)
+    ap.add_argument("--exp-name", default=None, help="run folder name (default: <model>_seed<seed>)")
     ap.add_argument("--epochs", type=int, default=None)
-    ap.add_argument("--image-only", action="store_true", help="photo-only baseline (no questionnaire)")
+    ap.add_argument("--loss-type", choices=["weighted_ce", "focal"], default=None)
+    ap.add_argument("--patience", type=int, default=None)
     ap.add_argument("--p-modality-drop", type=float, default=None)
     ap.add_argument("--p-field-drop", type=float, default=None)
-    ap.add_argument("--out-dir", type=Path, default=None)
     ap.add_argument("--max-batches", type=int, default=None, help="limit batches per epoch (smoke test)")
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--only-available", action="store_true", help="skip cases whose images are missing")
@@ -107,84 +125,69 @@ def main(argv: list[str] | None = None) -> int:
     cfg = load_config(args.config)
     tc = cfg["train"]
     epochs = args.epochs or tc["epochs"]
+    patience = args.patience or tc["early_stopping_patience"]
+    loss_type = args.loss_type or tc["loss_type"]
     p_mod = tc["p_modality_drop"] if args.p_modality_drop is None else args.p_modality_drop
     p_fld = tc["p_field_drop"] if args.p_field_drop is None else args.p_field_drop
-    use_q = not args.image_only
     if args.num_workers is not None:
-        tmp = args.config.with_name("_tmp_train.yaml")
         cfg["loader"]["num_workers"] = args.num_workers
-        import yaml
-        tmp.write_text(yaml.safe_dump(cfg), encoding="utf-8")
-        args.config = tmp
-    name = f"{'image_only' if args.image_only else 'fusion'}_seed{args.seed}"
-    out_dir = args.out_dir or ROOT / "runs" / name
+    exp = args.exp_name or f"{args.model}_seed{args.seed}"
+    out_dir = ROOT / "runs" / exp
     out_dir.mkdir(parents=True, exist_ok=True)
 
     seed_everything(args.seed)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    try:
-        loaders = get_dataloaders(args.config, args.seed, only_available=args.only_available)
-    finally:
-        if args.config.name == "_tmp_train.yaml":
-            args.config.unlink(missing_ok=True)
+    cfg_path = out_dir / "config_used.yaml"
+    cfg_path.write_text(yaml.safe_dump(cfg), encoding="utf-8")  # also makes the run reproducible
+    loaders = get_dataloaders(cfg_path, args.seed, only_available=args.only_available)
     train_ds = loaders["train"].dataset
     fields = field_index(train_ds.q_cols, train_ds.m_cols)
     n_classes = len(train_ds.classes)
-    n_q = len(train_ds.q_cols) + len(train_ds.m_cols)
 
-    model = FusionClassifier(n_classes, n_q, tc["backbone"], tc["pretrained"], tc["q_hidden"],
-                             p_dropout=0.0, use_questionnaire=use_q).to(device)
-    counts = np.bincount(train_ds.labels, minlength=n_classes).astype(np.float32)
-    weights = torch.tensor(counts.sum() / (n_classes * np.maximum(counts, 1)), device=device)
-    loss_fn = nn.CrossEntropyLoss(weight=weights)  # classes are imbalanced
+    model = build_model(args.model, tc, n_classes, len(train_ds.q_cols) + len(train_ds.m_cols)).to(device)
+    loss_fn = build_loss(loss_type, train_ds.labels, n_classes, device, tc["focal_gamma"])
     opt = torch.optim.AdamW(model.parameters(), lr=tc["lr"], weight_decay=tc["weight_decay"])
     sched = torch.optim.lr_scheduler.CosineAnnealingLR(opt, T_max=epochs)
-    scaler = torch.amp.GradScaler(enabled=device.type == "cuda")
-    log.info("%s | device=%s classes=%s train=%d val=%d test=%d", name, device, train_ds.classes,
-             len(train_ds), len(loaders["val"].dataset), len(loaders["test"].dataset))
+    scaler = torch.amp.GradScaler(enabled=tc["amp"] and device.type == "cuda")
+    adapt = make_fusion_adapt(fields, p_mod, p_fld, seed=args.seed) if args.model == "fusion" else image_only_adapt
+    log.info("%s | device=%s loss=%s classes=%s train=%d val=%d test=%d", exp, device, loss_type,
+             train_ds.classes, len(train_ds), len(loaders["val"].dataset), len(loaders["test"].dataset))
 
-    best_f1, history = -1.0, []
+    stopper, history = EarlyStopping(patience), []
     for epoch in range(epochs):
-        model.train()
         train_ds.set_epoch(epoch)
-        t0, running, nb = time.time(), 0.0, 0
-        gen = torch.Generator().manual_seed(args.seed * 1000 + epoch)
-        for b, batch in enumerate(loaders["train"]):
-            if args.max_batches and b >= args.max_batches:
-                break
-            q = model_input(batch, fields, p_mod, p_fld, device, gen) if use_q else None
-            with torch.autocast(device.type, enabled=device.type == "cuda"):
-                loss = loss_fn(model(batch["image"].to(device), q), batch["label"].to(device))
-            opt.zero_grad(set_to_none=True)
-            scaler.scale(loss).backward()
-            scaler.step(opt)
-            scaler.update()
-            running, nb = running + loss.item(), nb + 1
+        train_loss, secs = timed(train_one_epoch, model, loaders["train"], loss_fn, opt, scaler, device, adapt,
+                                 tc["amp"], tc["grad_clip"], args.max_batches)
+        val = evaluate(model, loaders["val"], loss_fn, device, adapt, tc["amp"], args.max_batches)
         sched.step()
-        y, p, _ = predict(model, loaders["val"], fields, device, 0.0, use_q, args.seed, args.max_batches)
-        val = scores(y, p)
-        history.append({"epoch": epoch, "train_loss": running / max(nb, 1), **{f"val_{k}": v for k, v in val.items()},
-                        "seconds": round(time.time() - t0, 1)})
-        log.info("epoch %d loss %.4f val macro-F1 %.3f bal-acc %.3f (%.0fs)", epoch, history[-1]["train_loss"],
-                 val["macro_f1"], val["balanced_acc"], history[-1]["seconds"])
-        if val["macro_f1"] > best_f1:
-            best_f1 = val["macro_f1"]
-            torch.save(model.state_dict(), out_dir / "best.pt")
-    pd.DataFrame(history).to_csv(out_dir / "history.csv", index=False)
+        row = {"epoch": epoch, "train_loss": train_loss, "val_loss": val["loss"], "val_macro_f1": val["macro_f1"],
+               "val_balanced_acc": val["balanced_acc"], "epoch_time": round(secs, 1), "lr": opt.param_groups[0]["lr"]}
+        history.append(row)
+        pd.DataFrame(history).to_csv(out_dir / "log.csv", index=False)
+        if stopper.step(val["macro_f1"], epoch):
+            torch.save(model.state_dict(), out_dir / "best_model.pt")
+        log.info("epoch %d train %.4f val %.4f macro-F1 %.3f%s (%.0fs)", epoch, train_loss, val["loss"],
+                 val["macro_f1"], " *" if stopper.best_epoch == epoch else "", secs)
+        if stopper.should_stop:
+            log.info("early stopping: no macro-F1 gain for %d epochs (best epoch %d)", patience, stopper.best_epoch)
+            break
 
     # One final test evaluation with the best-validation weights.
-    model.load_state_dict(torch.load(out_dir / "best.pt", map_location=device))
-    results = {"run": name, "seed": args.seed, "best_val_macro_f1": best_f1, "test": {}}
-    rates = tc["eval_missing_rates"] if use_q else [0.0]
+    model.load_state_dict(torch.load(out_dir / "best_model.pt", map_location=device))
+    results = {"run": exp, "model": args.model, "seed": args.seed, "loss_type": loss_type,
+               "best_epoch": stopper.best_epoch, "best_val_macro_f1": stopper.best, "test": {}}
+    rates = tc["eval_missing_rates"] if args.model == "fusion" else [0.0]
     for rate in rates:
-        y, p, ef = predict(model, loaders["test"], fields, device, rate, use_q, args.seed, args.max_batches)
-        groups = [EFST_NAMES.get(int(e), "missing") for e in ef]
-        rep = stratified_report(y, p, groups)
-        results["test"][f"missing_{rate}"] = {
-            **scores(y, p), "max_gap_macro_f1": max_gap(rep),
-            "by_efst_group": rep.set_index("group")[["n", "macro_f1", "balanced_acc"]].round(4).to_dict("index")}
+        ev_adapt = make_fusion_adapt(fields, 0, 0, rate, args.seed) if args.model == "fusion" else adapt
+        res = evaluate(model, loaders["test"], loss_fn, device, ev_adapt, tc["amp"], args.max_batches)
+        groups = [EFST_NAMES.get(int(e), "missing") for e in res["eFST"]]
+        rep = stratified_report(res["y_true"], res["y_pred"], groups)
         rep.to_csv(out_dir / f"test_by_efst_missing_{rate}.csv", index=False)
-        log.info("test, answers hidden %.0f%%: macro-F1 %.3f", 100 * rate, results["test"][f"missing_{rate}"]["macro_f1"])
+        results["test"][f"missing_{rate}"] = {
+            "loss": res["loss"], "macro_f1": res["macro_f1"], "balanced_acc": res["balanced_acc"], "n": res["n"],
+            "max_gap_macro_f1": max_gap(rep),
+            "by_efst_group": rep.set_index("group")[["n", "macro_f1", "balanced_acc"]].round(4).to_dict("index")}
+        log.info("test, answers hidden %.0f%%: macro-F1 %.3f", 100 * rate, res["macro_f1"])
     (out_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
     return 0
 

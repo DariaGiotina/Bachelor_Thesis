@@ -44,6 +44,11 @@ train:
   backbone: efficientnet_b0
   pretrained: true
   epochs: 15
+  early_stopping_patience: 5  # epochs without a better validation macro-F1
+  loss_type: weighted_ce      # weighted_ce | focal
+  focal_gamma: 2.0
+  grad_clip: 1.0
+  amp: true                   # mixed precision (GPU only)
   lr: 0.0003
   weight_decay: 0.01
   q_hidden: 64

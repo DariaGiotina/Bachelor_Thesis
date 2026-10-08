@@ -205,3 +205,17 @@ def _add_reference(self, text: str, url: str) -> int:
 
 DocEditor.replace_placeholder = _replace_placeholder
 DocEditor.add_reference = _add_reference
+
+
+def _append_to_section(self, heading_text: str, paragraphs: list[str]) -> None:
+    """Add body paragraphs at the end of a section (before the next heading)."""
+    h = self.heading(heading_text)
+    nxt = h._p.getnext()
+    while nxt is not None and not (nxt.tag == qn("w:p") and Paragraph(nxt, h._parent).style.name.startswith("Heading")):
+        nxt = nxt.getnext()
+    anchor = Paragraph(nxt, h._parent)
+    for text in paragraphs:
+        self.body_paragraph_before(anchor, text)
+
+
+DocEditor.append_to_section = _append_to_section
