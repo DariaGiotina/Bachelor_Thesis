@@ -77,3 +77,5 @@ wandb/
 CLAUDE.md
 docs/thesis_context_card.txt
 *.tgz
+
+!ml/features/questionnaire_features.parquet
