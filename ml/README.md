@@ -30,8 +30,14 @@ Datasets go in `ml/data/` (git-ignored). SCIN images must not be redistributed
 
 `train.py --model` is `dummy` (pipeline check), `image_only` (photo-only baseline, staged fine-tuning,
 `--backbone efficientnet_b0|mobilenetv3_large_100`, `--stages 1,2,3`) or `fusion` (photo + questionnaire). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,
-`results.json` and `test_by_efst_missing_<rate>.csv` (macro-F1 with 95% bootstrap CI per eFST group,
-at each share of hidden questionnaire fields).
+`results.json`, `predictions.csv` (one row per case: true/predicted category, confidence, eFST, eMST,
+seed, share of hidden questionnaire fields) and, via `evaluate.py`, `metrics_summary.json`,
+`metrics_summary.csv` and `risk_coverage.csv`.
+
+`python evaluate.py <predictions.csv>` evaluates any predictions file (several seeds or missing rates
+in one file are fine): macro-F1, balanced accuracy, accuracy and ECE with 95% case-level bootstrap
+CIs, per-class precision/recall/F1, eFST and eMST groups, the worst tone group (>= 20 cases) and
+risk-coverage / AURC.
 
 Step 6 must run before step 7: cases that share an identical photo are kept in the same split.
 

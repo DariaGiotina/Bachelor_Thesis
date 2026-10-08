@@ -53,8 +53,10 @@ def test_macro_f1_uses_classes_present_in_group():
 
 
 def test_bootstrap_ci_contains_point_estimate():
+    import pandas as pd
     rng = np.random.default_rng(0)
     y = rng.integers(0, 3, 200)
     p = np.where(rng.random(200) < 0.7, y, rng.integers(0, 3, 200))
-    lo, hi = bootstrap_ci(y, p, n_boot=200, seed=0)
-    assert lo <= macro_f1(y, p) <= hi
+    df = pd.DataFrame({"case_id": np.arange(200), "true_label": y, "pred_label": p})
+    point, lo, hi = bootstrap_ci(df, lambda d: macro_f1(d.true_label, d.pred_label), n_boot=200, seed=0)
+    assert lo <= point <= hi and point == pytest.approx(macro_f1(y, p))

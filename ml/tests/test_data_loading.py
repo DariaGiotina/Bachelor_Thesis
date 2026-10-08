@@ -24,7 +24,7 @@ def test_val_and_test_have_no_augmentation():
 def test_item_structure_and_no_nan():
     ds = dl.SCINDataset(CONFIG, "val", seed=0, only_available=True)
     item = ds[0]
-    assert set(item) == {"image", "q_vec", "q_mask", "label", "eFST", "case_id", "image_ok"}
+    assert set(item) == {"image", "q_vec", "q_mask", "label", "eFST", "eMST", "case_id", "image_ok"}
     assert item["image"].shape == (3, 224, 224)
     assert item["q_vec"].shape == (40,) and item["q_mask"].shape == (6,)
     assert not torch.isnan(item["q_vec"]).any()

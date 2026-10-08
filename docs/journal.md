@@ -2,6 +2,14 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Evaluation harness (Task 2.3)
+
+- **Done:** `ml/src/skinconcern/metrics.py` extended (macro-F1, balanced accuracy, per-class precision/recall/F1 via sklearn; ECE with configurable bins and a reliability table; risk-coverage table and AURC; case-level bootstrap CI for any metric; eFST/eMST grouping) and new `ml/evaluate.py` (reads a predictions CSV, evaluates every split x seed x missing_pct slice, overall and per eFST/eMST group, worst group, across-seed mean/sd/min/max; writes `metrics_summary.json`, `metrics_summary.csv`, `risk_coverage.csv`). Tests in `ml/tests/test_metrics.py` (60 tests pass in total).
+- **Wiring:** `engine.evaluate` now returns the confidence (max softmax) and eMST; the dataset item carries eMST. `train.py` writes `predictions.csv` (best model on validation, and on test at every missing rate) in the standard format and runs `evaluate.py` on it; the old per-rate CSVs are replaced by the harness outputs.
+- **Decisions:** bootstrap resamples `case_id` (all rows of a drawn case kept). Worst group: only tone groups with at least 20 cases are eligible ("missing" is never a tone group); excluded small groups are listed. ECE uses 15 equal-width bins. A fast numpy path computes the bootstrap metrics from the confusion matrix; a test checks it equals the sklearn definitions. Duplicate case rows within a slice are rejected.
+- **Checked:** a 2-epoch fusion smoke run produced all files end to end (numbers not recorded).
+- **Docs:** thesis 5.10 and paper 3.9 extended (per-class metrics, calibration/ECE, risk-coverage/AURC, worst group on eFST and eMST, case-level bootstrap, across-seed summary); references: Guo et al. 2017, Geifman and El-Yaniv 2017, Sagawa et al. 2020.
+
 ## 2026-10-08: Staged fine-tuning of the image-only baseline (Task 2.2)
 
 - **Done:** `ml/models/image_model.py` (`SkinImageBaseline`: timm EfficientNet-B0 or MobileNetV3, `set_stage(1|2|3)`, `get_optimizer_param_groups(base_lr)`), wired into `train.py --model image_only [--backbone ...] [--stages 1,2]`. Config block `image_baseline` in `configs/base.yaml`. Tests in `ml/tests/test_image_model.py` (8; 51 in total pass).

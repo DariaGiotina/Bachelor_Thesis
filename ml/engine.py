@@ -57,10 +57,14 @@ def train_one_epoch(model: nn.Module, loader, loss_fn: nn.Module, optimizer: tor
 @torch.no_grad()
 def evaluate(model: nn.Module, loader, loss_fn: nn.Module, device: torch.device,
              adapt: Adapt = image_only_adapt, amp: bool = True, max_batches: int | None = None) -> dict:
-    """Mean loss, macro-F1, balanced accuracy and the raw predictions (for per-group reports)."""
+    """Mean loss, macro-F1, balanced accuracy and per-case predictions.
+
+    Per case: true and predicted class index, confidence (maximum softmax probability), eFST, eMST
+    (when the batch has them) and case_id, for the evaluation harness (``evaluate.py``).
+    """
     model.eval()
     total, n = 0.0, 0
-    ys, ps, ef, ids, failed = [], [], [], [], 0
+    ys, ps, cf, ef, em, ids, failed = [], [], [], [], [], [], 0
     use_amp = amp and device.type == "cuda"
     for b, batch in enumerate(loader):
         if max_batches and b >= max_batches:
@@ -71,8 +75,12 @@ def evaluate(model: nn.Module, loader, loss_fn: nn.Module, device: torch.device,
             loss = loss_fn(logits, target)
         total, n = total + loss.item() * len(target), n + len(target)
         ys.append(target.cpu().numpy())
-        ps.append(logits.argmax(1).cpu().numpy())
+        prob = logits.float().softmax(1)
+        conf, pred = prob.max(1)
+        ps.append(pred.cpu().numpy())
+        cf.append(conf.cpu().numpy())
         ef.append(np.asarray(batch["eFST"]))
+        em.append(np.asarray(batch.get("eMST", np.full(len(target), -1))))
         ids.append(np.asarray(batch["case_id"]))
         if "image_ok" in batch:
             failed += int((batch["image_ok"] == 0).sum())
@@ -82,7 +90,8 @@ def evaluate(model: nn.Module, loader, loss_fn: nn.Module, device: torch.device,
         # macro-F1 over the classes present in the true labels (see skinconcern.metrics)
         "macro_f1": float(f1_score(y, p, labels=np.unique(y), average="macro", zero_division=0)),
         "balanced_acc": float(balanced_accuracy_score(y, p)),
-        "n": int(n), "n_image_failed": failed, "y_true": y, "y_pred": p, "eFST": np.concatenate(ef), "case_id": np.concatenate(ids),
+        "n": int(n), "n_image_failed": failed, "y_true": y, "y_pred": p, "confidence": np.concatenate(cf),
+        "eFST": np.concatenate(ef), "eMST": np.concatenate(em), "case_id": np.concatenate(ids),
     }
 
 

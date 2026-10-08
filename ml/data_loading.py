@@ -122,6 +122,7 @@ class SCINDataset(Dataset):
             raise ValueError("NaN found in questionnaire features")
         self.labels = labels.loc[ids, "primary_label"].map(self.class_to_idx).to_numpy(dtype=np.int64)
         self.efst = pd.to_numeric(labels.loc[ids, "eFST"], errors="coerce").fillna(-1).to_numpy(dtype=np.int64)
+        self.emst = pd.to_numeric(labels.loc[ids, "eMST"], errors="coerce").fillna(-1).to_numpy(dtype=np.int64)
         self.transform = build_transform(self.cfg, train=(split == "train"))
         self._warned: set[str] = set()
 
@@ -181,6 +182,7 @@ class SCINDataset(Dataset):
             "q_mask": torch.from_numpy(self.q_mask[idx].copy()),
             "label": torch.tensor(self.labels[idx]),
             "eFST": torch.tensor(self.efst[idx]),
+            "eMST": torch.tensor(self.emst[idx]),
             "case_id": torch.tensor(int(self.case_ids[idx]), dtype=torch.int64),
             "image_ok": torch.tensor(int(ok)),
         }

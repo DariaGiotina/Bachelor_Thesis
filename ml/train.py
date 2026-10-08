@@ -3,7 +3,9 @@
 Loads ``configs/base.yaml``, builds the DataLoaders, a model, the loss (class-weighted
 cross-entropy or focal), and runs the epoch loop of ``engine.py`` with early stopping on validation
 macro-F1. Writes to ``runs/<exp_name>/``: ``best_model.pt``, ``log.csv`` (train_loss, val_loss,
-val_macro_f1, epoch_time, ...) and, after training, test results by eFST group.
+val_macro_f1, epoch_time, ...), ``results.json`` (training summary), ``predictions.csv`` (best model
+on validation and on test at every missing-answer rate) and, through ``evaluate.py``,
+``metrics_summary.json`` / ``.csv`` and ``risk_coverage.csv``.
 
 Models (``--model``):
   dummy       tiny CNN, image only (placeholder to test the pipeline)
@@ -37,16 +39,15 @@ import torch.nn as nn
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
+import evaluate as harness  # noqa: E402
 from data_loading import ROOT, get_dataloaders, load_config  # noqa: E402
 from engine import EarlyStopping, evaluate, image_only_adapt, timed, train_one_epoch  # noqa: E402
 from losses import build_loss  # noqa: E402
 from models.image_model import SkinImageBaseline  # noqa: E402
-from skinconcern.metrics import max_gap, stratified_report  # noqa: E402
 from skinconcern.model import FusionClassifier  # noqa: E402
 from utils.seed import seed_everything  # noqa: E402
 
 log = logging.getLogger("train")
-EFST_NAMES = {1: "I-II", 2: "I-II", 3: "III-IV", 4: "III-IV", 5: "V-VI", 6: "V-VI"}
 
 
 # ------------------------------------------------------------------ missing-answer simulation
@@ -234,19 +235,32 @@ def main(argv: list[str] | None = None) -> int:
                "best_epoch": stopper.best_epoch, "best_stage": best_stage, "best_val_macro_f1": stopper.best,
                "test": {}}
     rates = tc["eval_missing_rates"] if args.model == "fusion" else [0.0]
-    for rate in rates:
-        ev_adapt = make_fusion_adapt(fields, 0.0, 0.0, rate, args.seed) if args.model == "fusion" else adapt
-        res = evaluate(model, loaders["test"], loss_fn, device, ev_adapt, tc["amp"], args.max_batches)
-        groups = [EFST_NAMES.get(int(e), "missing") for e in res["eFST"]]
-        rep = stratified_report(res["y_true"], res["y_pred"], groups)
-        rep.to_csv(out_dir / f"test_by_efst_missing_{rate}.csv", index=False)
-        results["test"][f"missing_{rate}"] = {
-            "loss": res["loss"], "macro_f1": res["macro_f1"], "balanced_acc": res["balanced_acc"], "n": res["n"],
-            "n_image_failed": res["n_image_failed"], "max_gap_macro_f1": max_gap(rep),
-            "by_efst_group": rep.set_index("group").round(4).to_dict("index")}
-        log.info("test, %.0f%% of fields hidden: macro-F1 %.3f", 100 * rate, res["macro_f1"])
+    frames = []
+    for split, split_rates in (("val", [0.0]), ("test", rates)):
+        for rate in split_rates:
+            ev_adapt = make_fusion_adapt(fields, 0.0, 0.0, rate, args.seed) if args.model == "fusion" else adapt
+            res = evaluate(model, loaders[split], loss_fn, device, ev_adapt, tc["amp"], args.max_batches)
+            frames.append(predictions_frame(res, train_ds.classes, split, args.seed, rate))
+            if split == "test":
+                results["test"][f"missing_{rate}"] = {"loss": res["loss"], "macro_f1": res["macro_f1"],
+                                                      "balanced_acc": res["balanced_acc"], "n": res["n"],
+                                                      "n_image_failed": res["n_image_failed"]}
+                log.info("test, %.0f%% of fields hidden: macro-F1 %.3f", 100 * rate, res["macro_f1"])
     (out_dir / "results.json").write_text(json.dumps(results, indent=2), encoding="utf-8")
+    pd.concat(frames, ignore_index=True).to_csv(out_dir / "predictions.csv", index=False)
+    harness.main([str(out_dir / "predictions.csv"), "--n-boot", str(tc.get("n_boot", 1000))])
     return 0
+
+
+def predictions_frame(res: dict, classes: list[str], split: str, seed: int, rate: float) -> pd.DataFrame:
+    """Per-case predictions in the standard format read by evaluate.py (class names, not indices)."""
+    return pd.DataFrame({
+        "case_id": res["case_id"].astype(str), "split": split,
+        "true_label": [classes[i] for i in res["y_true"]], "pred_label": [classes[i] for i in res["y_pred"]],
+        "confidence": res["confidence"].round(6),
+        "eFST": pd.Series(res["eFST"]).where(lambda s: s > 0).astype("Int64"),
+        "eMST": pd.Series(res["eMST"]).where(lambda s: s > 0).astype("Int64"),
+        "seed": seed, "missing_pct": rate})
 
 
 if __name__ == "__main__":
