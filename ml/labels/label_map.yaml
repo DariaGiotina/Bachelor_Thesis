@@ -1,0 +1,146 @@
+# Target categories for the informational skincare assistant (SCIN v1.0.0).
+# Raw SCIN strings are dermatologist differentials for images; here they are only
+# grouped into coarse "skin concern" categories. Not a medical classification.
+# Matching is case-insensitive on the exact raw string; unlisted strings fall back to
+# `unmapped_class`.
+version: 1
+source: SCIN v1.0.0 (weighted_skin_condition_label)
+
+# Minimum summed weight a target category needs (weights per case sum to ~1) to become
+# the primary label. Below this, or on an exact tie, the case is labelled `excluded`.
+min_weight: 0.40
+unmapped_class: excluded
+
+classes:
+  acne: Acne-type concerns (acne, comedones, folliculitis)
+  eczema_dermatitis: Eczema and dermatitis-type concerns
+  redness_rosacea: Redness-type concerns (rosacea, flushing, perioral, sunburn)
+  normal_other: Common benign or cosmetic concerns outside the three target categories
+  excluded: Infectious, systemic, lesion/growth, wound, ambiguous or low-confidence cases
+
+mapping:
+  acne:
+    - Acne
+    - Acne urticata
+    - Acneiform eruption
+    - Acne keloidalis
+    - Comedone
+    - Folliculitis
+    - Perifolliculitis
+    - Agminate folliculitis
+    - On examination - follicular pustules
+    - O/E - pustules
+
+  eczema_dermatitis:
+    - Eczema
+    - Allergic Contact Dermatitis
+    - Irritant Contact Dermatitis
+    - CD - Contact dermatitis
+    - Contact dermatitis, NOS
+    - Contact dermatitis caused by Rhus diversiloba
+    - Allergic contact dermatitis caused by allergenic hapten derived from plant
+    - Acute dermatitis, NOS
+    - Acute dermatitis
+    - Acute and chronic dermatitis
+    - Chronic dermatitis, NOS
+    - Chronic dermatitis
+    - resolving dermatitis
+    - Pruritic dermatitis
+    - Acute vesicular dermatitis
+    - Acute constitutional eczema
+    - Acute-on-chronic dyshidrotic eczema of hands
+    - Lichenified eczematous dermatitis
+    - Lichenified eczema
+    - Crusted eczematous dermatitis
+    - Infected eczema
+    - Stasis Dermatitis
+    - Seborrheic Dermatitis
+    - Lichen Simplex Chronicus
+    - Hypersensitivity
+    - Psoriasiform dermatitis
+    - Photodermatitis
+    - Photocontact dermatitis [berloque dermatitis]
+    - Berloque dermatitis
+    - Phytophotodermatitis
+    - Dermatitis herpetiformis
+
+  redness_rosacea:
+    - Rosacea
+    - Perioral Dermatitis
+    - Flushing
+    - Sunburn
+    - Burn erythema of back of hand
+    - Burn erythema of lower leg
+    - Burn erythema of abdominal wall
+    - Burn erythema of neck
+    - post-sunburn peeling/superficial desquamation
+    - TMEP - telangiectasia macularis eruptiva perstans
+    - Acral erythema
+
+  normal_other:
+    - Insect Bite
+    - Urticaria
+    - Psoriasis
+    - Inverse psoriasis
+    - Keratosis pilaris
+    - Xerosis
+    - Miliaria
+    - Milia
+    - Pityriasis alba
+    - Pityriasis rosea
+    - Melasma
+    - Post-Inflammatory hyperpigmentation
+    - Post-Inflammatory hypopigmentation
+    - Hyperpigmentation
+    - Hyperpigmentation disorder
+    - Idiopathic guttate hypomelanosis
+    - Vitiligo
+    - Lentigo
+    - Scar Condition
+    - Skin striae
+    - Ingrown hair
+    - Intertrigo
+    - Ichthyosis
+    - Keratosis
+    - HK - Hyperkeratosis
+    - Hyperkeratosis of skin
+    - Verruca vulgaris
+    - Melanocytic Nevus
+    - Acanthosis nigricans
+    - Knuckle pads
+    - Cyst
+    - Cheilitis
+    - Geographic tongue
+
+  excluded:
+    - Remove from labeling tool
+    - Inflicted skin lesions
+    - Drug Rash
+    - Herpes Zoster
+    - Herpes Simplex
+    - Impetigo
+    - Tinea
+    - Tinea Versicolor
+    - Scabies
+    - Molluscum Contagiosum
+    - Viral Exanthem
+    - Cellulitis
+    - Abscess
+    - Syphilis
+    - Leukocytoclastic Vasculitis
+    - Pigmented purpuric eruption
+    - Lichen planus/lichenoid eruption
+    - Granuloma annulare
+    - Cutaneous lupus
+    - Erythema multiforme
+    - SCC/SCCIS
+    - Basal Cell Carcinoma
+    - Actinic Keratosis
+    - Melanoma
+    - Skin cancer
+    - Abrasion, scrape, or scab
+    - O/E - ecchymoses present
+    - Purpura
+    - Skin infection
+    - Candida intertrigo
+    - Candidal intertrigo
