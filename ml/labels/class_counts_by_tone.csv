@@ -1,0 +1,9 @@
+tone_scale,tone_group,acne,eczema_dermatitis,redness_rosacea,normal_other,excluded,total
+eFST,I-II,55,478,30,216,994,1773
+eFST,III-IV,77,460,11,258,1355,2161
+eFST,V-VI,10,89,1,49,287,436
+eFST,missing,2,41,2,30,588,663
+eMST,1-3,99,777,38,362,2226,3502
+eMST,4-6,44,244,6,170,832,1296
+eMST,7-10,1,44,0,18,144,207
+eMST,missing,0,3,0,3,22,28
