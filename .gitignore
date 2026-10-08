@@ -79,3 +79,6 @@ docs/thesis_context_card.txt
 *.tgz
 
 !ml/features/questionnaire_features.parquet
+
+# SCIN photos in a sanity grid must not be redistributed
+ml/sanity_batch.png

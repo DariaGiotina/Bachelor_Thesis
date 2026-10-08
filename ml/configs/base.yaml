@@ -1,0 +1,40 @@
+# Base configuration for data loading. All paths are relative to the ml/ folder.
+paths:
+  labels: labels/scin_labels.csv
+  features: features/questionnaire_features.parquet
+  splits: splits/train_val_test_splits.json
+  images_dir: data/scin/images        # SCIN image files (git-ignored), named by file name only
+  cases_csv: data/scin/scin_cases.csv # holds image_1_path .. image_3_path per case_id
+
+data:
+  # Order defines the integer label (0, 1, ...). Cases whose primary_label is in drop_labels
+  # are left out (the 'excluded' group is not a target category of the assistant).
+  classes: [acne, eczema_dermatitis, redness_rosacea, normal_other]
+  drop_labels: [excluded]
+  image_size: 224                     # images are resized to image_size x image_size
+  primary_image_column: image_1_path  # image used for val/test (and the first choice for train)
+
+loader:
+  batch_size: 32
+  num_workers: 4
+  pin_memory: true
+  persistent_workers: false
+
+normalize:                            # ImageNet statistics, applied to every split
+  mean: [0.485, 0.456, 0.406]
+  std: [0.229, 0.224, 0.225]
+
+# Applied to the train split only; val/test get resize + normalize.
+augment:
+  horizontal_flip: {p: 0.5}
+  affine:                             # shift, scale and rotate
+    p: 0.7
+    translate_percent: 0.06
+    scale: [0.9, 1.1]
+    rotate: 15
+  color_jitter:
+    p: 0.8
+    brightness: 0.2
+    contrast: 0.2
+    saturation: 0.2
+    hue: 0.02                         # kept small so skin colour is not distorted

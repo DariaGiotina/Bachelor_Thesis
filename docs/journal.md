@@ -2,6 +2,15 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Data loading, augmentation and config utilities (Task 1.5)
+
+- **Done:** `ml/configs/base.yaml`, `ml/utils/seed.py` (`seed_everything`), `ml/data_loading.py` (`SCINDataset`, `get_dataloaders`, sanity grid), `ml/scripts/download_scin_images.py`, tests in `ml/tests/test_data_loading.py`.
+- **Rules:** train picks one random image per case per epoch (draw derived from seed, epoch, index, so independent of workers); val/test always use `image_1_path`. Augmentation (flip, shift/scale/rotate, colour jitter) only on train; every split gets resize 224 + ImageNet normalisation. Missing/corrupt image: try the case's other images, else black image with `image_ok = 0`.
+- **Decisions:** the `excluded` group is dropped, so 4 training classes and 1,809 cases (seed 0: 1,266 / 272 / 271). Hue jitter kept at 0.02 so skin colour is not distorted. `ShiftScaleRotate` replaced by `Affine` (deprecated in albumentations 2.x). Only 298 primary images were downloaded (about 300 MB) for the sanity check; full set is about 10 GB (`--all-images`).
+- **Repo:** `sanity_batch.png` shows real SCIN photos, so it is git-ignored (decision: never redistribute images).
+- **Docs:** the thesis and paper were renamed and restructured (`Teza_Licenta.docx`, `Paper_Skin_Concern.docx`). New section 5.7 (thesis) and 3.7 (paper); later sections renumbered. `DocEditor` added to `docs/tools/docx_tools.py` for the new structure.
+- **Open:** refresh the table of contents in Word to fix page numbers. Download all images before training.
+
 ## 2026-10-08: Case-level splits and leakage tests (Task 1.4)
 
 - **Done:** `ml/splits/make_splits.py`, `train_val_test_splits.json` (seeds 0-4, case_id lists), `split_summary.csv` and `ml/tests/test_no_leakage.py` (17 tests pass).
