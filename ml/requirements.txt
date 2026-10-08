@@ -20,3 +20,4 @@ tensorboard
 fairlearn>=0.10
 pytest
 python-docx
+pyarrow
