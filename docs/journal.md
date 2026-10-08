@@ -2,6 +2,11 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Skin-tone scales explained in thesis and paper
+
+- **Done:** thesis section 5.3 and paper section 3.3 define FST, eFST and eMST and what each group (I-II, III-IV, V-VI; 1-3, 4-6, 7-10) means. Sources: Fitzpatrick 1988 (doi 10.1001/archderm.1988.01670060015008) and the Monk Skin Tone Scale (https://skintone.google/).
+- **Why:** a reader of the tables cannot interpret the groups without the scale definitions. Rule going forward: every new term is explained where it first appears.
+
 ## 2026-10-08: Label derivation and class-set freeze (Task 1.2)
 
 - **Done:** `ml/labels/label_map.yaml` (5 target categories, explicit string-to-category dictionary, `min_weight` 0.40) and `ml/labels/build_labels.py`. Outputs `scin_labels.csv` and `class_counts_by_tone.csv` in `ml/labels/` (the raw SCIN file of the same name lives in git-ignored `ml/data/scin/`).
