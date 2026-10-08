@@ -2,6 +2,15 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Case-level splits and leakage tests (Task 1.4)
+
+- **Done:** `ml/splits/make_splits.py`, `train_val_test_splits.json` (seeds 0-4, case_id lists), `split_summary.csv` and `ml/tests/test_no_leakage.py` (17 tests pass).
+- **Method:** one row per `case_id`, so a case cannot span splits. Two-step stratified split on primary_label x eFST group (I-II, III-IV, V-VI, missing): 70/30, then 50/50. Strata under 4 cases are merged per label, then into `rare` (5 cases).
+- **Result:** 3,523 / 755 / 755 cases per seed. eFST V-VI: 305 / 66 / 65.
+- **Decisions:** all cases are split, including `excluded` (filter later when training); stratifying on eFST groups, not the six raw types, because raw types x labels are too sparse.
+- **Limitation:** redness_rosacea has 44 cases and 1 in V-VI, so per-tone results are not usable for it.
+- **Process:** from now on one commit per prompt.
+
 ## 2026-10-08: Questionnaire schema, missingness mask and encoder (Task 1.3)
 
 - **Done:** `ml/features/questionnaire_schema.yaml`, `field_mapping.md`, `encode_questionnaire.py` and `questionnaire_features.parquet` (5,033 rows indexed by `case_id`, 40 feature columns + 6 mask columns, no NaN). Test in `ml/tests/test_encode_questionnaire.py`.
