@@ -15,7 +15,7 @@ needs_images = pytest.mark.skipif(not HAS_IMAGES, reason="SCIN images not downlo
 
 def test_val_and_test_have_no_augmentation():
     names = [type(t).__name__ for t in dl.build_transform(dl.load_config(CONFIG), train=False).transforms]
-    assert names == ["Resize", "Normalize", "ToTensorV2"]
+    assert names == ["LongestMaxSize", "PadIfNeeded", "Normalize", "ToTensorV2"]
     train = [type(t).__name__ for t in dl.build_transform(dl.load_config(CONFIG), train=True).transforms]
     assert {"HorizontalFlip", "Affine", "ColorJitter"} <= set(train)
 
@@ -40,6 +40,22 @@ def test_val_is_deterministic_and_train_changes_with_epoch():
     assert not torch.equal(a, train[0]["image"])
     train.set_epoch(0)
     assert torch.equal(a, train[0]["image"])
+
+
+@needs_images
+def test_set_epoch_reaches_persistent_workers():
+    """With persistent workers the per-epoch image draw must still change (shared epoch counter)."""
+    cfg = dl.load_config(CONFIG)
+    cfg["loader"].update(num_workers=1, persistent_workers=True, batch_size=4)
+    loader = dl.get_dataloaders(cfg, 0, "train", only_available=True)
+    loader.dataset.case_ids = loader.dataset.case_ids[:4]  # tiny epoch
+    loader = torch.utils.data.DataLoader(loader.dataset, batch_size=4, num_workers=1, persistent_workers=True)
+    a = next(iter(loader))["image"]
+    loader.dataset.set_epoch(1)
+    b = next(iter(loader))["image"]
+    loader.dataset.set_epoch(0)
+    c = next(iter(loader))["image"]
+    assert not torch.equal(a, b) and torch.equal(a, c)
 
 
 def test_cases_stay_in_their_split():

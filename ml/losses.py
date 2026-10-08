@@ -17,7 +17,9 @@ class FocalLoss(nn.Module):
     """Focal loss (Lin et al., 2017): cross-entropy scaled by (1 - p_t)^gamma.
 
     Easy, confident examples contribute little, so training concentrates on hard and rare ones.
-    ``weight`` holds optional per-class weights (alpha).
+    ``weight`` holds optional per-class weights (alpha). Like ``nn.CrossEntropyLoss(weight=...)``,
+    the weighted mean divides by the sum of the weights of the targets, so with ``gamma = 0`` the two
+    losses are identical.
     """
 
     def __init__(self, gamma: float = 2.0, weight: torch.Tensor | None = None):
@@ -29,9 +31,10 @@ class FocalLoss(nn.Module):
         logits = logits.float()
         logp = F.log_softmax(logits, dim=1).gather(1, target.unsqueeze(1)).squeeze(1)
         loss = -((1 - logp.exp()) ** self.gamma) * logp
-        if self.weight is not None:
-            loss = loss * self.weight[target]
-        return loss.mean()
+        if self.weight is None:
+            return loss.mean()
+        w = self.weight[target]
+        return (loss * w).sum() / w.sum()
 
 
 def build_loss(loss_type: str, labels: np.ndarray, n_classes: int, device: torch.device,

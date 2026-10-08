@@ -2,6 +2,19 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Review of the whole ML pipeline (fixes and improvements)
+
+- **Leakage found and fixed:** MD5 hashes of all 4,089 downloaded images (all 3,886 of the used cases) show 5 groups of 2-3 cases (12 cases) sharing identical photos, most likely resubmissions. In the old seed-0 split four such photos were in different splits. New `ml/scripts/find_duplicate_images.py` writes `ml/splits/duplicate_image_groups.csv`; `make_splits.py` now splits on these groups, and `test_no_leakage.py` checks it. New sizes: 3,522-3,525 / 754-757 / 754-756 per seed; used cases for seed 0: 1,266 / 273 / 270. One group has the same photos labelled redness_rosacea, eczema_dermatitis and excluded (label noise, kept and reported).
+- **Images were distorted:** most SCIN photos are portrait 3:4 (median 810x1080, some 0.45:1); `Resize(224,224)` stretched them. Now letterbox (`LongestMaxSize` + black `PadIfNeeded`) for every split.
+- **Model inference bug:** with no questionnaire the model sent zeros and an "answered" flag, unlike training. `FusionClassifier` now takes `q_vec` and `q_mask`; a missing questionnaire is zero features + all-ones mask, the same as in training. The old availability flag and in-model dropout were removed (answers are hidden in `train.py`). Grad-CAM wrapper updated.
+- **Evaluation matched the text only partly:** the 25/50/75% test hid whole questionnaires per case, while the thesis says fields. It now hides each field with probability r (on top of natural missingness); r = 1 hides all.
+- **Metrics:** per-group macro-F1 over the classes present in that group; 95% bootstrap CI (1,000 resamples) for every group; the tone gap now excludes the "missing" eFST group.
+- **Focal loss:** weighted mean now divides by the summed target weights, like `nn.CrossEntropyLoss(weight)`, so gamma = 0 gives exactly the weighted CE (tested).
+- **Smaller fixes:** `log.csv` logged the next epoch's learning rate; `get_dataloaders` accepts a config dict (no temp files); a warning lists cases with no image file; `results.json` reports failed images.
+- **Speed:** a profile showed Windows re-spawning DataLoader workers each epoch (about 6 s per worker), not image decoding, was the bottleneck. The epoch counter is now a shared-memory tensor, so persistent workers keep the per-epoch image draw (tested). Plus a 448 px lossless image cache (`scripts/resize_image_cache.py`). Epoch time dropped from 62 s to 5 s after a one-time start; epoch-0 numbers are identical with and without the change.
+- **Checked and unchanged:** label derivation, questionnaire encoding, audit numbers, stratification logic, engine AMP/early stopping. Considered, not changed: 35 used cases whose first dermatologist rated the image quality insufficient (they still have labels from the weighted label; 1.9%).
+- **Docs:** thesis 5.6-5.10 and paper 3.6-3.9 updated (new split numbers, duplicate grouping, letterbox, missing-questionnaire representation, field-level hiding, bootstrap CIs; reference: Efron and Tibshirani 1993). `ml/README.md` now lists the pipeline order. 43 tests pass.
+
 ## 2026-10-08: Reusable training/evaluation engine (Task 2.1)
 
 - **Done:** `ml/engine.py` (`train_one_epoch`, `evaluate`, `EarlyStopping`; AMP via `torch.autocast` + `GradScaler`; model-agnostic through an `adapt(batch, training)` function that maps a batch to the model's keyword arguments), `ml/losses.py` (class-weighted cross-entropy and focal loss) and a refactored `ml/train.py` (`--model dummy|image_only|fusion`, early stopping on validation macro-F1, `runs/<exp_name>/best_model.pt` and `log.csv` with train_loss, val_loss, val_macro_f1, epoch_time). Tests in `ml/tests/test_engine.py`.

@@ -4,8 +4,12 @@ One item is one ``case_id``. Image choice:
 
 * train: one image picked at random from the case's available images, redrawn every epoch
   (call ``dataset.set_epoch(epoch)``); augmentation is applied.
-* val / test: always the primary image (``image_1_path``); resize + ImageNet normalisation
-  only, so evaluation is exactly reproducible.
+* val / test: always the primary image (``image_1_path``, the close-up shot in the SCIN app);
+  letterbox + ImageNet normalisation only, so evaluation is exactly reproducible.
+
+Letterbox: the longer side is scaled to ``image_size`` and the shorter side is padded with black,
+so lesions keep their shape (most SCIN photos are portrait 3:4; stretching them to a square would
+distort them).
 
 A missing or unreadable image falls back to another image of the same case; if none can be
 read the item gets a black image and ``image_ok = 0`` (never an exception mid-epoch).
@@ -22,6 +26,7 @@ import logging
 from pathlib import Path
 
 import albumentations as A
+import cv2
 import numpy as np
 import pandas as pd
 import torch
@@ -37,14 +42,19 @@ ROOT = Path(__file__).resolve().parent
 IMAGE_COLS = ["image_1_path", "image_2_path", "image_3_path"]
 
 
-def load_config(config_path: str | Path) -> dict:
-    return yaml.safe_load(Path(config_path).read_text(encoding="utf-8"))
+def load_config(config: str | Path | dict) -> dict:
+    """A config dict, or the path of a YAML config file."""
+    if isinstance(config, dict):
+        return config
+    return yaml.safe_load(Path(config).read_text(encoding="utf-8"))
 
 
 def build_transform(cfg: dict, train: bool) -> A.Compose:
     size = cfg["data"]["image_size"]
     norm = A.Normalize(mean=cfg["normalize"]["mean"], std=cfg["normalize"]["std"])
-    steps: list = [A.Resize(size, size)]  # resize first: all later steps run on small images
+    # Resize first so all later steps run on small images; keep the aspect ratio and pad.
+    steps: list = [A.LongestMaxSize(max_size=size),
+                   A.PadIfNeeded(min_height=size, min_width=size, border_mode=cv2.BORDER_CONSTANT, fill=0)]
     if train:
         aug = cfg["augment"]
         steps += [
@@ -61,14 +71,20 @@ def build_transform(cfg: dict, train: bool) -> A.Compose:
 
 
 class SCINDataset(Dataset):
-    def __init__(self, config_path: str | Path, split: str, seed: int = 0,
+    def __init__(self, config_path: str | Path | dict, split: str, seed: int = 0,
                  only_available: bool = False, root: Path = ROOT):
         if split not in ("train", "val", "test"):
             raise ValueError(f"split must be train, val or test, got {split!r}")
         self.cfg = load_config(config_path)
-        self.split, self.seed, self.epoch = split, seed, 0
+        self.split, self.seed = split, seed
+        # shared-memory tensor: persistent DataLoader workers see set_epoch() of the main process
+        self._epoch = torch.zeros(1, dtype=torch.int64).share_memory_()
         paths = {k: root / v for k, v in self.cfg["paths"].items()}
         self.images_dir = paths["images_dir"]
+        cache = paths.get("image_cache_dir")
+        self.cache_dir = cache if cache is not None and cache.is_dir() else None
+        if cache is not None and self.cache_dir is None:
+            log.info("no image cache at %s; reading the original images (slower)", cache)
         self.classes = list(self.cfg["data"]["classes"])
         self.class_to_idx = {c: i for i, c in enumerate(self.classes)}
 
@@ -89,8 +105,12 @@ class SCINDataset(Dataset):
         keep = ~labels.loc[ids, "primary_label"].isin(self.cfg["data"]["drop_labels"]).to_numpy()
         ids = [i for i, k in zip(ids, keep) if k]
         self.image_names = {i: self._image_names(cases.loc[i]) for i in ids}
+        has_image = {i: any(self._path(n).exists() for n in self.image_names[i]) for i in ids}
         if only_available:
-            ids = [i for i in ids if any((self.images_dir / n).exists() for n in self.image_names[i])]
+            ids = [i for i in ids if has_image[i]]
+        elif not all(has_image.values()):
+            log.warning("%s: %d of %d cases have no image file on disk (they get a black image, image_ok=0)",
+                        split, sum(not v for v in has_image.values()), len(ids))
         self.case_ids = ids
         log.info("%s: %d cases (seed %d)", split, len(ids), seed)
 
@@ -112,14 +132,24 @@ class SCINDataset(Dataset):
 
     def set_epoch(self, epoch: int) -> None:
         """Changes the random image/augmentation draw of the train split."""
-        self.epoch = epoch
+        self._epoch[0] = epoch
+
+    @property
+    def epoch(self) -> int:
+        return int(self._epoch[0])
 
     def __len__(self) -> int:
         return len(self.case_ids)
 
+    def _path(self, name: str) -> Path:
+        """Downscaled cache copy if it exists, otherwise the original file."""
+        if self.cache_dir is not None and (self.cache_dir / name).exists():
+            return self.cache_dir / name
+        return self.images_dir / name
+
     def _read(self, name: str) -> np.ndarray | None:
         try:
-            with Image.open(self.images_dir / name) as im:
+            with Image.open(self._path(name)) as im:
                 return np.asarray(im.convert("RGB"))
         except (FileNotFoundError, OSError, ValueError) as e:
             if name not in self._warned:
@@ -156,7 +186,7 @@ class SCINDataset(Dataset):
         }
 
 
-def get_dataloaders(config_path: str | Path, seed: int = 0, split: str | None = None,
+def get_dataloaders(config_path: str | Path | dict, seed: int = 0, split: str | None = None,
                     only_available: bool = False) -> DataLoader | dict[str, DataLoader]:
     """DataLoaders for train, val and test (dict), or one loader if ``split`` is given."""
     cfg = load_config(config_path)
@@ -169,6 +199,8 @@ def get_dataloaders(config_path: str | Path, seed: int = 0, split: str | None = 
         out[name] = DataLoader(
             ds, batch_size=lc["batch_size"], shuffle=(name == "train"), generator=gen,
             num_workers=nw, pin_memory=lc["pin_memory"] and torch.cuda.is_available(),
+            # workers stay alive between epochs (starting them is slow on Windows); set_epoch()
+            # still reaches them through the shared-memory epoch counter
             persistent_workers=lc["persistent_workers"] and nw > 0, drop_last=False)
     return out[split] if split else out
 
@@ -213,16 +245,8 @@ if __name__ == "__main__":
     cfg = load_config(args.config)
     if args.num_workers is not None:
         cfg["loader"]["num_workers"] = args.num_workers
-        tmp = args.config.with_name("_tmp_sanity.yaml")
-        tmp.write_text(yaml.safe_dump(cfg), encoding="utf-8")
-        args.config = tmp
-    try:
-        loader = get_dataloaders(args.config, args.seed, "train", args.only_available)
-        batch = next(iter(loader))
-    finally:
-        tmp_file = args.config.with_name("_tmp_sanity.yaml")
-        if tmp_file.exists():
-            tmp_file.unlink()
+    loader = get_dataloaders(cfg, args.seed, "train", args.only_available)
+    batch = next(iter(loader))
     for k, v in batch.items():
         log.info("%-8s %s %s", k, tuple(v.shape), v.dtype)
     log.info("images readable: %d/%d", int(batch["image_ok"].sum()), len(batch["image_ok"]))

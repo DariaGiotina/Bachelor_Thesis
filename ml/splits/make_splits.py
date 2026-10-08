@@ -1,12 +1,14 @@
 """Create case-level 70/15/15 train/val/test splits for seeds 0-4.
 
-Every row of ``scin_labels.csv`` is one ``case_id`` (all images of a case share it), and the
-split is made on ``case_id`` only, so a case can never appear in more than one split. The
-split is stratified on ``primary_label`` x eFST group (I-II, III-IV, V-VI, missing) in two
-steps: train vs. rest (70/30), then rest into val and test (50/50).
+Every row of ``scin_labels.csv`` is one ``case_id`` (all images of a case share it), so a case
+can never appear in more than one split. Cases that share an identical image file (listed in
+``duplicate_image_groups.csv`` by ``scripts/find_duplicate_images.py``) are kept together as one
+group, so the same photo can never be in two splits either.
 
-Strata with too few cases to split are merged into a per-label stratum, then into one
-``rare`` stratum, so stratification never fails.
+The split is made on these groups, stratified on ``primary_label`` x eFST group (I-II, III-IV,
+V-VI, missing) in two steps: train vs. rest (70/30), then rest into val and test (50/50). Strata
+with too few groups to split are merged into a per-label stratum, then into one ``rare``
+stratum, so stratification never fails.
 
 Writes ``train_val_test_splits.json`` ({seed: {train, val, test}}) and ``split_summary.csv``.
 
@@ -34,13 +36,30 @@ EFST_GROUPS = {1: "I-II", 2: "I-II", 3: "III-IV", 4: "III-IV", 5: "V-VI", 6: "V-
 log = logging.getLogger("make_splits")
 
 
-def load_cases(path: Path) -> pd.DataFrame:
+def load_cases(path: Path, dup_path: Path | None = None) -> pd.DataFrame:
     # dtype=str keeps the 64-bit case_id exact.
     df = pd.read_csv(path, dtype={"case_id": str})
     if df["case_id"].isna().any() or df["case_id"].duplicated().any():
         raise ValueError("case_id must be non-null and unique: one row per case")
     df["eFST_group"] = pd.to_numeric(df["eFST"], errors="coerce").map(EFST_GROUPS).fillna("missing")
-    return df[["case_id", "primary_label", "eFST_group"]]
+    # split unit: the duplicate-image group if the case has one, otherwise the case itself
+    df["unit"] = df["case_id"]
+    if dup_path is not None and dup_path.exists():
+        dups = pd.read_csv(dup_path, dtype=str).set_index("case_id")["dup_group"]
+        df["unit"] = df["case_id"].map(dups).fillna(df["case_id"])
+        log.info("duplicate-image groups: %d covering %d cases", dups.nunique(), len(dups))
+    else:
+        log.warning("no duplicate-image file found; splitting by case_id only")
+    return df[["case_id", "unit", "primary_label", "eFST_group"]]
+
+
+def unit_table(df: pd.DataFrame) -> pd.DataFrame:
+    """One row per split unit; its stratum is the most common label|eFST_group of its cases."""
+    s = df["primary_label"] + "|" + df["eFST_group"]
+    mode = s.groupby(df["unit"]).agg(lambda x: x.value_counts().sort_index().idxmax())
+    out = mode.rename("raw").reset_index()
+    out[["primary_label", "eFST_group"]] = out["raw"].str.split("|", expand=True)
+    return out
 
 
 def build_strata(df: pd.DataFrame) -> pd.Series:
@@ -52,24 +71,32 @@ def build_strata(df: pd.DataFrame) -> pd.Series:
     return s.where(~small, "rare")
 
 
-def split_once(df: pd.DataFrame, strata: pd.Series, seed: int) -> dict[str, list[str]]:
-    ids = df["case_id"]
+def split_once(df: pd.DataFrame, units: pd.DataFrame, strata: pd.Series, seed: int) -> dict[str, list[str]]:
+    """Split the units, then expand each unit back to its case_ids."""
     train, rest = train_test_split(
-        ids, test_size=1 - FRACTIONS["train"], stratify=strata, random_state=seed)
+        units["unit"], test_size=1 - FRACTIONS["train"], stratify=strata, random_state=seed)
     rest_strata = strata.loc[rest.index]
     # the rest is halved; merge strata that are too small to halve again
     small = rest_strata.map(rest_strata.value_counts()) < 2
     rest_strata = rest_strata.where(~small, "rare")
-    if (rest_strata.value_counts() < 2).any():
-        rest_strata = None
+    if (rest_strata.value_counts() < 2).any():  # a lone 'rare' unit joins the largest stratum
+        rest_strata = rest_strata.replace("rare", rest_strata.value_counts().idxmax())
     val, test = train_test_split(
         rest, test_size=FRACTIONS["test"] / (FRACTIONS["val"] + FRACTIONS["test"]),
         stratify=rest_strata, random_state=seed)
-    return {"train": sorted(train), "val": sorted(val), "test": sorted(test)}
+    cases = df.groupby("unit")["case_id"].apply(list)
+    return {name: sorted(c for u in part for c in cases[u])
+            for name, part in (("train", train), ("val", val), ("test", test))}
 
 
-def check(splits: dict[str, list[str]], all_ids: set[str]) -> None:
+def check(splits: dict[str, list[str]], all_ids: set[str], unit_of: dict[str, str] | None = None) -> None:
     sets = {k: set(v) for k, v in splits.items()}
+    if unit_of is not None:
+        where = {}
+        for name, ids in splits.items():
+            for i in ids:
+                if where.setdefault(unit_of[i], name) != name:
+                    raise AssertionError(f"duplicate-image group {unit_of[i]} spans two splits")
     if any(len(sets[k]) != len(splits[k]) for k in sets):
         raise AssertionError("duplicate case_id inside a split")
     for a, b in (("train", "val"), ("train", "test"), ("val", "test")):
@@ -97,20 +124,23 @@ def main(argv: list[str] | None = None) -> int:
     here = Path(__file__).resolve().parent
     p = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     p.add_argument("--labels", type=Path, default=ROOT / "labels" / "scin_labels.csv")
+    p.add_argument("--duplicates", type=Path, default=here / "duplicate_image_groups.csv")
     p.add_argument("--out-dir", type=Path, default=here)
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
-    df = load_cases(args.labels)
-    strata = build_strata(df)
-    log.info("cases=%d strata=%d (rare merged: %d cases)",
-             len(df), strata.nunique(), int((strata == "rare").sum()))
+    df = load_cases(args.labels, args.duplicates)
+    units = unit_table(df)
+    strata = build_strata(units)
+    log.info("cases=%d units=%d strata=%d (rare merged: %d units)",
+             len(df), len(units), strata.nunique(), int((strata == "rare").sum()))
+    unit_of = dict(zip(df["case_id"], df["unit"]))
 
     all_ids = set(df["case_id"])
     all_splits = {}
     for seed in SEEDS:
-        splits = split_once(df, strata, seed)
-        check(splits, all_ids)
+        splits = split_once(df, units, strata, seed)
+        check(splits, all_ids, unit_of)
         all_splits[seed] = splits
         log.info("seed %d: train=%d val=%d test=%d", seed,
                  len(splits["train"]), len(splits["val"]), len(splits["test"]))

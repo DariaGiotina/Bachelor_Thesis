@@ -49,11 +49,11 @@ def test_early_stopping_tracks_best_and_stops():
     assert es.best == 0.6 and es.best_epoch == 1
 
 
-def test_focal_with_gamma_zero_equals_cross_entropy():
+def test_focal_with_gamma_zero_equals_weighted_cross_entropy():
     logits, y = torch.randn(16, 4), torch.randint(0, 4, (16,))
     w = torch.tensor([1.0, 2.0, 0.5, 1.5])
-    assert torch.allclose(losses.FocalLoss(0.0, w)(logits, y), nn.CrossEntropyLoss(weight=w, reduction="none")(
-        logits, y).mul(0).add(torch.nn.functional.cross_entropy(logits, y, reduction="none") * w[y]).mean(), atol=1e-6)
+    assert torch.allclose(losses.FocalLoss(0.0, w)(logits, y), nn.CrossEntropyLoss(weight=w)(logits, y), atol=1e-6)
+    assert torch.allclose(losses.FocalLoss(0.0)(logits, y), nn.CrossEntropyLoss()(logits, y), atol=1e-6)
     assert losses.FocalLoss(2.0)(logits, y) < losses.FocalLoss(0.0)(logits, y)
 
 

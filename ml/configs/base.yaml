@@ -4,6 +4,7 @@ paths:
   features: features/questionnaire_features.parquet
   splits: splits/train_val_test_splits.json
   images_dir: data/scin/images        # SCIN image files (git-ignored), named by file name only
+  image_cache_dir: data/scin/images_448  # downscaled copies (scripts/resize_image_cache.py), read first
   cases_csv: data/scin/scin_cases.csv # holds image_1_path .. image_3_path per case_id
 
 data:
@@ -18,7 +19,7 @@ loader:
   batch_size: 32
   num_workers: 4
   pin_memory: true
-  persistent_workers: false
+  persistent_workers: true            # keep workers alive between epochs (much faster on Windows)
 
 normalize:                            # ImageNet statistics, applied to every split
   mean: [0.485, 0.456, 0.406]

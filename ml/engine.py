@@ -60,7 +60,7 @@ def evaluate(model: nn.Module, loader, loss_fn: nn.Module, device: torch.device,
     """Mean loss, macro-F1, balanced accuracy and the raw predictions (for per-group reports)."""
     model.eval()
     total, n = 0.0, 0
-    ys, ps, ef, ids = [], [], [], []
+    ys, ps, ef, ids, failed = [], [], [], [], 0
     use_amp = amp and device.type == "cuda"
     for b, batch in enumerate(loader):
         if max_batches and b >= max_batches:
@@ -74,12 +74,15 @@ def evaluate(model: nn.Module, loader, loss_fn: nn.Module, device: torch.device,
         ps.append(logits.argmax(1).cpu().numpy())
         ef.append(np.asarray(batch["eFST"]))
         ids.append(np.asarray(batch["case_id"]))
+        if "image_ok" in batch:
+            failed += int((batch["image_ok"] == 0).sum())
     y, p = np.concatenate(ys), np.concatenate(ps)
     return {
         "loss": total / max(n, 1),
-        "macro_f1": float(f1_score(y, p, average="macro", zero_division=0)),
+        # macro-F1 over the classes present in the true labels (see skinconcern.metrics)
+        "macro_f1": float(f1_score(y, p, labels=np.unique(y), average="macro", zero_division=0)),
         "balanced_acc": float(balanced_accuracy_score(y, p)),
-        "n": int(n), "y_true": y, "y_pred": p, "eFST": np.concatenate(ef), "case_id": np.concatenate(ids),
+        "n": int(n), "n_image_failed": failed, "y_true": y, "y_pred": p, "eFST": np.concatenate(ef), "case_id": np.concatenate(ids),
     }
 
 

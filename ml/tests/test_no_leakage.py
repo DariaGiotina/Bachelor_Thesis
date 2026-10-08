@@ -50,3 +50,12 @@ def test_split_sizes_are_70_15_15(splits, seed):
 def test_seeds_give_different_splits(splits):
     tests = {tuple(splits[s]["test"]) for s in SEEDS}
     assert len(tests) == len(SEEDS)
+
+
+@pytest.mark.parametrize("seed", SEEDS)
+def test_duplicate_image_groups_stay_in_one_split(splits, seed):
+    """Cases sharing an identical photo must not be divided between splits."""
+    dups = pd.read_csv(ROOT / "splits" / "duplicate_image_groups.csv", dtype=str)
+    where = {cid: name for name, ids in splits[seed].items() for cid in ids}
+    for group, g in dups.groupby("dup_group"):
+        assert len({where[c] for c in g["case_id"]}) == 1, f"{group} spans splits"
