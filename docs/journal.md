@@ -2,6 +2,14 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-08: Training script with modality dropout (Task 1.6, no results yet)
+
+- **Done:** `ml/train.py` trains the late-fusion model (EfficientNet-B0 from timm + questionnaire branch) for one split seed, keeps the best-validation checkpoint and evaluates once on test, overall and per eFST group, with 0/25/50/75/100% of questionnaire fields hidden. `--image-only` trains the photo-only baseline. Defaults live in the `train:` block of `ml/configs/base.yaml`. Tests in `ml/tests/test_train_utils.py`.
+- **Decisions:** the model input is `[q_vec, q_mask]` (46 numbers). Modality dropout hides the whole questionnaire with p = 0.3 and each field with p = 0.15; a hidden field gets features 0 and mask 1, like a real missing answer (no imputation). Class-weighted cross-entropy because of the imbalance (44 redness_rosacea vs 1,068 eczema_dermatitis). AdamW, lr 3e-4, cosine decay, 15 epochs, mixed precision.
+- **Checked:** a 2-epoch, 5-batch smoke run on the images downloaded so far ran end to end (numbers meaningless, not recorded). No real results exist yet.
+- **Docs:** thesis 5.8 and 5.10, paper 3.8 and 3.9 filled with the method; references added: EfficientNet, timm, AdamW, SGDR (all with URLs).
+- **Open:** wait for the image download (about 2,000 of 3,886 done), then a short real run on seed 0, then 5 seeds for both models. Run outputs go to the git-ignored `ml/runs/`.
+
 ## 2026-10-08: Data loading, augmentation and config utilities (Task 1.5)
 
 - **Done:** `ml/configs/base.yaml`, `ml/utils/seed.py` (`seed_everything`), `ml/data_loading.py` (`SCINDataset`, `get_dataloaders`, sanity grid), `ml/scripts/download_scin_images.py`, tests in `ml/tests/test_data_loading.py`.

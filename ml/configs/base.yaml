@@ -38,3 +38,15 @@ augment:
     contrast: 0.2
     saturation: 0.2
     hue: 0.02                         # kept small so skin colour is not distorted
+
+# Training defaults (override on the command line of train.py).
+train:
+  backbone: efficientnet_b0
+  pretrained: true
+  epochs: 15
+  lr: 0.0003
+  weight_decay: 0.01
+  q_hidden: 64
+  p_modality_drop: 0.3   # whole questionnaire hidden for a sample (all masks set to 1)
+  p_field_drop: 0.15     # each answered field hidden independently
+  eval_missing_rates: [0.0, 0.25, 0.5, 0.75, 1.0]

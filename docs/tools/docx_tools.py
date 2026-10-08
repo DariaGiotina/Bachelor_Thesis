@@ -173,3 +173,35 @@ class DocEditor:
 
     def save(self) -> None:
         self.doc.save(self.path)
+
+
+def _replace_placeholder(self, heading_text: str, paragraphs: list[str]) -> None:
+    """Replace the '[De redactat...]' / '[To be written...]' paragraph under a heading."""
+    h = self.heading(heading_text)
+    nxt = h._p.getnext()
+    ph = Paragraph(nxt, h._parent)
+    if not ph.text.strip().startswith("["):
+        raise ValueError(f"no placeholder under '{heading_text}'")
+    for text in paragraphs:
+        self.body_paragraph_before(ph, text)
+    ph._p.getparent().remove(ph._p)
+
+
+def _add_reference(self, text: str, url: str) -> int:
+    """Append '[n] text. url' after the last reference (skipped if the URL is already listed)."""
+    refs = [p for p in self.doc.paragraphs if re.match(r"^\[\d+\]", p.text.strip())]
+    for i, p in enumerate(refs, 1):
+        if url in p.text:
+            return i
+    last = refs[-1]
+    new = copy.deepcopy(last._p)
+    for r in new.findall(qn("w:r"))[1:]:
+        new.remove(r)
+    last._p.addnext(new)
+    par = Paragraph(new, last._parent)
+    par.runs[0].text = f"[{len(refs) + 1}] {text}. {url}"
+    return len(refs) + 1
+
+
+DocEditor.replace_placeholder = _replace_placeholder
+DocEditor.add_reference = _add_reference
