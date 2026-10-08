@@ -10,6 +10,7 @@ Running log of decisions and why. Newest first.
 - **Repo:** `sanity_batch.png` shows real SCIN photos, so it is git-ignored (decision: never redistribute images).
 - **Docs:** the thesis and paper were renamed and restructured (`Teza_Licenta.docx`, `Paper_Skin_Concern.docx`). New section 5.7 (thesis) and 3.7 (paper); later sections renumbered. `DocEditor` added to `docs/tools/docx_tools.py` for the new structure.
 - **Open:** refresh the table of contents in Word to fix page numbers. Download all images before training.
+- **Update (same day):** `download_scin_images.py` got `--used-only` (only cases kept by `drop_labels`) plus timeouts and retries. Running `--used-only --all-images` fetches the 3,886 images of the 1,809 training cases (about 3.9 GB) into the git-ignored `ml/data/scin/images/`.
 
 ## 2026-10-08: Case-level splits and leakage tests (Task 1.4)
 
