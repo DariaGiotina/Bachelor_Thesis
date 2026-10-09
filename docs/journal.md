@@ -10,6 +10,7 @@ Running log of decisions and why. Newest first.
 - **Decisions:** never guess a mapping (unknown -> dropped and reported); the probe uses the primary image without augmentation (frozen features); the L2 grid goes from 0 to 100 because a smoke run on EfficientNet-B0 features picked the edge of a narrower grid (a warning now flags edge choices); the checkpoint backbone is read from the run's `config_used.yaml`.
 - **Checked:** end-to-end smoke tests (21 Atlas images, two 2-batch checkpoints; probe with `timm:efficientnet_b0` features on seeds 0-1); numbers meaningless, not recorded.
 - **Docs:** new thesis 5.11 and paper 3.10 (zero-shot external evaluation, domain shift, mapping statuses, foundation models, frozen features, linear probe, standardisation, L2 penalty); references: Daneshjou et al. 2022, Groh et al. 2021, Alain and Bengio 2016, Radford et al. 2021, PanDerm (Yan et al. 2025), Derm1M/DermLIP (Yan et al. 2025).
+- **Download result:** 619 of the 4,012 mapped Fitzpatrick17k images are still online (all from Atlas Dermatológico; 3,393 failed): normal_other 362, acne 126, eczema_dermatitis 115, redness_rosacea 16; FST 1: 12, 2: 100, 3: 165, 4: 194, 5: 97, 6: 32, unknown 19. Too few and too skewed (redness_rosacea 16) for a fair test, so the full set is still needed.
 - **Next:** request the Fitzpatrick17k images and download DDI; check DDI disease strings against the report; get PanDerm weights; `pip install open_clip_torch` for DermLIP.
 
 ## 2026-10-09: Bug fixes in evaluate.py and train.py
