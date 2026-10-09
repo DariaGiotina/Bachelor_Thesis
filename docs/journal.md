@@ -2,6 +2,13 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Fitzpatrick17k data-use terms
+
+- **Fact:** the full Fitzpatrick17k images were requested from the authors; the agreement requires deleting them once the research is complete.
+- **Decision:** Fitzpatrick17k (and DDI) are used for testing only, never for training, never redistributed, never shown in the app, repo, thesis or paper; only aggregate metrics are reported. The shipped model is trained on SCIN only, so the deletion obligation does not touch it.
+- **Open:** reread the signed text for clauses on derived data/models and publication; note the deletion deadline; check commercial-use terms of SCIN and of any pretrained weights (ImageNet, PanDerm, DermLIP) before a public release. Not legal advice.
+- **Docs:** one paragraph added to thesis 5.11 and paper 3.10; `data_sources.csv` note.
+
 ## 2026-10-09: External test sets and foundation-model linear probe (Task 2.5)
 
 - **Done:** `ml/external_datasets.py`: `DDIDataset` and `Fitzpatrick17kDataset` (items shaped like SCIN items), label mapping through `label_map.yaml` plus a new `external_aliases` section (not read by `build_labels.py`; SCIN labels unchanged), a per-row status report (`mapped`, `excluded_class`, `unmapped`, `qc_wrong_label`, `missing_image`; only `mapped` rows are used), zero-shot inference of every SCIN image-only checkpoint, `external_eval.csv` in the evaluate.py format (split = dataset, seed = SCIN seed, plus logits and probabilities) and evaluate.py on it. `ml/foundation_probe.py`: frozen encoder from `timm:`, `open_clip:` or `hf:` (local weights for timm, e.g. PanDerm; DermLIP through OpenCLIP), features of all 1,809 used SCIN cases cached once, per seed a linear layer (multinomial logistic regression, standardised features, class-weighted CE, L2 penalty chosen on validation macro-F1), predictions + evaluate.py + `foundation_probe_test.csv` (mean ± sd). 8 new tests (73 pass).
