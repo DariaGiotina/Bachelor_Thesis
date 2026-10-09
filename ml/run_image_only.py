@@ -204,6 +204,17 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
 
 
 # ------------------------------------------------------------------------------------ aggregation
+def write_seed_runs(path: Path, rows: list[dict]) -> None:
+    """Merge per-seed training records into ``path``: rows of re-run seeds replace the old ones, and seeds
+    skipped with ``--skip-existing`` keep their earlier record (it is not overwritten)."""
+    new = pd.DataFrame(rows)
+    if path.exists() and len(new):
+        old = pd.read_csv(path)
+        new = pd.concat([old[~old["seed"].isin(new["seed"])], new], ignore_index=True)
+    if len(new):
+        new.sort_values("seed").to_csv(path, index=False)
+
+
 def aggregate_seeds(flat: pd.DataFrame) -> pd.DataFrame:
     """Test metrics across seeds (mean, sd, min, max) from the stacked evaluate.py metrics_summary.csv,
     separately for every missing-answer rate (``missing_pct``).
@@ -256,7 +267,7 @@ def run(options: dict | None = None) -> pd.DataFrame:
             ckpt.unlink(missing_ok=True)  # never resume from another run's weights
             runs.append({"backbone": opts["backbone"], "balance": opts["balance"],
                          **train_seed(seed, cfg, opts, out_dir, ckpt, device)})
-            pd.DataFrame(runs).to_csv(root / "seed_runs.csv", index=False)
+            write_seed_runs(root / "seed_runs.csv", runs[-1:])
             harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(n_boot)])
         flats.append(pd.read_csv(out_dir / "metrics_summary.csv", dtype={"seed": str}))
 

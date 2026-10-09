@@ -39,7 +39,7 @@ import evaluate as harness  # noqa: E402
 from data_loading import ROOT, SCINDataset, get_dataloaders, load_config  # noqa: E402
 from models.image_model import SkinImageBaseline  # noqa: E402
 from models.q_model import QuestionnaireMLP  # noqa: E402
-from run_image_only import BACKBONES, BALANCES, aggregate_seeds  # noqa: E402
+from run_image_only import BACKBONES, BALANCES, aggregate_seeds, write_seed_runs  # noqa: E402
 from run_q_only import QuestionnaireDataset, make_q_adapt  # noqa: E402
 from train import field_index, predictions_frame  # noqa: E402
 
@@ -131,7 +131,7 @@ def run(options: dict | None = None) -> pd.DataFrame:
         if not (opts["skip_existing"] and (out_dir / "metrics_summary.csv").exists()):
             runs.append(run_seed(seed, cfg, img_root / f"img_only_seed{seed}.pt", q_root / f"q_only_seed{seed}.pt",
                                  out_dir, device))
-            pd.DataFrame(runs).to_csv(root / "seed_runs.csv", index=False)
+            write_seed_runs(root / "seed_runs.csv", runs[-1:])
             harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(opts["n_boot"])])
         flats.append(pd.read_csv(out_dir / "metrics_summary.csv", dtype={"seed": str}))
     summary = aggregate_seeds(pd.concat(flats, ignore_index=True))

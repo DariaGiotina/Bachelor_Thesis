@@ -49,7 +49,7 @@ from data_loading import ROOT, SCINDataset, load_config  # noqa: E402
 from engine import EarlyStopping, evaluate, timed, train_one_epoch  # noqa: E402
 from losses import class_weights  # noqa: E402
 from models.q_model import QuestionnaireMLP  # noqa: E402
-from run_image_only import BALANCES, aggregate_seeds, sample_weights  # noqa: E402
+from run_image_only import BALANCES, aggregate_seeds, sample_weights, write_seed_runs  # noqa: E402
 from train import field_index, hide_answers, predictions_frame  # noqa: E402
 from utils.seed import seed_everything  # noqa: E402
 
@@ -181,7 +181,7 @@ def run(options: dict | None = None) -> pd.DataFrame:
             ckpt.unlink(missing_ok=True)  # never start from another run's weights
             summary, _ = train_seed(seed, cfg, opts, out_dir, ckpt, device)
             runs.append({"balance": opts["balance"], "p_field_drop": opts["p_field_drop"], **summary})
-            pd.DataFrame(runs).to_csv(root / "seed_runs.csv", index=False)
+            write_seed_runs(root / "seed_runs.csv", runs[-1:])
             harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(n_boot)])
         flats.append(pd.read_csv(out_dir / "metrics_summary.csv", dtype={"seed": str}))
 

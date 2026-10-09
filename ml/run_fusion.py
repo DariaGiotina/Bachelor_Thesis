@@ -40,7 +40,8 @@ import evaluate as harness  # noqa: E402
 from data_loading import ROOT, get_dataloaders, load_config  # noqa: E402
 from engine import evaluate  # noqa: E402
 from models.fusion_model import FUSIONS  # noqa: E402
-from run_image_only import BACKBONES, BALANCES, aggregate_seeds, build_balanced_training, fit_staged  # noqa: E402
+from run_image_only import (BACKBONES, BALANCES, aggregate_seeds, build_balanced_training, fit_staged,  # noqa: E402
+                            write_seed_runs)
 from train import build_fusion, field_index, make_fusion_adapt, predictions_frame  # noqa: E402
 from utils.seed import seed_everything  # noqa: E402
 
@@ -115,7 +116,7 @@ def run(options: dict | None = None) -> pd.DataFrame:
             runs.append({"backbone": cfg["image_baseline"]["backbone"], "fusion": variant, "balance": opts["balance"],
                          "p_modality_drop": opts["p_modality_drop"], "p_field_drop": opts["p_field_drop"],
                          **train_seed(seed, cfg, opts, out_dir, ckpt, device)})
-            pd.DataFrame(runs).to_csv(root / "seed_runs.csv", index=False)
+            write_seed_runs(root / "seed_runs.csv", runs[-1:])
             harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(n_boot)])
         flats.append(pd.read_csv(out_dir / "metrics_summary.csv", dtype={"seed": str}))
 

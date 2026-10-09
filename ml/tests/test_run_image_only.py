@@ -61,3 +61,12 @@ def test_aggregate_seeds_keeps_missing_rates_apart():
     agg = r.aggregate_seeds(pd.concat([a, b]))
     ov = agg[(agg.scope == "overall") & (agg.metric == "macro_f1")].set_index("missing_pct")["mean"]
     assert ov.to_dict() == {0.0: 0.5, 1.0: 0.1}
+
+
+def test_write_seed_runs_keeps_skipped_seeds(tmp_path):
+    path = tmp_path / "seed_runs.csv"
+    r.write_seed_runs(path, [{"seed": 0, "v": 1}, {"seed": 1, "v": 1}])
+    r.write_seed_runs(path, [{"seed": 1, "v": 2}])        # seed 1 re-run, seed 0 skipped
+    r.write_seed_runs(path, [{"seed": 5, "v": 3}])        # new seed
+    df = pd.read_csv(path)
+    assert df["seed"].tolist() == [0, 1, 5] and df["v"].tolist() == [1, 2, 3]

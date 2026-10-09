@@ -20,7 +20,10 @@
    * one row per pair of arms: the per-seed macro-F1 difference (A - B) on the shared test cases,
      each with a paired case-bootstrap CI (both models scored on the same resampled cases), the mean
      difference with a seed-stratified paired bootstrap CI, the number of seeds where A wins, and a
-     paired t-test and Wilcoxon signed-rank test over seeds.
+     paired t-test and Wilcoxon signed-rank test over seeds;
+   * per skin-tone group (eFST I-II / III-IV / V-VI, eMST 1-3 / 4-6 / 7-10) the macro-F1, and per
+     category the F1, of every arm, and the paired difference of every arm against image_only,
+     with Holm-adjusted p-values (family = all groups and categories of one comparison).
 
 Usage::
 
@@ -44,7 +47,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 from data_loading import ROOT  # noqa: E402
 from models.fusion_model import FUSIONS  # noqa: E402
 from run_image_only import BACKBONES, BALANCES  # noqa: E402
-from skinconcern.metrics import FAST_NAMES, _fast_metrics, bias_corrected_ci  # noqa: E402
+from skinconcern.metrics import (FAST_NAMES, _fast_metrics, bias_corrected_ci, efst_group,  # noqa: E402
+                                 emst_group)
 
 log = logging.getLogger("run_e1")
 DEFAULT_ARMS = ["image_only", "questionnaire_only", "fusion_concat", "fusion_gated"]
@@ -184,6 +188,140 @@ def pairs(arms: list[str]) -> list[tuple[str, str]]:
     return out
 
 
+
+# --------------------------------------------------------------- skin tone and category (RQ1 "for whom", RQ3)
+SCALES = {"eFST": (efst_group, ["I-II", "III-IV", "V-VI"]), "eMST": (emst_group, ["1-3", "4-6", "7-10"])}
+
+
+def class_f1(t: np.ndarray, p: np.ndarray, k: int) -> np.ndarray:
+    """F1 per class (NaN for a class absent from the true labels)."""
+    cm = np.bincount(t * k + p, minlength=k * k).reshape(k, k)
+    tp, denom = np.diag(cm).astype(float), (cm.sum(1) + cm.sum(0)).astype(float)
+    return np.where(cm.sum(1) > 0, 2 * tp / np.maximum(denom, 1), np.nan)
+
+
+def holm(pvalues: list[float]) -> list[float]:
+    """Holm-Bonferroni adjusted p-values (NaN entries are left out and stay NaN)."""
+    p = np.asarray(pvalues, float)
+    ok = np.where(~np.isnan(p))[0]
+    adj = np.full(len(p), np.nan)
+    running = 0.0
+    for rank, i in enumerate(ok[np.argsort(p[ok])]):
+        running = max(running, min(1.0, (len(ok) - rank) * p[i]))
+        adj[i] = running
+    return adj.tolist()
+
+
+def subgroups(preds: pd.DataFrame, arms: list[str], seeds: list[int], classes: list[str], n_boot: int,
+              boot_seed: int, reference: str = "image_only") -> pd.DataFrame:
+    """Macro-F1 per skin-tone group and F1 per category for every arm, and paired differences vs ``reference``.
+
+    Within a seed, the cases of a tone group are resampled inside the group, and categories use resamples
+    of the whole test set; the resamples are shared by all arms (paired). Mean over seeds with a
+    seed-stratified bootstrap CI, a t-test over seeds, and Holm-adjusted p within each comparison (all
+    groups and categories of one arm vs the reference form one family).
+    """
+    k = len(classes)
+    code = {c: i for i, c in enumerate(classes)}
+    base = preds[preds["missing_pct"] == 0.0].copy()
+    for scale, (fn, _) in SCALES.items():
+        base[f"{scale}_group"] = base[scale].map(fn)
+    per = {(a, s): base[(base["arm"] == a) & (base["seed"] == s)].sort_values("case_id").reset_index(drop=True)
+           for a in arms for s in seeds}
+    units = [(scale, g) for scale, (_, gs) in SCALES.items() for g in gs] + [("class", c) for c in classes]
+    rng = np.random.default_rng(boot_seed + 1)
+    point, boot, n_cases = {}, {}, {}
+    for s in seeds:
+        ref = per[(arms[0], s)]
+        whole = rng.integers(0, len(ref), size=(n_boot, len(ref)))
+        groups = {}
+        for scale, (_, gs) in SCALES.items():
+            for g in gs:
+                rows = np.where(ref[f"{scale}_group"].to_numpy() == g)[0]
+                draws = rows[rng.integers(0, len(rows), size=(n_boot, len(rows)))] if len(rows) else None
+                groups[(scale, g)] = (rows, draws)
+                n_cases.setdefault((scale, g), []).append(len(rows))
+        tt_ref = ref["true_label"].map(code).to_numpy()
+        for j, c in enumerate(classes):
+            n_cases.setdefault(("class", c), []).append(int((tt_ref == j).sum()))
+        for a in arms:
+            d = per[(a, s)]
+            tt, pp = d["true_label"].map(code).to_numpy(), d["pred_label"].map(code).to_numpy()
+            conf = d["confidence"].to_numpy(float)
+            for u, (rows, draws) in groups.items():
+                if len(rows) < 2:
+                    v, b = np.nan, np.full(n_boot, np.nan)
+                else:
+                    v = _fast_metrics(tt[rows], pp[rows], conf[rows], k, 15)[0]
+                    b = np.array([_fast_metrics(tt[i], pp[i], conf[i], k, 15)[0] for i in draws])
+                point.setdefault((a, u), []).append(v)
+                boot.setdefault((a, u), []).append(b)
+            f1, fb = class_f1(tt, pp, k), np.array([class_f1(tt[i], pp[i], k) for i in whole])
+            for j, c in enumerate(classes):
+                point.setdefault((a, ("class", c)), []).append(f1[j])
+                boot.setdefault((a, ("class", c)), []).append(fb[:, j])
+
+    def kind(u, prefix):
+        return f"{prefix}_class" if u[0] == "class" else f"{prefix}_group"
+
+    rows = []
+    for a in arms:
+        for u in units:
+            pt, bt = np.array(point[(a, u)]), np.nanmean(np.stack(boot[(a, u)]), axis=0)
+            rows.append({"row_type": kind(u, "arm"), "arm": a, "versus": "", "scale": u[0], "group": u[1],
+                         "metric": "f1" if u[0] == "class" else "macro_f1", "missing_pct": 0.0,
+                         "n_seeds": int(np.sum(~np.isnan(pt))), "mean_n_cases": float(np.mean(n_cases[u])),
+                         "mean": np.nanmean(pt), "sd": np.nanstd(pt, ddof=1),
+                         "ci_low": np.nanquantile(bt, 0.025), "ci_high": np.nanquantile(bt, 0.975)})
+    if reference in arms:
+        for a in [x for x in arms if x != reference]:
+            fam = []
+            for u in units:
+                d_pt = np.array(point[(a, u)]) - np.array(point[(reference, u)])
+                d_bt = np.nanmean(np.stack(boot[(a, u)]) - np.stack(boot[(reference, u)]), axis=0)
+                ok = ~np.isnan(d_pt)
+                tp = (stats.ttest_1samp(d_pt[ok], 0).pvalue
+                      if ok.sum() > 1 and np.std(d_pt[ok]) > 0 else np.nan)
+                fam.append({"row_type": kind(u, "paired"), "arm": a, "versus": reference, "scale": u[0],
+                            "group": u[1], "metric": "f1" if u[0] == "class" else "macro_f1", "missing_pct": 0.0,
+                            "n_seeds": int(ok.sum()), "mean_n_cases": float(np.mean(n_cases[u])),
+                            "mean": np.nanmean(d_pt), "sd": np.nanstd(d_pt, ddof=1),
+                            "ci_low": np.nanquantile(d_bt, 0.025), "ci_high": np.nanquantile(d_bt, 0.975),
+                            "a_better_seeds": int((d_pt[ok] > 0).sum()), "t_test_p": tp})
+            for r, h in zip(fam, holm([r["t_test_p"] for r in fam])):
+                r["holm_p"] = h
+            rows += fam
+    return pd.DataFrame(rows)
+
+
+def markdown_subgroups(sub: pd.DataFrame, arms: list[str], reference: str = "image_only") -> str:
+    units = list(dict.fromkeys(zip(sub["scale"], sub["group"])))
+    head = [g if s == "class" else f"{s} {g}" for s, g in units]
+    arm_rows = sub[sub["row_type"].isin(["arm_group", "arm_class"])]
+    n = arm_rows[arm_rows["arm"] == arms[0]].set_index(["scale", "group"])["mean_n_cases"]
+    lines = ["", "## By skin tone (macro-F1) and by category (F1)", "",
+             "Mean ± sd over seeds. Mean test cases per seed: "
+             + ", ".join(f"{h} {n[u]:.0f}" for h, u in zip(head, units)) + ".", "",
+             "| Arm | " + " | ".join(head) + " |", "|---|" + "---|" * len(units)]
+    for a in arms:
+        r = arm_rows[arm_rows["arm"] == a].set_index(["scale", "group"])
+        lines.append(f"| {a} | " + " | ".join(f"{r.loc[u, 'mean']:.3f} ± {r.loc[u, 'sd']:.3f}" for u in units) + " |")
+    pair_rows = sub[sub["row_type"].isin(["paired_group", "paired_class"])]
+    if len(pair_rows):
+        lines += ["", f"Difference vs {reference}: mean [95% seed-stratified paired bootstrap CI], seeds better; "
+                  "Holm-adjusted p shown when < 0.05 (family = all groups and categories of one comparison).", "",
+                  "| Arm | " + " | ".join(head) + " |", "|---|" + "---|" * len(units)]
+        for a in [x for x in arms if x != reference]:
+            r = pair_rows[pair_rows["arm"] == a].set_index(["scale", "group"])
+            cells = []
+            for u in units:
+                x = r.loc[u]
+                star = f" **p={x['holm_p']:.3f}**" if x["holm_p"] < 0.05 else ""
+                cells.append(f"{x['mean']:+.3f} [{x['ci_low']:+.3f}, {x['ci_high']:+.3f}] "
+                             f"{int(x['a_better_seeds'])}/{int(x['n_seeds'])}{star}")
+            lines.append(f"| {a} | " + " | ".join(cells) + " |")
+    return "\n".join(lines) + "\n"
+
 # ------------------------------------------------------------------------------------------ table
 def markdown(arm_table: pd.DataFrame, pair_table: pd.DataFrame, meta: dict) -> str:
     def cell(r):
@@ -240,13 +378,15 @@ def main(argv: list[str] | None = None) -> int:
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
     meta = {"arms": args.arms, "seeds": args.seeds, "backbone": args.backbone, "balance": args.balance}
-    summary = pd.concat([arm_table, pair_table], ignore_index=True)
+    sub = subgroups(preds, args.arms, args.seeds, classes, args.n_boot, args.boot_seed)
+    summary = pd.concat([arm_table, pair_table, sub], ignore_index=True)
     summary.insert(0, "backbone", args.backbone)
     summary.insert(1, "balance", args.balance)
     summary.to_csv(args.out_dir / "e1_summary.csv", index=False, float_format="%.5f")
-    (args.out_dir / "e1_table.md").write_text(markdown(arm_table, pair_table, meta), encoding="utf-8")
+    text = markdown(arm_table, pair_table, meta) + markdown_subgroups(sub, args.arms)
+    (args.out_dir / "e1_table.md").write_text(text, encoding="utf-8")
     log.info("wrote %s and e1_table.md", args.out_dir / "e1_summary.csv")
-    print(markdown(arm_table, pair_table, meta))
+    print(text)
     return 0
 
 

@@ -1,50 +1,180 @@
-backbone,balance,row_type,arm,versus,metric,missing_pct,n_seeds,mean,sd,ci_low,ci_high,seed0,seed1,seed2,seed3,seed4,a_better_seeds,t_test_p,wilcoxon_p,seed0_ci,seed1_ci,seed2_ci,seed3_ci,seed4_ci
-efficientnet_b0,weighted_loss,arm,image_only,,macro_f1,0.00000,5,0.53671,0.03798,0.49319,0.57204,0.48740,0.57655,0.51817,0.57323,0.52820,,,,,,,,
-efficientnet_b0,weighted_loss,arm,image_only,,balanced_acc,0.00000,5,0.62393,0.04382,0.58531,0.66067,0.56918,0.63374,0.60165,0.68780,0.62726,,,,,,,,
-efficientnet_b0,weighted_loss,arm,image_only,,accuracy,0.00000,5,0.57049,0.01934,0.54395,0.59629,0.54815,0.57565,0.56089,0.56777,0.60000,,,,,,,,
-efficientnet_b0,weighted_loss,arm,image_only,,ece,0.00000,5,0.07015,0.01186,0.05136,0.08937,0.08405,0.05759,0.07388,0.05801,0.07724,,,,,,,,
-efficientnet_b0,weighted_loss,arm,questionnaire_only,,macro_f1,0.00000,5,0.39001,0.03788,0.34378,0.42752,0.34151,0.41042,0.44184,0.37939,0.37688,,,,,,,,
-efficientnet_b0,weighted_loss,arm,questionnaire_only,,balanced_acc,0.00000,5,0.44310,0.04298,0.38793,0.49411,0.42346,0.47755,0.45769,0.47926,0.37756,,,,,,,,
-efficientnet_b0,weighted_loss,arm,questionnaire_only,,accuracy,0.00000,5,0.47599,0.04797,0.44871,0.50176,0.40741,0.50923,0.53137,0.45788,0.47407,,,,,,,,
-efficientnet_b0,weighted_loss,arm,questionnaire_only,,ece,0.00000,5,0.08323,0.02011,0.06363,0.10366,0.07600,0.08381,0.06737,0.07146,0.11751,,,,,,,,
-efficientnet_b0,weighted_loss,arm,questionnaire_only,,macro_f1,1.00000,5,0.14453,0.03704,0.13781,0.15159,0.11864,0.18488,0.11723,0.11657,0.18531,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat,,macro_f1,0.00000,5,0.51554,0.05711,0.46800,0.55132,0.43472,0.59460,0.52086,0.52444,0.50306,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat,,balanced_acc,0.00000,5,0.59488,0.03798,0.55035,0.63684,0.58086,0.65986,0.57842,0.56207,0.59320,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat,,accuracy,0.00000,5,0.54683,0.06128,0.52018,0.57404,0.45185,0.58672,0.53137,0.55311,0.61111,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat,,ece,0.00000,5,0.08795,0.05554,0.06740,0.10976,0.04153,0.09418,0.06696,0.05597,0.18112,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat,,macro_f1,1.00000,5,0.50584,0.05980,0.46086,0.54001,0.40939,0.55962,0.52350,0.54560,0.49111,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_gated,,macro_f1,0.00000,5,0.51354,0.03959,0.46390,0.55004,0.49392,0.58158,0.50086,0.51078,0.48056,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_gated,,balanced_acc,0.00000,5,0.58159,0.06473,0.53448,0.62851,0.61259,0.67823,0.53178,0.52088,0.56446,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_gated,,accuracy,0.00000,5,0.56678,0.02739,0.54085,0.59335,0.54074,0.61255,0.56827,0.55678,0.55556,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_gated,,ece,0.00000,5,0.08822,0.02076,0.06694,0.10990,0.07110,0.11304,0.09332,0.10063,0.06302,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_gated,,macro_f1,1.00000,5,0.52076,0.04343,0.47320,0.55583,0.48784,0.57976,0.50610,0.55178,0.47830,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_film,,macro_f1,0.00000,5,0.54439,0.04335,0.49747,0.57946,0.53277,0.59438,0.54629,0.56935,0.47915,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_film,,balanced_acc,0.00000,5,0.61078,0.05776,0.56530,0.65370,0.62343,0.69873,0.57247,0.61160,0.54767,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_film,,accuracy,0.00000,5,0.58156,0.03029,0.55577,0.60742,0.58519,0.62362,0.53875,0.57509,0.58519,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_film,,ece,0.00000,5,0.08542,0.02767,0.06677,0.10482,0.05853,0.10672,0.10858,0.05219,0.10107,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_film,,macro_f1,1.00000,5,0.51840,0.04907,0.47264,0.55183,0.49535,0.58873,0.51028,0.53958,0.45807,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,macro_f1,0.00000,5,0.50333,0.04635,0.45605,0.53773,0.43243,0.54362,0.49505,0.54641,0.49914,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,balanced_acc,0.00000,5,0.58179,0.03457,0.53562,0.62295,0.58665,0.60294,0.52194,0.60749,0.58996,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,accuracy,0.00000,5,0.54679,0.06185,0.51949,0.57413,0.44444,0.53506,0.57934,0.57509,0.60000,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,ece,0.00000,5,0.08833,0.04845,0.06864,0.10872,0.05743,0.05966,0.06119,0.09218,0.17116,,,,,,,,
-efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,macro_f1,1.00000,5,0.49523,0.04766,0.44846,0.52917,0.42185,0.51951,0.48726,0.55040,0.49710,,,,,,,,
-efficientnet_b0,weighted_loss,arm,ensemble_image_q,,macro_f1,0.00000,5,0.52096,0.03451,0.47050,0.55580,0.48268,0.51955,0.49908,0.57323,0.53027,,,,,,,,
-efficientnet_b0,weighted_loss,arm,ensemble_image_q,,balanced_acc,0.00000,5,0.57383,0.06858,0.52671,0.61641,0.56463,0.53702,0.50764,0.68780,0.57206,,,,,,,,
-efficientnet_b0,weighted_loss,arm,ensemble_image_q,,accuracy,0.00000,5,0.58304,0.02973,0.55715,0.60950,0.54074,0.60517,0.58672,0.56777,0.61481,,,,,,,,
-efficientnet_b0,weighted_loss,arm,ensemble_image_q,,ece,0.00000,5,0.08118,0.02159,0.06216,0.10075,0.07660,0.08942,0.11225,0.05362,0.07403,,,,,,,,
-efficientnet_b0,weighted_loss,arm,ensemble_image_q,,macro_f1,1.00000,5,0.54870,0.04445,0.50566,0.58247,0.48268,0.60151,0.53627,0.57323,0.54979,,,,,,,,
-efficientnet_b0,weighted_loss,paired,fusion_concat,image_only,macro_f1,0.00000,5,-0.02117,0.03114,-0.05133,0.00676,-0.05268,0.01804,0.00268,-0.04879,-0.02513,2.00000,0.20299,0.31250,"[-0.119, 0.013]","[-0.011, 0.050]","[-0.055, 0.062]","[-0.143, 0.024]","[-0.098, 0.049]"
-efficientnet_b0,weighted_loss,paired,fusion_concat,questionnaire_only,macro_f1,0.00000,5,0.12553,0.04192,0.07131,0.17831,0.09321,0.18418,0.07902,0.14505,0.12619,5.00000,0.00259,0.06250,"[-0.032, 0.211]","[0.076, 0.300]","[-0.034, 0.197]","[0.030, 0.253]","[0.007, 0.247]"
-efficientnet_b0,weighted_loss,paired,fusion_gated,image_only,macro_f1,0.00000,5,-0.02317,0.03103,-0.06014,0.01063,0.00652,0.00502,-0.01731,-0.06245,-0.04763,2.00000,0.17034,0.31250,"[-0.054, 0.068]","[-0.071, 0.078]","[-0.092, 0.048]","[-0.177, 0.034]","[-0.121, 0.022]"
-efficientnet_b0,weighted_loss,paired,fusion_gated,questionnaire_only,macro_f1,0.00000,5,0.12353,0.04393,0.07047,0.17483,0.15241,0.17116,0.05902,0.13139,0.10369,5.00000,0.00327,0.06250,"[0.032, 0.267]","[0.065, 0.280]","[-0.050, 0.178]","[-0.003, 0.253]","[-0.013, 0.220]"
-efficientnet_b0,weighted_loss,paired,fusion_film,image_only,macro_f1,0.00000,5,0.00768,0.03637,-0.02339,0.03781,0.04537,0.01782,0.02812,-0.00388,-0.04904,3.00000,0.66151,0.81250,"[-0.008, 0.100]","[-0.046, 0.076]","[-0.052, 0.106]","[-0.093, 0.070]","[-0.119, 0.015]"
-efficientnet_b0,weighted_loss,paired,fusion_film,questionnaire_only,macro_f1,0.00000,5,0.15438,0.04666,0.10360,0.20453,0.19126,0.18396,0.10445,0.18996,0.10227,5.00000,0.00178,0.06250,"[0.064, 0.309]","[0.086, 0.288]","[-0.001, 0.224]","[0.091, 0.285]","[-0.014, 0.221]"
-efficientnet_b0,weighted_loss,paired,fusion_concat_nodrop,image_only,macro_f1,0.00000,5,-0.03338,0.01258,-0.06731,-0.00201,-0.05498,-0.03293,-0.02313,-0.02681,-0.02906,0.00000,0.00405,0.06250,"[-0.122, 0.013]","[-0.079, 0.011]","[-0.121, 0.065]","[-0.107, 0.036]","[-0.103, 0.042]"
-efficientnet_b0,weighted_loss,paired,fusion_concat_nodrop,questionnaire_only,macro_f1,0.00000,5,0.11332,0.04323,0.06289,0.16451,0.09092,0.13321,0.05321,0.16702,0.12226,5.00000,0.00423,0.06250,"[-0.032, 0.207]","[0.026, 0.244]","[-0.047, 0.161]","[0.069, 0.262]","[0.001, 0.241]"
-efficientnet_b0,weighted_loss,paired,ensemble_image_q,image_only,macro_f1,0.00000,5,-0.01575,0.02450,-0.05326,0.01752,-0.00472,-0.05700,-0.01910,0.00000,0.00208,1.00000,0.22397,0.25000,"[-0.013, 0.000]","[-0.187, 0.058]","[-0.121, 0.073]","[0.000, 0.000]","[-0.073, 0.073]"
-efficientnet_b0,weighted_loss,paired,ensemble_image_q,questionnaire_only,macro_f1,0.00000,5,0.13095,0.05117,0.08556,0.17653,0.14118,0.10913,0.05724,0.19383,0.15339,5.00000,0.00461,0.06250,"[0.011, 0.257]","[0.048, 0.181]","[-0.038, 0.163]","[0.098, 0.290]","[0.046, 0.258]"
-efficientnet_b0,weighted_loss,paired,image_only,questionnaire_only,macro_f1,0.00000,5,0.14670,0.04351,0.09626,0.19894,0.14590,0.16614,0.07634,0.19383,0.15132,5.00000,0.00166,0.06250,"[0.019, 0.264]","[0.056, 0.280]","[-0.039, 0.198]","[0.098, 0.290]","[0.033, 0.275]"
-efficientnet_b0,weighted_loss,paired,fusion_gated,fusion_concat,macro_f1,0.00000,5,-0.00199,0.03445,-0.03491,0.02706,0.05920,-0.01302,-0.01999,-0.01366,-0.02250,1.00000,0.90325,0.62500,"[0.002, 0.119]","[-0.089, 0.057]","[-0.101, 0.054]","[-0.095, 0.047]","[-0.082, 0.037]"
-efficientnet_b0,weighted_loss,paired,fusion_film,fusion_concat,macro_f1,0.00000,5,0.02885,0.04660,-0.00153,0.06025,0.09805,-0.00022,0.02543,0.04491,-0.02391,3.00000,0.23846,0.31250,"[0.040, 0.160]","[-0.065, 0.059]","[-0.052, 0.099]","[-0.031, 0.128]","[-0.095, 0.043]"
-efficientnet_b0,weighted_loss,paired,fusion_concat_nodrop,fusion_concat,macro_f1,0.00000,5,-0.01221,0.02749,-0.03621,0.01113,-0.00229,-0.05097,-0.02581,0.02197,-0.00393,1.00000,0.37701,0.31250,"[-0.014, 0.012]","[-0.094, -0.011]","[-0.119, 0.053]","[-0.045, 0.093]","[-0.016, 0.007]"
-efficientnet_b0,weighted_loss,paired,ensemble_image_q,fusion_concat,macro_f1,0.00000,5,0.00543,0.05334,-0.03698,0.04681,0.04796,-0.07505,-0.02178,0.04879,0.02721,3.00000,0.83121,0.81250,"[-0.018, 0.115]","[-0.204, 0.043]","[-0.130, 0.086]","[-0.024, 0.143]","[-0.049, 0.110]"
+backbone,balance,row_type,arm,versus,metric,missing_pct,n_seeds,mean,sd,ci_low,ci_high,seed0,seed1,seed2,seed3,seed4,seed5,seed6,seed7,seed8,seed9,a_better_seeds,t_test_p,wilcoxon_p,seed0_ci,seed1_ci,seed2_ci,seed3_ci,seed4_ci,seed5_ci,seed6_ci,seed7_ci,seed8_ci,seed9_ci,scale,group,mean_n_cases,holm_p
+efficientnet_b0,weighted_loss,arm,image_only,,macro_f1,0.00000,10,0.51911,0.03981,0.48497,0.54150,0.48740,0.57655,0.51817,0.57323,0.52820,0.47439,0.48556,0.47854,0.56367,0.50541,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,image_only,,balanced_acc,0.00000,10,0.60984,0.03847,0.57968,0.63923,0.56918,0.63374,0.60165,0.68780,0.62726,0.55090,0.60757,0.61254,0.62723,0.58056,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,image_only,,accuracy,0.00000,10,0.56389,0.02580,0.54582,0.58238,0.54815,0.57565,0.56089,0.56777,0.60000,0.54444,0.53676,0.52593,0.60370,0.57565,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,image_only,,ece,0.00000,10,0.07903,0.01726,0.06587,0.09327,0.08405,0.05759,0.07388,0.05801,0.07724,0.11990,0.08092,0.07440,0.08450,0.07982,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,questionnaire_only,,macro_f1,0.00000,10,0.38063,0.04979,0.34948,0.40422,0.34151,0.41042,0.44184,0.37939,0.37688,0.39693,0.32617,0.31998,0.46936,0.34385,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,questionnaire_only,,balanced_acc,0.00000,10,0.43709,0.06566,0.39948,0.47490,0.42346,0.47755,0.45769,0.47926,0.37756,0.47138,0.35993,0.36690,0.56726,0.38989,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,questionnaire_only,,accuracy,0.00000,10,0.48229,0.03997,0.46384,0.50150,0.40741,0.50923,0.53137,0.45788,0.47407,0.50741,0.46691,0.46667,0.54074,0.46125,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,questionnaire_only,,ece,0.00000,10,0.08780,0.02177,0.07326,0.10297,0.07600,0.08381,0.06737,0.07146,0.11751,0.09073,0.09620,0.07152,0.07163,0.13181,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,questionnaire_only,,macro_f1,1.00000,10,0.13839,0.03243,0.13348,0.14365,0.11864,0.18488,0.11723,0.11657,0.18531,0.11864,0.18591,0.11972,0.11864,0.11831,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat,,macro_f1,0.00000,10,0.51427,0.03997,0.48153,0.53807,0.43472,0.59460,0.52086,0.52444,0.50306,0.48356,0.52936,0.50834,0.52338,0.52040,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat,,balanced_acc,0.00000,10,0.59656,0.03195,0.56653,0.62559,0.58086,0.65986,0.57842,0.56207,0.59320,0.54824,0.60610,0.61615,0.62068,0.60002,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat,,accuracy,0.00000,10,0.56423,0.04663,0.54574,0.58380,0.45185,0.58672,0.53137,0.55311,0.61111,0.57778,0.61029,0.55556,0.58148,0.58303,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat,,ece,0.00000,10,0.09249,0.04217,0.07848,0.10719,0.04153,0.09418,0.06696,0.05597,0.18112,0.13788,0.07885,0.11775,0.06848,0.08216,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat,,macro_f1,1.00000,10,0.50464,0.04181,0.47190,0.52784,0.40939,0.55962,0.52350,0.54560,0.49111,0.49032,0.52584,0.47867,0.51314,0.50924,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_gated,,macro_f1,0.00000,10,0.48951,0.04058,0.45538,0.51302,0.49392,0.58158,0.50086,0.51078,0.48056,0.46959,0.48453,0.46757,0.42064,0.48503,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_gated,,balanced_acc,0.00000,10,0.56541,0.04983,0.53273,0.59804,0.61259,0.67823,0.53178,0.52088,0.56446,0.52465,0.56925,0.58393,0.52188,0.54641,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_gated,,accuracy,0.00000,10,0.55721,0.02899,0.53876,0.57607,0.54074,0.61255,0.56827,0.55678,0.55556,0.58148,0.56250,0.54444,0.50000,0.54982,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_gated,,ece,0.00000,10,0.08493,0.01980,0.07068,0.09968,0.07110,0.11304,0.09332,0.10063,0.06302,0.10730,0.07036,0.05918,0.09936,0.07201,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_gated,,macro_f1,1.00000,10,0.49090,0.04539,0.45748,0.51455,0.48784,0.57976,0.50610,0.55178,0.47830,0.46800,0.46322,0.47441,0.42156,0.47801,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_film,,macro_f1,0.00000,10,0.51946,0.04353,0.48394,0.54446,0.53277,0.59438,0.54629,0.56935,0.47915,0.45835,0.48175,0.48465,0.52100,0.52695,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_film,,balanced_acc,0.00000,10,0.58155,0.05928,0.54620,0.61527,0.62343,0.69873,0.57247,0.61160,0.54767,0.47921,0.53061,0.56321,0.58244,0.60615,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_film,,accuracy,0.00000,10,0.58382,0.02502,0.56538,0.60228,0.58519,0.62362,0.53875,0.57509,0.58519,0.60370,0.59559,0.54815,0.58889,0.59410,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_film,,ece,0.00000,10,0.07562,0.02377,0.06218,0.08997,0.05853,0.10672,0.10858,0.05219,0.10107,0.04842,0.08024,0.08600,0.05723,0.05724,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_film,,macro_f1,1.00000,10,0.51339,0.03416,0.47915,0.53711,0.49535,0.58873,0.51028,0.53958,0.45807,0.50862,0.51138,0.48740,0.51955,0.51494,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,macro_f1,0.00000,10,0.50525,0.03621,0.46964,0.52897,0.43243,0.54362,0.49505,0.54641,0.49914,0.48908,0.47686,0.49813,0.54576,0.52605,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,balanced_acc,0.00000,10,0.58208,0.03823,0.55074,0.61359,0.58665,0.60294,0.52194,0.60749,0.58996,0.55697,0.51517,0.62300,0.61860,0.59808,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,accuracy,0.00000,10,0.56644,0.04802,0.54763,0.58460,0.44444,0.53506,0.57934,0.57509,0.60000,0.58519,0.58824,0.55556,0.61111,0.59041,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,ece,0.00000,10,0.09318,0.03663,0.07860,0.10829,0.05743,0.05966,0.06119,0.09218,0.17116,0.13847,0.08875,0.07728,0.10390,0.08179,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,fusion_concat_nodrop,,macro_f1,1.00000,10,0.50448,0.03537,0.46969,0.52705,0.42185,0.51951,0.48726,0.55040,0.49710,0.50918,0.51747,0.49041,0.54073,0.51091,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,ensemble_image_q,,macro_f1,0.00000,10,0.49822,0.05202,0.46090,0.52288,0.48268,0.51955,0.49908,0.57323,0.53027,0.47816,0.43991,0.47854,0.57005,0.41071,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,ensemble_image_q,,balanced_acc,0.00000,10,0.55482,0.08037,0.52088,0.58739,0.56463,0.53702,0.50764,0.68780,0.57206,0.51051,0.47024,0.61254,0.65417,0.43157,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,ensemble_image_q,,accuracy,0.00000,10,0.57275,0.03970,0.55391,0.59196,0.54074,0.60517,0.58672,0.56777,0.61481,0.56667,0.58456,0.52593,0.62963,0.50554,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,ensemble_image_q,,ece,0.00000,10,0.10348,0.03814,0.08932,0.11756,0.07660,0.08942,0.11225,0.05362,0.07403,0.15562,0.10698,0.08122,0.10745,0.17766,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,arm,ensemble_image_q,,macro_f1,1.00000,10,0.49633,0.09653,0.46218,0.51912,0.48268,0.60151,0.53627,0.57323,0.54979,0.47707,0.41732,0.47854,0.57297,0.27396,,,,,,,,,,,,,,,,,
+efficientnet_b0,weighted_loss,paired,fusion_concat,image_only,macro_f1,0.00000,10,-0.00484,0.03436,-0.02386,0.01360,-0.05268,0.01804,0.00268,-0.04879,-0.02513,0.00917,0.04380,0.02980,-0.04030,0.01500,6.00000,0.66648,0.76953,"[-0.119, 0.013]","[-0.011, 0.050]","[-0.055, 0.062]","[-0.143, 0.024]","[-0.098, 0.049]","[-0.044, 0.060]","[-0.006, 0.100]","[-0.008, 0.071]","[-0.120, 0.052]","[-0.011, 0.042]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_concat,questionnaire_only,macro_f1,0.00000,10,0.13364,0.05331,0.09806,0.16862,0.09321,0.18418,0.07902,0.14505,0.12619,0.08663,0.20319,0.18835,0.05401,0.17655,10.00000,0.00002,0.00195,"[-0.032, 0.211]","[0.076, 0.300]","[-0.034, 0.197]","[0.030, 0.253]","[0.007, 0.247]","[-0.010, 0.180]","[0.108, 0.291]","[0.087, 0.281]","[-0.045, 0.159]","[0.043, 0.298]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_gated,image_only,macro_f1,0.00000,10,-0.02960,0.04569,-0.05311,-0.00694,0.00652,0.00502,-0.01731,-0.06245,-0.04763,-0.00480,-0.00103,-0.01097,-0.14303,-0.02038,2.00000,0.07073,0.03711,"[-0.054, 0.068]","[-0.071, 0.078]","[-0.092, 0.048]","[-0.177, 0.034]","[-0.121, 0.022]","[-0.052, 0.042]","[-0.085, 0.083]","[-0.074, 0.051]","[-0.219, -0.063]","[-0.066, 0.020]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_gated,questionnaire_only,macro_f1,0.00000,10,0.10887,0.06661,0.07277,0.14268,0.15241,0.17116,0.05902,0.13139,0.10369,0.07266,0.15836,0.14759,-0.04872,0.14118,9.00000,0.00059,0.00391,"[0.032, 0.267]","[0.065, 0.280]","[-0.050, 0.178]","[-0.003, 0.253]","[-0.013, 0.220]","[-0.022, 0.169]","[0.059, 0.252]","[0.051, 0.241]","[-0.154, 0.067]","[0.010, 0.266]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_film,image_only,macro_f1,0.00000,10,0.00035,0.03015,-0.02291,0.02261,0.04537,0.01782,0.02812,-0.00388,-0.04904,-0.01604,-0.00381,0.00611,-0.04268,0.02154,5.00000,0.97140,0.84570,"[-0.008, 0.100]","[-0.046, 0.076]","[-0.052, 0.106]","[-0.093, 0.070]","[-0.119, 0.015]","[-0.121, 0.071]","[-0.091, 0.071]","[-0.080, 0.086]","[-0.112, 0.024]","[-0.015, 0.056]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_film,questionnaire_only,macro_f1,0.00000,10,0.13883,0.05418,0.10133,0.17337,0.19126,0.18396,0.10445,0.18996,0.10227,0.06142,0.15558,0.16466,0.05163,0.18310,10.00000,0.00002,0.00195,"[0.064, 0.309]","[0.086, 0.288]","[-0.001, 0.224]","[0.091, 0.285]","[-0.014, 0.221]","[-0.044, 0.154]","[0.059, 0.249]","[0.065, 0.256]","[-0.069, 0.175]","[0.050, 0.300]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,-0.01386,0.02518,-0.03518,0.00579,-0.05498,-0.03293,-0.02313,-0.02681,-0.02906,0.01469,-0.00871,0.01959,-0.01792,0.02065,3.00000,0.11574,0.10547,"[-0.122, 0.013]","[-0.079, 0.011]","[-0.121, 0.065]","[-0.107, 0.036]","[-0.103, 0.042]","[-0.036, 0.063]","[-0.095, 0.067]","[-0.031, 0.067]","[-0.068, 0.027]","[-0.011, 0.053]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_concat_nodrop,questionnaire_only,macro_f1,0.00000,10,0.12462,0.04516,0.08971,0.15761,0.09092,0.13321,0.05321,0.16702,0.12226,0.09215,0.15068,0.17815,0.07639,0.18220,10.00000,0.00001,0.00195,"[-0.032, 0.207]","[0.026, 0.244]","[-0.047, 0.161]","[0.069, 0.262]","[0.001, 0.241]","[-0.002, 0.183]","[0.051, 0.246]","[0.082, 0.273]","[-0.042, 0.193]","[0.051, 0.302]",,,,
+efficientnet_b0,weighted_loss,paired,ensemble_image_q,image_only,macro_f1,0.00000,10,-0.02090,0.03396,-0.04710,0.00294,-0.00472,-0.05700,-0.01910,0.00000,0.00208,0.00377,-0.04565,0.00000,0.00637,-0.09470,3.00000,0.08357,0.14844,"[-0.013, 0.000]","[-0.187, 0.058]","[-0.121, 0.073]","[0.000, 0.000]","[-0.073, 0.073]","[-0.086, 0.072]","[-0.149, 0.057]","[0.000, 0.000]","[-0.061, 0.094]","[-0.201, -0.009]",,,,
+efficientnet_b0,weighted_loss,paired,ensemble_image_q,questionnaire_only,macro_f1,0.00000,10,0.11758,0.04377,0.08402,0.14605,0.14118,0.10913,0.05724,0.19383,0.15339,0.08123,0.11374,0.15856,0.10068,0.06686,10.00000,0.00001,0.00195,"[0.011, 0.257]","[0.048, 0.181]","[-0.038, 0.163]","[0.098, 0.290]","[0.046, 0.258]","[-0.012, 0.168]","[0.031, 0.200]","[0.059, 0.253]","[0.005, 0.197]","[-0.040, 0.161]",,,,
+efficientnet_b0,weighted_loss,paired,image_only,questionnaire_only,macro_f1,0.00000,10,0.13848,0.04077,0.10211,0.17288,0.14590,0.16614,0.07634,0.19383,0.15132,0.07746,0.15939,0.15856,0.09431,0.16156,10.00000,0.00000,0.00195,"[0.019, 0.264]","[0.056, 0.280]","[-0.039, 0.198]","[0.098, 0.290]","[0.033, 0.275]","[-0.020, 0.173]","[0.063, 0.249]","[0.059, 0.253]","[-0.036, 0.217]","[0.025, 0.278]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_gated,fusion_concat,macro_f1,0.00000,10,-0.02476,0.03987,-0.04621,-0.00503,0.05920,-0.01302,-0.01999,-0.01366,-0.02250,-0.01397,-0.04483,-0.04076,-0.10273,-0.03538,1.00000,0.08110,0.06445,"[0.002, 0.119]","[-0.089, 0.057]","[-0.101, 0.054]","[-0.095, 0.047]","[-0.082, 0.037]","[-0.054, 0.024]","[-0.131, 0.037]","[-0.098, 0.013]","[-0.180, -0.027]","[-0.080, 0.005]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_film,fusion_concat,macro_f1,0.00000,10,0.00519,0.04229,-0.01719,0.02726,0.09805,-0.00022,0.02543,0.04491,-0.02391,-0.02521,-0.04761,-0.02369,-0.00238,0.00655,4.00000,0.70684,1.00000,"[0.040, 0.160]","[-0.065, 0.059]","[-0.052, 0.099]","[-0.031, 0.128]","[-0.095, 0.043]","[-0.126, 0.062]","[-0.123, 0.009]","[-0.106, 0.050]","[-0.076, 0.054]","[-0.025, 0.038]",,,,
+efficientnet_b0,weighted_loss,paired,fusion_concat_nodrop,fusion_concat,macro_f1,0.00000,10,-0.00902,0.02662,-0.02522,0.00635,-0.00229,-0.05097,-0.02581,0.02197,-0.00393,0.00552,-0.05251,-0.01020,0.02238,0.00565,4.00000,0.31189,0.49219,"[-0.014, 0.012]","[-0.094, -0.011]","[-0.119, 0.053]","[-0.045, 0.093]","[-0.016, 0.007]","[-0.019, 0.032]","[-0.130, -0.002]","[-0.057, 0.030]","[-0.061, 0.091]","[-0.011, 0.022]",,,,
+efficientnet_b0,weighted_loss,paired,ensemble_image_q,fusion_concat,macro_f1,0.00000,10,-0.01605,0.05970,-0.04496,0.01030,0.04796,-0.07505,-0.02178,0.04879,0.02721,-0.00540,-0.08945,-0.02980,0.04667,-0.10970,4.00000,0.41717,0.55664,"[-0.018, 0.115]","[-0.204, 0.043]","[-0.130, 0.086]","[-0.024, 0.143]","[-0.049, 0.110]","[-0.097, 0.075]","[-0.189, 0.008]","[-0.071, 0.008]","[0.000, 0.104]","[-0.218, -0.022]",,,,
+efficientnet_b0,weighted_loss,arm_group,image_only,,macro_f1,0.00000,10,0.51256,0.04471,0.46617,0.53961,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,image_only,,macro_f1,0.00000,10,0.55257,0.07344,0.50220,0.58587,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,image_only,,macro_f1,0.00000,10,0.49621,0.14019,0.43684,0.58422,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,image_only,,macro_f1,0.00000,10,0.53413,0.04711,0.49756,0.56024,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,image_only,,macro_f1,0.00000,10,0.45701,0.06908,0.42271,0.50834,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,image_only,,macro_f1,0.00000,10,0.67806,0.13350,0.59055,0.76733,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,image_only,,f1,0.00000,10,0.31997,0.06405,0.27440,0.36068,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,image_only,,f1,0.00000,10,0.68892,0.01769,0.66848,0.70718,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,image_only,,f1,0.00000,10,0.43462,0.04308,0.40283,0.46178,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,image_only,,f1,0.00000,10,0.63295,0.10084,0.52074,0.71066,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,arm_group,questionnaire_only,,macro_f1,0.00000,10,0.38820,0.07997,0.34342,0.41782,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,questionnaire_only,,macro_f1,0.00000,10,0.36542,0.08619,0.34011,0.41689,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,questionnaire_only,,macro_f1,0.00000,10,0.42622,0.12303,0.36637,0.50005,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,questionnaire_only,,macro_f1,0.00000,10,0.38369,0.05257,0.34402,0.40997,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,questionnaire_only,,macro_f1,0.00000,10,0.40713,0.08256,0.37362,0.45744,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,questionnaire_only,,macro_f1,0.00000,10,0.48120,0.12462,0.38961,0.58461,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,questionnaire_only,,f1,0.00000,10,0.20681,0.10161,0.16182,0.24593,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,questionnaire_only,,f1,0.00000,10,0.58901,0.04340,0.56663,0.60891,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,questionnaire_only,,f1,0.00000,10,0.42412,0.05001,0.39586,0.45036,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,questionnaire_only,,f1,0.00000,10,0.30259,0.12701,0.20583,0.37849,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat,,macro_f1,0.00000,10,0.51347,0.05032,0.46750,0.54103,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat,,macro_f1,0.00000,10,0.54003,0.07918,0.48606,0.57429,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat,,macro_f1,0.00000,10,0.48873,0.09488,0.42273,0.57362,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat,,macro_f1,0.00000,10,0.53425,0.04184,0.49481,0.56043,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat,,macro_f1,0.00000,10,0.44446,0.06807,0.40278,0.49580,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat,,macro_f1,0.00000,10,0.68211,0.16947,0.59724,0.76777,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat,,f1,0.00000,10,0.30386,0.08801,0.25493,0.34683,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat,,f1,0.00000,10,0.67743,0.06921,0.65671,0.69770,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat,,f1,0.00000,10,0.44710,0.05377,0.41382,0.47573,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat,,f1,0.00000,10,0.62870,0.10786,0.51185,0.70348,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,arm_group,fusion_gated,,macro_f1,0.00000,10,0.49288,0.05644,0.44413,0.52178,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_gated,,macro_f1,0.00000,10,0.47953,0.05214,0.44832,0.52849,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_gated,,macro_f1,0.00000,10,0.45342,0.10945,0.39593,0.53909,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_gated,,macro_f1,0.00000,10,0.50401,0.03996,0.46190,0.52982,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_gated,,macro_f1,0.00000,10,0.45491,0.06832,0.41032,0.49974,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,fusion_gated,,macro_f1,0.00000,10,0.62994,0.23469,0.53694,0.72248,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,fusion_gated,,f1,0.00000,10,0.27312,0.08957,0.22538,0.31644,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,fusion_gated,,f1,0.00000,10,0.68299,0.03541,0.66268,0.70155,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,fusion_gated,,f1,0.00000,10,0.42828,0.03716,0.39576,0.45601,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,fusion_gated,,f1,0.00000,10,0.57364,0.09974,0.45738,0.65422,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,arm_group,fusion_film,,macro_f1,0.00000,10,0.50005,0.05306,0.44870,0.52956,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_film,,macro_f1,0.00000,10,0.54853,0.08098,0.50259,0.58631,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_film,,macro_f1,0.00000,10,0.57208,0.10901,0.50082,0.65425,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_film,,macro_f1,0.00000,10,0.52743,0.04272,0.48564,0.55514,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_film,,macro_f1,0.00000,10,0.49422,0.08657,0.45149,0.54064,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,fusion_film,,macro_f1,0.00000,10,0.70225,0.20690,0.61907,0.78636,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,fusion_film,,f1,0.00000,10,0.32648,0.08170,0.27631,0.36957,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,fusion_film,,f1,0.00000,10,0.70365,0.03101,0.68311,0.72228,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,fusion_film,,f1,0.00000,10,0.45945,0.04399,0.42785,0.48587,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,fusion_film,,f1,0.00000,10,0.58827,0.13649,0.46076,0.66926,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat_nodrop,,macro_f1,0.00000,10,0.48997,0.03646,0.44048,0.51815,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat_nodrop,,macro_f1,0.00000,10,0.53949,0.08176,0.49622,0.58096,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat_nodrop,,macro_f1,0.00000,10,0.51723,0.11189,0.44804,0.60462,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat_nodrop,,macro_f1,0.00000,10,0.51889,0.03197,0.47804,0.54514,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat_nodrop,,macro_f1,0.00000,10,0.45719,0.09014,0.41890,0.50460,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,fusion_concat_nodrop,,macro_f1,0.00000,10,0.71792,0.16763,0.63521,0.80665,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat_nodrop,,f1,0.00000,10,0.30478,0.07265,0.25649,0.34818,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat_nodrop,,f1,0.00000,10,0.68174,0.07012,0.66167,0.70168,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat_nodrop,,f1,0.00000,10,0.44814,0.06180,0.41679,0.47619,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,fusion_concat_nodrop,,f1,0.00000,10,0.58635,0.10178,0.46820,0.66679,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,arm_group,ensemble_image_q,,macro_f1,0.00000,10,0.48105,0.08720,0.43316,0.50930,,,,,,,,,,,,,,,,,,,,,,,,eFST,I-II,117.10000,
+efficientnet_b0,weighted_loss,arm_group,ensemble_image_q,,macro_f1,0.00000,10,0.54926,0.11335,0.48691,0.57547,,,,,,,,,,,,,,,,,,,,,,,,eFST,III-IV,120.10000,
+efficientnet_b0,weighted_loss,arm_group,ensemble_image_q,,macro_f1,0.00000,10,0.52093,0.13661,0.46237,0.61043,,,,,,,,,,,,,,,,,,,,,,,,eFST,V-VI,22.60000,
+efficientnet_b0,weighted_loss,arm_group,ensemble_image_q,,macro_f1,0.00000,10,0.50414,0.05749,0.46219,0.53034,,,,,,,,,,,,,,,,,,,,,,,,eMST,1-3,186.60000,
+efficientnet_b0,weighted_loss,arm_group,ensemble_image_q,,macro_f1,0.00000,10,0.47649,0.06369,0.43317,0.52319,,,,,,,,,,,,,,,,,,,,,,,,eMST,4-6,72.30000,
+efficientnet_b0,weighted_loss,arm_group,ensemble_image_q,,macro_f1,0.00000,10,0.68896,0.18467,0.60565,0.77903,,,,,,,,,,,,,,,,,,,,,,,,eMST,7-10,11.40000,
+efficientnet_b0,weighted_loss,arm_class,ensemble_image_q,,f1,0.00000,10,0.28848,0.08601,0.23934,0.33089,,,,,,,,,,,,,,,,,,,,,,,,class,acne,22.00000,
+efficientnet_b0,weighted_loss,arm_class,ensemble_image_q,,f1,0.00000,10,0.69741,0.03573,0.67838,0.71566,,,,,,,,,,,,,,,,,,,,,,,,class,eczema_dermatitis,159.30000,
+efficientnet_b0,weighted_loss,arm_class,ensemble_image_q,,f1,0.00000,10,0.45042,0.05536,0.41796,0.47768,,,,,,,,,,,,,,,,,,,,,,,,class,normal_other,83.80000,
+efficientnet_b0,weighted_loss,arm_class,ensemble_image_q,,f1,0.00000,10,0.55657,0.14904,0.43056,0.64128,,,,,,,,,,,,,,,,,,,,,,,,class,redness_rosacea,5.70000,
+efficientnet_b0,weighted_loss,paired_group,questionnaire_only,image_only,macro_f1,0.00000,10,-0.12436,0.06209,-0.17181,-0.07295,,,,,,,,,,,0.00000,0.00014,,,,,,,,,,,,eFST,I-II,117.10000,0.00081
+efficientnet_b0,weighted_loss,paired_group,questionnaire_only,image_only,macro_f1,0.00000,10,-0.18715,0.09112,-0.22079,-0.10980,,,,,,,,,,,0.00000,0.00011,,,,,,,,,,,,eFST,III-IV,120.10000,0.00078
+efficientnet_b0,weighted_loss,paired_group,questionnaire_only,image_only,macro_f1,0.00000,10,-0.07000,0.18162,-0.16467,0.01103,,,,,,,,,,,4.00000,0.25391,,,,,,,,,,,,eFST,V-VI,22.60000,0.50782
+efficientnet_b0,weighted_loss,paired_group,questionnaire_only,image_only,macro_f1,0.00000,10,-0.15044,0.05811,-0.19214,-0.10926,,,,,,,,,,,0.00000,0.00002,,,,,,,,,,,,eMST,1-3,186.60000,0.00017
+efficientnet_b0,weighted_loss,paired_group,questionnaire_only,image_only,macro_f1,0.00000,10,-0.04988,0.10484,-0.10612,0.00289,,,,,,,,,,,2.00000,0.16670,,,,,,,,,,,,eMST,4-6,72.30000,0.50011
+efficientnet_b0,weighted_loss,paired_group,questionnaire_only,image_only,macro_f1,0.00000,10,-0.19686,0.10320,-0.32010,-0.06810,,,,,,,,,,,0.00000,0.00019,,,,,,,,,,,,eMST,7-10,11.40000,0.00097
+efficientnet_b0,weighted_loss,paired_class,questionnaire_only,image_only,f1,0.00000,10,-0.11316,0.10683,-0.16799,-0.05611,,,,,,,,,,,2.00000,0.00853,,,,,,,,,,,,class,acne,22.00000,0.03412
+efficientnet_b0,weighted_loss,paired_class,questionnaire_only,image_only,f1,0.00000,10,-0.09990,0.04316,-0.12654,-0.07426,,,,,,,,,,,0.00000,0.00004,,,,,,,,,,,,class,eczema_dermatitis,159.30000,0.00036
+efficientnet_b0,weighted_loss,paired_class,questionnaire_only,image_only,f1,0.00000,10,-0.01050,0.07984,-0.04623,0.02696,,,,,,,,,,,5.00000,0.68714,,,,,,,,,,,,class,normal_other,83.80000,0.68714
+efficientnet_b0,weighted_loss,paired_class,questionnaire_only,image_only,f1,0.00000,10,-0.33035,0.10316,-0.43659,-0.21619,,,,,,,,,,,0.00000,0.00000,,,,,,,,,,,,class,redness_rosacea,5.70000,0.00003
+efficientnet_b0,weighted_loss,paired_group,fusion_concat,image_only,macro_f1,0.00000,10,0.00090,0.04478,-0.02688,0.02769,,,,,,,,,,,6.00000,0.95053,,,,,,,,,,,,eFST,I-II,117.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat,image_only,macro_f1,0.00000,10,-0.01254,0.04260,-0.04578,0.01455,,,,,,,,,,,4.00000,0.37610,,,,,,,,,,,,eFST,III-IV,120.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat,image_only,macro_f1,0.00000,10,-0.00748,0.08180,-0.06812,0.03921,,,,,,,,,,,6.00000,0.77891,,,,,,,,,,,,eFST,V-VI,22.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat,image_only,macro_f1,0.00000,10,0.00012,0.04273,-0.02380,0.02169,,,,,,,,,,,6.00000,0.99306,,,,,,,,,,,,eMST,1-3,186.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat,image_only,macro_f1,0.00000,10,-0.01255,0.03048,-0.05023,0.01720,,,,,,,,,,,4.00000,0.22527,,,,,,,,,,,,eMST,4-6,72.30000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat,image_only,macro_f1,0.00000,10,0.00405,0.10894,-0.07426,0.08376,,,,,,,,,,,5.00000,0.90895,,,,,,,,,,,,eMST,7-10,11.40000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat,image_only,f1,0.00000,10,-0.01610,0.06173,-0.05251,0.01884,,,,,,,,,,,4.00000,0.43067,,,,,,,,,,,,class,acne,22.00000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat,image_only,f1,0.00000,10,-0.01149,0.06661,-0.02479,0.00331,,,,,,,,,,,5.00000,0.59864,,,,,,,,,,,,class,eczema_dermatitis,159.30000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat,image_only,f1,0.00000,10,0.01248,0.06279,-0.01161,0.03798,,,,,,,,,,,6.00000,0.54513,,,,,,,,,,,,class,normal_other,83.80000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat,image_only,f1,0.00000,10,-0.00425,0.06901,-0.05410,0.04287,,,,,,,,,,,4.00000,0.84993,,,,,,,,,,,,class,redness_rosacea,5.70000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_gated,image_only,macro_f1,0.00000,10,-0.01969,0.06279,-0.05650,0.01307,,,,,,,,,,,4.00000,0.34738,,,,,,,,,,,,eFST,I-II,117.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_gated,image_only,macro_f1,0.00000,10,-0.07304,0.05683,-0.09517,-0.02053,,,,,,,,,,,0.00000,0.00282,,,,,,,,,,,,eFST,III-IV,120.10000,0.02823
+efficientnet_b0,weighted_loss,paired_group,fusion_gated,image_only,macro_f1,0.00000,10,-0.04279,0.14381,-0.11206,0.02876,,,,,,,,,,,3.00000,0.37129,,,,,,,,,,,,eFST,V-VI,22.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_gated,image_only,macro_f1,0.00000,10,-0.03013,0.05093,-0.05932,-0.00400,,,,,,,,,,,3.00000,0.09420,,,,,,,,,,,,eMST,1-3,186.60000,0.75357
+efficientnet_b0,weighted_loss,paired_group,fusion_gated,image_only,macro_f1,0.00000,10,-0.00210,0.06744,-0.05144,0.03183,,,,,,,,,,,3.00000,0.92357,,,,,,,,,,,,eMST,4-6,72.30000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_gated,image_only,macro_f1,0.00000,10,-0.04812,0.15986,-0.14199,0.04219,,,,,,,,,,,4.00000,0.36603,,,,,,,,,,,,eMST,7-10,11.40000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_gated,image_only,f1,0.00000,10,-0.04685,0.07944,-0.08934,-0.00587,,,,,,,,,,,2.00000,0.09508,,,,,,,,,,,,class,acne,22.00000,0.75357
+efficientnet_b0,weighted_loss,paired_class,fusion_gated,image_only,f1,0.00000,10,-0.00593,0.04434,-0.02211,0.00988,,,,,,,,,,,5.00000,0.68226,,,,,,,,,,,,class,eczema_dermatitis,159.30000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_gated,image_only,f1,0.00000,10,-0.00634,0.04508,-0.03425,0.02282,,,,,,,,,,,6.00000,0.66719,,,,,,,,,,,,class,normal_other,83.80000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_gated,image_only,f1,0.00000,10,-0.05931,0.09136,-0.12882,0.00349,,,,,,,,,,,2.00000,0.07031,,,,,,,,,,,,class,redness_rosacea,5.70000,0.63280
+efficientnet_b0,weighted_loss,paired_group,fusion_film,image_only,macro_f1,0.00000,10,-0.01251,0.04507,-0.04931,0.01757,,,,,,,,,,,4.00000,0.40288,,,,,,,,,,,,eFST,I-II,117.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_film,image_only,macro_f1,0.00000,10,-0.00405,0.03965,-0.03119,0.03024,,,,,,,,,,,4.00000,0.75427,,,,,,,,,,,,eFST,III-IV,120.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_film,image_only,macro_f1,0.00000,10,0.07587,0.19058,-0.00816,0.13058,,,,,,,,,,,6.00000,0.23973,,,,,,,,,,,,eFST,V-VI,22.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_film,image_only,macro_f1,0.00000,10,-0.00670,0.04027,-0.03688,0.01965,,,,,,,,,,,5.00000,0.61138,,,,,,,,,,,,eMST,1-3,186.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_film,image_only,macro_f1,0.00000,10,0.03721,0.07101,-0.00570,0.06579,,,,,,,,,,,6.00000,0.13195,,,,,,,,,,,,eMST,4-6,72.30000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_film,image_only,macro_f1,0.00000,10,0.02419,0.13719,-0.05365,0.11115,,,,,,,,,,,6.00000,0.59074,,,,,,,,,,,,eMST,7-10,11.40000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_film,image_only,f1,0.00000,10,0.00652,0.06684,-0.02978,0.04233,,,,,,,,,,,6.00000,0.76489,,,,,,,,,,,,class,acne,22.00000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_film,image_only,f1,0.00000,10,0.01474,0.03593,0.00031,0.02901,,,,,,,,,,,7.00000,0.22692,,,,,,,,,,,,class,eczema_dermatitis,159.30000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_film,image_only,f1,0.00000,10,0.02483,0.04232,-0.00154,0.05195,,,,,,,,,,,6.00000,0.09658,,,,,,,,,,,,class,normal_other,83.80000,0.96576
+efficientnet_b0,weighted_loss,paired_class,fusion_film,image_only,f1,0.00000,10,-0.04467,0.08164,-0.11593,0.02398,,,,,,,,,,,2.00000,0.11760,,,,,,,,,,,,class,redness_rosacea,5.70000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,-0.02259,0.03401,-0.05424,0.00660,,,,,,,,,,,3.00000,0.06505,,,,,,,,,,,,eFST,I-II,117.10000,0.58543
+efficientnet_b0,weighted_loss,paired_group,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,-0.01308,0.03891,-0.03450,0.02251,,,,,,,,,,,5.00000,0.31548,,,,,,,,,,,,eFST,III-IV,120.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,0.02102,0.09749,-0.04268,0.06988,,,,,,,,,,,8.00000,0.51259,,,,,,,,,,,,eFST,V-VI,22.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,-0.01524,0.03817,-0.04240,0.00877,,,,,,,,,,,3.00000,0.23844,,,,,,,,,,,,eMST,1-3,186.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,0.00018,0.03111,-0.03606,0.02944,,,,,,,,,,,6.00000,0.98614,,,,,,,,,,,,eMST,4-6,72.30000,1.00000
+efficientnet_b0,weighted_loss,paired_group,fusion_concat_nodrop,image_only,macro_f1,0.00000,10,0.03986,0.10503,-0.04053,0.13422,,,,,,,,,,,6.00000,0.26078,,,,,,,,,,,,eMST,7-10,11.40000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat_nodrop,image_only,f1,0.00000,10,-0.01519,0.04686,-0.05231,0.02259,,,,,,,,,,,4.00000,0.33217,,,,,,,,,,,,class,acne,22.00000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat_nodrop,image_only,f1,0.00000,10,-0.00718,0.06797,-0.02146,0.00869,,,,,,,,,,,7.00000,0.74614,,,,,,,,,,,,class,eczema_dermatitis,159.30000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat_nodrop,image_only,f1,0.00000,10,0.01352,0.06046,-0.01253,0.04139,,,,,,,,,,,7.00000,0.49721,,,,,,,,,,,,class,normal_other,83.80000,1.00000
+efficientnet_b0,weighted_loss,paired_class,fusion_concat_nodrop,image_only,f1,0.00000,10,-0.04660,0.05476,-0.09961,0.00146,,,,,,,,,,,1.00000,0.02476,,,,,,,,,,,,class,redness_rosacea,5.70000,0.24757
+efficientnet_b0,weighted_loss,paired_group,ensemble_image_q,image_only,macro_f1,0.00000,10,-0.03152,0.05083,-0.06254,-0.00144,,,,,,,,,,,1.00000,0.08154,,,,,,,,,,,,eFST,I-II,117.10000,0.65231
+efficientnet_b0,weighted_loss,paired_group,ensemble_image_q,image_only,macro_f1,0.00000,10,-0.00331,0.10320,-0.04874,0.02566,,,,,,,,,,,5.00000,0.92143,,,,,,,,,,,,eFST,III-IV,120.10000,1.00000
+efficientnet_b0,weighted_loss,paired_group,ensemble_image_q,image_only,macro_f1,0.00000,10,0.02471,0.10909,-0.01961,0.07347,,,,,,,,,,,5.00000,0.49189,,,,,,,,,,,,eFST,V-VI,22.60000,1.00000
+efficientnet_b0,weighted_loss,paired_group,ensemble_image_q,image_only,macro_f1,0.00000,10,-0.02999,0.03267,-0.06109,-0.00329,,,,,,,,,,,0.00000,0.01750,,,,,,,,,,,,eMST,1-3,186.60000,0.17498
+efficientnet_b0,weighted_loss,paired_group,ensemble_image_q,image_only,macro_f1,0.00000,10,0.01948,0.06970,-0.01934,0.04532,,,,,,,,,,,6.00000,0.39990,,,,,,,,,,,,eMST,4-6,72.30000,1.00000
+efficientnet_b0,weighted_loss,paired_group,ensemble_image_q,image_only,macro_f1,0.00000,10,0.01090,0.11136,-0.04810,0.08075,,,,,,,,,,,5.00000,0.76399,,,,,,,,,,,,eMST,7-10,11.40000,1.00000
+efficientnet_b0,weighted_loss,paired_class,ensemble_image_q,image_only,f1,0.00000,10,-0.03149,0.07254,-0.06701,0.00227,,,,,,,,,,,3.00000,0.20309,,,,,,,,,,,,class,acne,22.00000,1.00000
+efficientnet_b0,weighted_loss,paired_class,ensemble_image_q,image_only,f1,0.00000,10,0.00849,0.03618,-0.00268,0.02055,,,,,,,,,,,5.00000,0.47682,,,,,,,,,,,,class,eczema_dermatitis,159.30000,1.00000
+efficientnet_b0,weighted_loss,paired_class,ensemble_image_q,image_only,f1,0.00000,10,0.01580,0.05238,-0.00554,0.03685,,,,,,,,,,,6.00000,0.36522,,,,,,,,,,,,class,normal_other,83.80000,1.00000
+efficientnet_b0,weighted_loss,paired_class,ensemble_image_q,image_only,f1,0.00000,10,-0.07638,0.11035,-0.15908,0.00036,,,,,,,,,,,1.00000,0.05636,,,,,,,,,,,,class,redness_rosacea,5.70000,0.50726

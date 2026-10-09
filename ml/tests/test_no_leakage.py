@@ -7,7 +7,7 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 SPLITS = ROOT / "splits" / "train_val_test_splits.json"
 LABELS = ROOT / "labels" / "scin_labels.csv"
-SEEDS = ["0", "1", "2", "3", "4"]
+SEEDS = [str(s) for s in range(10)]
 
 
 @pytest.fixture(scope="module")

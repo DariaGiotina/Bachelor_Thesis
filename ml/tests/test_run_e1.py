@@ -78,3 +78,26 @@ def test_arm_spec_names_runs():
     assert s["dir"].name == "efficientnet_b0_concat_weighted_loss_nodrop" and s["questionnaire"]
     with pytest.raises(ValueError):
         run_e1.arm_spec("fusion_attention", "efficientnet_b0", "weighted_loss")
+
+
+def test_holm_adjustment():
+    adj = run_e1.holm([0.01, 0.04, 0.03, float("nan")])
+    assert np.allclose(adj[:3], [0.03, 0.06, 0.06]) and np.isnan(adj[3])
+
+
+def test_class_f1_matches_sklearn():
+    from sklearn.metrics import f1_score
+    rng = np.random.default_rng(0)
+    t, p = rng.integers(0, 3, 200), rng.integers(0, 3, 200)
+    assert np.allclose(run_e1.class_f1(t, p, 4)[:3], f1_score(t, p, labels=[0, 1, 2], average=None))
+    assert np.isnan(run_e1.class_f1(t, p, 4)[3])          # class absent from the truth
+
+
+def test_subgroups_identical_arms_give_zero_difference():
+    preds = pd.concat([_preds(a, s, noisy) for a in ("image_only", "fusion_concat") for s in (0, 1)])
+    preds["eFST"] = np.tile([1, 3, 5], len(preds) // 3 + 1)[:len(preds)]
+    preds["eMST"] = np.tile([2, 5, 8], len(preds) // 3 + 1)[:len(preds)]
+    preds.loc[preds.arm == "fusion_concat", "pred_label"] = preds.loc[preds.arm == "image_only", "pred_label"].values
+    sub = run_e1.subgroups(preds, ["image_only", "fusion_concat"], [0, 1], CLASSES, 50, 0)
+    d = sub[sub.row_type.isin(["paired_group", "paired_class"])]
+    assert len(d) == 6 + 3 and np.allclose(d["mean"], 0) and np.allclose(d["ci_low"], 0)
