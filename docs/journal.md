@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Why the questionnaire does not help (diagnostics; corrects an earlier hypothesis)
+
+- **Fact checked:** SCIN dermatologists labelled each submission seeing the images and the self-reported answers, and their confidence rose with the number of answers (Ward et al. 2024, arXiv 2402.18545). So the null result is not built into how the labels were made.
+- **Done:** `ml/analysis/questionnaire_diagnostics.py` (no retraining; 10 seeds) -> `ml/results/e1/diagnostics/` (complementarity.csv, field_importance.csv, redundancy.csv, diagnostics.md).
+- **Redundancy (photo features -> answers, logistic regression, AUROC):** 0.50-0.70 (body area 0.57-0.69, symptoms 0.51-0.57, texture 0.50-0.55, duration 0.56, age >= 50 0.70). The photo model does NOT encode the answers (SCIN photos are mostly close-ups). **This refutes the redundancy hypothesis written on the same day in thesis 8.3 / paper 4.3 and in the card; corrected there.**
+- **Complementarity:** P(questionnaire right | photo wrong) 0.426 < overall 0.482 < P(q right | photo right) 0.526: errors are positively correlated (hard cases are hard for both: ambiguous photos, noisy labels). Oracle (either right) 0.749 vs photo 0.564, but nothing in the inputs tells when to trust the questionnaire (the ensemble tried and failed).
+- **Field importance (questionnaire-only, macro-F1 drop when hidden):** body area 0.125, duration 0.057, symptoms 0.053, texture 0.043, skin type 0.012, age 0.012.
+- **Explanation now:** different but weak information, overlapping with what the photo already gets right; the truly complementary part is too small and noisy to learn from about 1,270 mostly single-labeller cases. App implication: keep body area and duration questions.
+- **Docs:** new thesis 8.5 / paper 4.5 (AUROC, correlated errors, oracle defined; references: Ward et al. 2024, Fawcett 2006); the redundancy sentence in 8.3 / 4.3 now says the hypothesis was tested and not supported.
+
 ## 2026-10-09: E1 on ten seeds, by skin tone and by category (final E1 results)
 
 - **Plan fixed before running:** same 7 arms, metrics and paired comparisons vs photo only; per tone group (eFST I-II/III-IV/V-VI, eMST 1-3/4-6/7-10) and per category, with Holm-adjusted p (family = 10 groups and categories per comparison). The 5-seed hint "FiLM better on eMST 4-6" (+0.088, 5/5) was recorded before seeds 5-9 were run, so seeds 5-9 are an independent replication.
