@@ -126,7 +126,10 @@ def flatten(summary: dict) -> pd.DataFrame:
 
 
 def across_seeds(flat: pd.DataFrame) -> pd.DataFrame:
-    keep = flat[flat["scope"].isin(["overall", "eFST", "eMST"]) & ~flat["group"].str.contains("worst=|-", regex=True)]
+    # worst-group and gap rows name a different group per seed, so they are not averaged here;
+    # tone groups such as 'I-II' or '1-3' are kept
+    keep = flat[flat["scope"].isin(["overall", "eFST", "eMST"]) & ~flat["group"].str.startswith("worst=")
+                & (flat["metric"] != "gap_macro_f1")]
     agg = keep.groupby(["split", "missing_pct", "scope", "group", "metric"])["value"].agg(
         n_seeds="count", mean="mean", sd="std", min="min", max="max").reset_index()
     return agg

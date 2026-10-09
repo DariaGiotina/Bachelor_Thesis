@@ -144,3 +144,22 @@ mapping:
     - Skin infection
     - Candida intertrigo
     - Candidal intertrigo
+
+# External test sets (DDI, Fitzpatrick17k; image only, used by external_datasets.py).
+# Their diagnoses are matched to `mapping` above after normalisation (case-insensitive,
+# '-' and '_' read as spaces). The aliases below add near-synonyms that are written
+# differently; anything still unmatched is reported as 'unmapped' and dropped, never guessed.
+# Not read by build_labels.py.
+external_aliases:
+  fitzpatrick17k:
+    acne: [acne vulgaris]
+    eczema_dermatitis: [dyshidrotic eczema, lichen simplex, neurodermatitis]
+    redness_rosacea: [rhinophyma]
+    normal_other: [pustular psoriasis, ichthyosis vulgaris, striae, nevocytic nevus, tick bite]
+    excluded: [squamous cell carcinoma, malignant melanoma, superficial spreading melanoma ssm, lentigo maligna,
+               solid cystic basal cell carcinoma, basal cell carcinoma morpheiform, lichen planus, drug eruption,
+               lupus erythematosus, lupus subacute, nematode infection]
+  ddi:  # VERIFY against ddi_metadata.csv once downloaded (unmatched strings are listed in the report)
+    acne: [acne cystic]
+    eczema_dermatitis: [eczema spongiotic dermatitis]
+    normal_other: [melanocytic nevi]

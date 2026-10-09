@@ -2,6 +2,42 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Fitzpatrick17k data-use terms
+
+- **Fact:** the full Fitzpatrick17k images were requested from the authors; the agreement requires deleting them once the research is complete.
+- **Decision:** Fitzpatrick17k (and DDI) are used for testing only, never for training, never redistributed, never shown in the app, repo, thesis or paper; only aggregate metrics are reported. The shipped model is trained on SCIN only, so the deletion obligation does not touch it.
+- **Open:** reread the signed text for clauses on derived data/models and publication; note the deletion deadline; check commercial-use terms of SCIN and of any pretrained weights (ImageNet, PanDerm, DermLIP) before a public release. Not legal advice.
+- **Docs:** one paragraph added to thesis 5.11 and paper 3.10; `data_sources.csv` note.
+
+## 2026-10-09: External test sets and foundation-model linear probe (Task 2.5)
+
+- **Done:** `ml/external_datasets.py`: `DDIDataset` and `Fitzpatrick17kDataset` (items shaped like SCIN items), label mapping through `label_map.yaml` plus a new `external_aliases` section (not read by `build_labels.py`; SCIN labels unchanged), a per-row status report (`mapped`, `excluded_class`, `unmapped`, `qc_wrong_label`, `missing_image`; only `mapped` rows are used), zero-shot inference of every SCIN image-only checkpoint, `external_eval.csv` in the evaluate.py format (split = dataset, seed = SCIN seed, plus logits and probabilities) and evaluate.py on it. `ml/foundation_probe.py`: frozen encoder from `timm:`, `open_clip:` or `hf:` (local weights for timm, e.g. PanDerm; DermLIP through OpenCLIP), features of all 1,809 used SCIN cases cached once, per seed a linear layer (multinomial logistic regression, standardised features, class-weighted CE, L2 penalty chosen on validation macro-F1), predictions + evaluate.py + `foundation_probe_test.csv` (mean ± sd). 8 new tests (73 pass).
+- **Data facts:** Fitzpatrick17k (CSV checked): 16,577 rows, 114 labels; 4,012 map to targets (normal_other 1,892, mostly psoriasis; eczema_dermatitis 1,009; acne 857; redness_rosacea 254), 4,183 to non-target categories, 8,376 unmapped, 6 dropped by the quality check ("wrongly labelled"). Licence CC BY-NC-SA 3.0. DDI: 656 images, biopsy-confirmed, tones 12/34/56 mapped to eFST 1/3/5 (= groups I-II/III-IV/V-VI); download through Stanford AIMI / Redivis, licence still TO VERIFY. `data_sources.csv` updated.
+- **Found:** the DermaAmin image URLs (about 90% of the mapped Fitzpatrick17k rows) return HTTP 404; only Atlas Dermatológico links work. The full image set must be requested from the authors (form in the Fitzpatrick17k repo). The downloader no longer retries 4xx answers and logs progress. DDI disease strings are not verified yet (aliases marked VERIFY; unmatched strings are listed in the report).
+- **Decisions:** never guess a mapping (unknown -> dropped and reported); the probe uses the primary image without augmentation (frozen features); the L2 grid goes from 0 to 100 because a smoke run on EfficientNet-B0 features picked the edge of a narrower grid (a warning now flags edge choices); the checkpoint backbone is read from the run's `config_used.yaml`.
+- **Checked:** end-to-end smoke tests (21 Atlas images, two 2-batch checkpoints; probe with `timm:efficientnet_b0` features on seeds 0-1); numbers meaningless, not recorded.
+- **Docs:** new thesis 5.11 and paper 3.10 (zero-shot external evaluation, domain shift, mapping statuses, foundation models, frozen features, linear probe, standardisation, L2 penalty); references: Daneshjou et al. 2022, Groh et al. 2021, Alain and Bengio 2016, Radford et al. 2021, PanDerm (Yan et al. 2025), Derm1M/DermLIP (Yan et al. 2025).
+- **Download result:** 619 of the 4,012 mapped Fitzpatrick17k images are still online (all from Atlas Dermatológico; 3,393 failed): normal_other 362, acne 126, eczema_dermatitis 115, redness_rosacea 16; FST 1: 12, 2: 100, 3: 165, 4: 194, 5: 97, 6: 32, unknown 19. Too few and too skewed (redness_rosacea 16) for a fair test, so the full set is still needed.
+- **Next:** request the Fitzpatrick17k images and download DDI; check DDI disease strings against the report; get PanDerm weights; `pip install open_clip_torch` for DermLIP.
+
+## 2026-10-09: Bug fixes in evaluate.py and train.py
+
+- **evaluate.py:** `across_seeds` filtered rows with the pattern `worst=|-`, meant to drop the worst-group and gap rows, but every tone group name contains "-" (I-II, III-IV, 1-3, ...), so the across-seed summary in `metrics_summary.json` kept only the overall and "missing" rows. It now drops rows whose group starts with `worst=` and the `gap_macro_f1` metric only. Regression test added in `ml/tests/test_metrics.py` (65 tests pass). No reported numbers were affected (no real results exist yet).
+- **train.py:** before stage 1, a `best_model.pt` left in the run folder by an earlier run with the same name was loaded, so a rerun silently started from the old weights instead of ImageNet. The file is now deleted at the start of each run (`run_image_only.py` already did this).
+- **Process:** new standing rule: bugs are always repaired, even when a task says not to change a file.
+- **Docs:** the thesis and paper already describe the intended behaviour (5.10 / 3.9), so no text change was needed.
+
+## 2026-10-09: Multi-seed image-only baseline and imbalance ablation (Task 2.4, E1 arm 1)
+
+- **Done:** `ml/run_image_only.py` trains `SkinImageBaseline` with the three-stage recipe on split seeds 0-4 (engine and evaluate.py are imported, not changed), keeps the best-validation checkpoint per seed (`seed_checkpoints/img_only_seed{seed}.pt`), writes val + test predictions, runs `evaluate.py` on the test split per seed and writes `e1_image_only_test.csv` (mean, sd, min, max and "mean ± sd" per metric, class and tone group). Options: `--backbone efficientnet_b0|mobilenetv3_large_100`, `--balance weighted_loss|sampler`, `--seeds`, `--skip-existing`; also callable as `run({...})` from a notebook. Tests in `ml/tests/test_run_image_only.py` (64 pass in total).
+- **Ablation:** `weighted_loss` = inverse-frequency class weights in cross-entropy, uniform shuffling. `sampler` = plain cross-entropy + `WeightedRandomSampler` (weight 1 / class count, with replacement, epoch size = training-set size). Never both. Seed-0 training counts: eczema_dermatitis 748, normal_other 387, acne 101, redness_rosacea 30.
+- **Found and handled:** the dataset's random image/augmentation draw depends on (seed, epoch, case), so a rare case drawn about 10 times in one epoch by the sampler (up to 16 in a check) would have been 10 identical copies. Repeated draws are now numbered and each repeat gets its own image and augmentation; the first draw equals the weighted-loss arm's draw (tested), so only the correction differs.
+- **Found, not fixed (outside this task):** in `evaluate.py`, `across_seeds` drops every group whose name contains "-", which removes all tone groups (I-II, 1-3, ...). The new runner does its own across-seed summary from the per-seed `metrics_summary.csv`, so E1 is not affected; the fix in `evaluate.py` is pending.
+- **Decision:** the winning arm is chosen by mean validation macro-F1, never by test results.
+- **Checked:** smoke runs (1 epoch per stage, 2-3 batches, seeds 0-1) of both arms with EfficientNet-B0 and one MobileNetV3 run, plus `--skip-existing`; numbers meaningless, not recorded. Sampler check: about 25% of draws per class.
+- **Docs:** thesis 5.8 and paper 3.8 extended (seeds, mean ± sd, class imbalance, ablation, the two corrections, repeated-draw handling, overfitting risk); references: Buda et al. 2018, PyTorch WeightedRandomSampler docs.
+- **Next:** run the four full combinations (2 backbones x 2 balances, about 20 training runs) and record the results.
+
 ## 2026-10-08: Evaluation harness (Task 2.3)
 
 - **Done:** `ml/src/skinconcern/metrics.py` extended (macro-F1, balanced accuracy, per-class precision/recall/F1 via sklearn; ECE with configurable bins and a reliability table; risk-coverage table and AURC; case-level bootstrap CI for any metric; eFST/eMST grouping) and new `ml/evaluate.py` (reads a predictions CSV, evaluates every split x seed x missing_pct slice, overall and per eFST/eMST group, worst group, across-seed mean/sd/min/max; writes `metrics_summary.json`, `metrics_summary.csv`, `risk_coverage.csv`). Tests in `ml/tests/test_metrics.py` (60 tests pass in total).
