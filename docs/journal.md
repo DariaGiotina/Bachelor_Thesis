@@ -2,6 +2,18 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Late-fusion model and first E1 comparison (Task 3.2)
+
+- **Done:** `ml/models/fusion_model.py` (`LateFusionNet`): `SkinImageBaseline` in feature mode (new `num_classes=0`) + questionnaire encoder (2 x 64 over [q_vec, q_mask]) + fusion `concat` (default), `gated` (gated multimodal unit, gate inspectable with `gate_values`) or `film` (FiLM, starts as image-only). Same `set_stage` and parameter groups as the image baseline; the new layers train in every stage at the head rate. `train.py --model fusion [--fusion ...]` now builds it (old `FusionClassifier` no longer used by training; kept for the Grad-CAM wrapper and its tests). The staged loop moved into `run_image_only.fit_staged`, shared by `run_image_only.py` and the new `ml/run_fusion.py` (5 seeds, `--fusion`, `--balance`, `--no-dropout` for E2, checkpoints `seed_checkpoints/fusion_late_<variant>_seed{k}.pt`, summary `e1_fusion_test.csv`). Config block `fusion`. 13 new tests (94 pass).
+- **Bug found and fixed:** MobileNetV3 returns 1,280 pooled features although timm's `num_features` is 960 (its conv_head comes after pooling), so a fusion head sized from `num_features` crashed. `SkinImageBaseline.num_features` now uses `head_hidden_size`; test added.
+- **Real runs (EfficientNet-B0, weighted loss, seeds 0-4, about 3 min per seed):**
+  - photo only: macro-F1 0.537 ± 0.038, bal-acc 0.624 ± 0.044, ECE 0.070, AURC 0.332; per class F1 eczema 0.691, redness 0.682, normal_other 0.437, acne 0.337; eFST I-II 0.538, III-IV 0.542, V-VI 0.490 ± 0.175 (worst group V-VI x3).
+  - fusion concat: macro-F1 0.516 ± 0.057, bal-acc 0.595 ± 0.038, ECE 0.088 ± 0.056 (seed 4: 0.181), AURC 0.354; hidden answers 0/25/50/75/100% -> 0.516/0.510/0.518/0.511/0.506; eFST V-VI 0.445 ± 0.085.
+  - paired difference fusion - photo: -0.021 ± 0.031 (per seed -0.053, +0.018, +0.003, -0.049, -0.025), paired t p = 0.20, Wilcoxon p = 0.31: no significant difference.
+- **Interpretation (hypotheses, not tested):** the fusion model barely uses the questionnaire (flat across hidden rates although the questionnaire alone gives 0.390). Possible causes: 1,280 image features vs 64 questionnaire features in the concat layer; whole questionnaire hidden in 30% of training samples; noisy checkpoint selection (3 of 5 fusion seeds kept a stage-1 checkpoint from epochs 0-2; validation has about 270 cases).
+- **Next:** run `--fusion gated` and `film`, and `--no-dropout` (E2); consider a larger validation signal (e.g. selection on validation loss or a smoothed macro-F1) - to decide, not changed now. The image-only ablation (sampler, MobileNetV3) is still to run.
+- **Docs:** thesis 5.8 / paper 3.8 rewritten for `LateFusionNet` and the staged training of the fusion model, plus the gated and FiLM variants (references: Arevalo et al. 2017, Perez et al. 2018); new thesis 8.2 / paper 4.2 with Table 8.2 / Table 2 and the paired tests (paired test and p-value defined; reference: Student 1908).
+
 ## 2026-10-09: Questionnaire-only baseline (Task 3.1, E1 arm 2) - first real results
 
 - **Done:** `ml/models/q_model.py` (`QuestionnaireMLP`: [q_vec (40), q_mask (6)] -> 2 hidden layers of 64, ReLU, dropout 0.2 -> 4 logits) and `ml/run_q_only.py` (same cases, splits, seeds 0-4, class-weighted CE, early stopping on validation macro-F1 with patience 20, engine + evaluate.py; no image is read). Config block `q_baseline` in `configs/base.yaml`. `run_image_only.aggregate_seeds` now also groups by `missing_pct` (before, missing-answer rates would have been averaged together). 5 new tests (78 pass).

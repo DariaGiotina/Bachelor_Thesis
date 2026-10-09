@@ -125,24 +125,19 @@ def build_balanced_training(balance: str, cfg: dict, seed: int, loaders: dict, d
     return nn.CrossEntropyLoss(), {**loaders, "train": train_loader}
 
 
-# --------------------------------------------------------------------------------------- one seed
-def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, device: torch.device) -> dict:
-    """Staged fine-tuning on one split seed; returns the training summary (best checkpoint in ``ckpt``)."""
-    seed_everything(seed)
-    tc, ib = cfg["train"], cfg["image_baseline"]
-    loaders = get_dataloaders(cfg, seed, only_available=opts["only_available"])
-    loss_fn, loaders = build_balanced_training(opts["balance"], cfg, seed, loaders, device, opts["only_available"])
-    train_ds, classes = loaders["train"].dataset, loaders["train"].dataset.classes
-    log.info("seed %d | %s %s | train=%d val=%d test=%d | class counts %s", seed, opts["backbone"], opts["balance"],
-             len(train_ds), len(loaders["val"].dataset), len(loaders["test"].dataset),
-             dict(zip(classes, np.bincount(train_ds.labels, minlength=len(classes)).tolist())))
+# ------------------------------------------------------------------------------- staged training
+def fit_staged(model: nn.Module, loaders: dict, loss_fn: nn.Module, adapt, cfg: dict, ckpt: Path, out_dir: Path,
+               device: torch.device, seed: int, epochs: int | None = None, max_batches: int | None = None) -> dict:
+    """Staged fine-tuning (``image_baseline`` stages of the config) with early stopping on val macro-F1.
 
-    model = SkinImageBaseline(len(classes), ib["backbone"], tc["pretrained"], ib["top_blocks"],
-                              ib["drop_rate"]).to(device)
+    Shared by every model with ``set_stage`` (image-only and fusion), so all arms of E1 train the same
+    way. Each stage starts from the best checkpoint so far and has its own patience; the best weights
+    are in ``ckpt`` and the epoch log in ``out_dir/log.csv``. Returns the training summary.
+    """
+    tc = cfg["train"]
     scaler = torch.amp.GradScaler(enabled=tc["amp"] and device.type == "cuda")
-    patience = tc["early_stopping_patience"]
-    stopper, history, epoch, best_stage, t0 = EarlyStopping(patience), [], 0, None, time.time()
-    for phase in stage_plan(model, cfg, opts["epochs"]):
+    stopper, history, epoch, best_stage, t0 = EarlyStopping(tc["early_stopping_patience"]), [], 0, None, time.time()
+    for phase in stage_plan(model, cfg, epochs):
         if ckpt.exists() and stopper.best_epoch >= 0:
             model.load_state_dict(torch.load(ckpt, map_location=device))  # each stage starts from the best so far
         opt = torch.optim.AdamW(param_groups(model, phase, cfg))
@@ -153,8 +148,8 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
         for _ in range(phase["epochs"]):
             loaders["train"].dataset.set_epoch(epoch)
             train_loss, secs = timed(train_one_epoch, model, loaders["train"], loss_fn, opt, scaler, device,
-                                     image_only_adapt, tc["amp"], tc["grad_clip"], opts["max_batches"])
-            val = evaluate(model, loaders["val"], loss_fn, device, image_only_adapt, tc["amp"], opts["max_batches"])
+                                     adapt, tc["amp"], tc["grad_clip"], max_batches)
+            val = evaluate(model, loaders["val"], loss_fn, device, adapt, tc["amp"], max_batches)
             lr = max(g["lr"] for g in opt.param_groups)
             sched.step()
             history.append({"epoch": epoch, "stage": phase["stage"], "train_loss": train_loss,
@@ -170,6 +165,26 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
             if stopper.should_stop:
                 log.info("seed %d stage %d: early stop (best epoch %d)", seed, phase["stage"], stopper.best_epoch)
                 break
+    return {"best_epoch": stopper.best_epoch, "best_stage": best_stage, "best_val_macro_f1": stopper.best,
+            "epochs_run": epoch, "train_minutes": (time.time() - t0) / 60}
+
+
+# --------------------------------------------------------------------------------------- one seed
+def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, device: torch.device) -> dict:
+    """Staged fine-tuning on one split seed; returns the training summary (best checkpoint in ``ckpt``)."""
+    seed_everything(seed)
+    tc, ib = cfg["train"], cfg["image_baseline"]
+    loaders = get_dataloaders(cfg, seed, only_available=opts["only_available"])
+    loss_fn, loaders = build_balanced_training(opts["balance"], cfg, seed, loaders, device, opts["only_available"])
+    train_ds, classes = loaders["train"].dataset, loaders["train"].dataset.classes
+    log.info("seed %d | %s %s | train=%d val=%d test=%d | class counts %s", seed, opts["backbone"], opts["balance"],
+             len(train_ds), len(loaders["val"].dataset), len(loaders["test"].dataset),
+             dict(zip(classes, np.bincount(train_ds.labels, minlength=len(classes)).tolist())))
+
+    model = SkinImageBaseline(len(classes), ib["backbone"], tc["pretrained"], ib["top_blocks"],
+                              ib["drop_rate"]).to(device)
+    fit = fit_staged(model, loaders, loss_fn, image_only_adapt, cfg, ckpt, out_dir, device, seed,
+                     opts["epochs"], opts["max_batches"])
 
     # Test once, with the best-validation weights.
     model.load_state_dict(torch.load(ckpt, map_location=device))
@@ -180,10 +195,8 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
         if split == "test":
             test = res
     pd.concat(frames, ignore_index=True).to_csv(out_dir / "predictions.csv", index=False)
-    summary = {"seed": seed, "best_epoch": stopper.best_epoch, "best_stage": best_stage,
-               "best_val_macro_f1": stopper.best, "epochs_run": epoch, "train_minutes": (time.time() - t0) / 60,
-               "test_macro_f1": test["macro_f1"], "test_balanced_acc": test["balanced_acc"], "n_test": test["n"],
-               "n_test_image_failed": test["n_image_failed"]}
+    summary = {"seed": seed, **fit, "test_macro_f1": test["macro_f1"], "test_balanced_acc": test["balanced_acc"],
+               "n_test": test["n"], "n_test_image_failed": test["n_image_failed"]}
     del model, loaders
     if device.type == "cuda":
         torch.cuda.empty_cache()

@@ -82,3 +82,15 @@ q_baseline:
   epochs: 200
   early_stopping_patience: 20   # epochs are fast (no images), so patience is longer
   p_field_drop: 0.0             # 0 = plain baseline; > 0 hides single answers in training (robustness)
+
+# Photo + questionnaire fusion (models/fusion_model.py; train.py --model fusion, run_fusion.py).
+# Trained with the staged recipe of image_baseline; questionnaire branch and fusion layers train
+# in every stage at the head learning rate. Answers are hidden in training with
+# train.p_modality_drop / train.p_field_drop (modality dropout).
+fusion:
+  variant: concat        # concat (late fusion) | gated (gated multimodal unit) | film (FiLM-style)
+  q_hidden: 64
+  q_depth: 2
+  q_dropout: 0.1
+  fused_dim: 256         # gated fusion only
+  head_dropout: 0.2

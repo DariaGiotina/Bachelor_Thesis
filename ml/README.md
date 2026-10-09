@@ -29,11 +29,12 @@ Datasets go in `ml/data/` (git-ignored). SCIN images must not be redistributed
 | 9. Train + test | `python train.py --model fusion --seed 0` | `runs/<exp_name>/` (ignored) |
 | 10. E1 image-only, seeds 0-4 | `python run_image_only.py --backbone efficientnet_b0 --balance weighted_loss` | `runs/e1_image_only/<backbone>_<balance>/` (ignored) |
 | 10b. E1 questionnaire-only, seeds 0-4 | `python run_q_only.py` | `runs/e1_questionnaire_only/<balance>/e1_questionnaire_only_test.csv` (ignored) |
+| 10c. E1 fusion, seeds 0-4 | `python run_fusion.py [--fusion concat\|gated\|film] [--no-dropout]` | `runs/e1_fusion/<backbone>_<variant>_<balance>/` with `seed_checkpoints/fusion_late_<variant>_seed{k}.pt` (ignored) |
 | 11. E5 linear probe | `python foundation_probe.py --backbone timm:<name>` (or `open_clip:` / `hf:`) | `runs/foundation_probe/<tag>/` (ignored) |
 | 12. External test (DDI, Fitzpatrick17k) | `python external_datasets.py --checkpoints "runs/e1_image_only/<exp>/seed_checkpoints/*.pt"` | `runs/external_eval/<exp>/external_eval.csv` + metrics (ignored) |
 
 `train.py --model` is `dummy` (pipeline check), `image_only` (photo-only baseline, staged fine-tuning,
-`--backbone efficientnet_b0|mobilenetv3_large_100`, `--stages 1,2,3`) or `fusion` (photo + questionnaire). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,
+`--backbone efficientnet_b0|mobilenetv3_large_100`, `--stages 1,2,3`) or `fusion` (`LateFusionNet`, photo + questionnaire, `--fusion concat|gated|film`, same stages as `image_only`). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,
 `results.json`, `predictions.csv` (one row per case: true/predicted category, confidence, eFST, eMST,
 seed, share of hidden questionnaire fields) and, via `evaluate.py`, `metrics_summary.json`,
 `metrics_summary.csv` and `risk_coverage.csv`.
