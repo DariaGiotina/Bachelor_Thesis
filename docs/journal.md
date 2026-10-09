@@ -2,6 +2,17 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Multi-seed image-only baseline and imbalance ablation (Task 2.4, E1 arm 1)
+
+- **Done:** `ml/run_image_only.py` trains `SkinImageBaseline` with the three-stage recipe on split seeds 0-4 (engine and evaluate.py are imported, not changed), keeps the best-validation checkpoint per seed (`seed_checkpoints/img_only_seed{seed}.pt`), writes val + test predictions, runs `evaluate.py` on the test split per seed and writes `e1_image_only_test.csv` (mean, sd, min, max and "mean ± sd" per metric, class and tone group). Options: `--backbone efficientnet_b0|mobilenetv3_large_100`, `--balance weighted_loss|sampler`, `--seeds`, `--skip-existing`; also callable as `run({...})` from a notebook. Tests in `ml/tests/test_run_image_only.py` (64 pass in total).
+- **Ablation:** `weighted_loss` = inverse-frequency class weights in cross-entropy, uniform shuffling. `sampler` = plain cross-entropy + `WeightedRandomSampler` (weight 1 / class count, with replacement, epoch size = training-set size). Never both. Seed-0 training counts: eczema_dermatitis 748, normal_other 387, acne 101, redness_rosacea 30.
+- **Found and handled:** the dataset's random image/augmentation draw depends on (seed, epoch, case), so a rare case drawn about 10 times in one epoch by the sampler (up to 16 in a check) would have been 10 identical copies. Repeated draws are now numbered and each repeat gets its own image and augmentation; the first draw equals the weighted-loss arm's draw (tested), so only the correction differs.
+- **Found, not fixed (outside this task):** in `evaluate.py`, `across_seeds` drops every group whose name contains "-", which removes all tone groups (I-II, 1-3, ...). The new runner does its own across-seed summary from the per-seed `metrics_summary.csv`, so E1 is not affected; the fix in `evaluate.py` is pending.
+- **Decision:** the winning arm is chosen by mean validation macro-F1, never by test results.
+- **Checked:** smoke runs (1 epoch per stage, 2-3 batches, seeds 0-1) of both arms with EfficientNet-B0 and one MobileNetV3 run, plus `--skip-existing`; numbers meaningless, not recorded. Sampler check: about 25% of draws per class.
+- **Docs:** thesis 5.8 and paper 3.8 extended (seeds, mean ± sd, class imbalance, ablation, the two corrections, repeated-draw handling, overfitting risk); references: Buda et al. 2018, PyTorch WeightedRandomSampler docs.
+- **Next:** run the four full combinations (2 backbones x 2 balances, about 20 training runs) and record the results.
+
 ## 2026-10-08: Evaluation harness (Task 2.3)
 
 - **Done:** `ml/src/skinconcern/metrics.py` extended (macro-F1, balanced accuracy, per-class precision/recall/F1 via sklearn; ECE with configurable bins and a reliability table; risk-coverage table and AURC; case-level bootstrap CI for any metric; eFST/eMST grouping) and new `ml/evaluate.py` (reads a predictions CSV, evaluates every split x seed x missing_pct slice, overall and per eFST/eMST group, worst group, across-seed mean/sd/min/max; writes `metrics_summary.json`, `metrics_summary.csv`, `risk_coverage.csv`). Tests in `ml/tests/test_metrics.py` (60 tests pass in total).

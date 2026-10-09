@@ -27,6 +27,7 @@ Datasets go in `ml/data/` (git-ignored). SCIN images must not be redistributed
 | 7. Splits (seeds 0-4) | `python splits/make_splits.py` | `splits/train_val_test_splits.json`, `splits/split_summary.csv` |
 | 8. Sanity batch | `python data_loading.py` | `sanity_batch.png` (ignored: shows SCIN photos) |
 | 9. Train + test | `python train.py --model fusion --seed 0` | `runs/<exp_name>/` (ignored) |
+| 10. E1 image-only, seeds 0-4 | `python run_image_only.py --backbone efficientnet_b0 --balance weighted_loss` | `runs/e1_image_only/<backbone>_<balance>/` (ignored) |
 
 `train.py --model` is `dummy` (pipeline check), `image_only` (photo-only baseline, staged fine-tuning,
 `--backbone efficientnet_b0|mobilenetv3_large_100`, `--stages 1,2,3`) or `fusion` (photo + questionnaire). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,
@@ -38,6 +39,12 @@ seed, share of hidden questionnaire fields) and, via `evaluate.py`, `metrics_sum
 in one file are fine): macro-F1, balanced accuracy, accuracy and ECE with 95% case-level bootstrap
 CIs, per-class precision/recall/F1, eFST and eMST groups, the worst tone group (>= 20 cases) and
 risk-coverage / AURC.
+
+`run_image_only.py` trains the photo-only baseline on every split seed and runs the imbalance
+ablation: `--balance weighted_loss` (class-weighted cross-entropy) or `--balance sampler`
+(unweighted cross-entropy + `WeightedRandomSampler`). It writes `seed_checkpoints/img_only_seed{seed}.pt`,
+per-seed predictions and metrics, `seed_runs.csv` and `e1_image_only_test.csv` (test metrics across
+seeds as mean ± sd). Run the four combinations (2 backbones x 2 balances); `--skip-existing` resumes.
 
 Step 6 must run before step 7: cases that share an identical photo are kept in the same split.
 
