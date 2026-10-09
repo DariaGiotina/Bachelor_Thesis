@@ -28,6 +28,7 @@ Datasets go in `ml/data/` (git-ignored). SCIN images must not be redistributed
 | 8. Sanity batch | `python data_loading.py` | `sanity_batch.png` (ignored: shows SCIN photos) |
 | 9. Train + test | `python train.py --model fusion --seed 0` | `runs/<exp_name>/` (ignored) |
 | 10. E1 image-only, seeds 0-4 | `python run_image_only.py --backbone efficientnet_b0 --balance weighted_loss` | `runs/e1_image_only/<backbone>_<balance>/` (ignored) |
+| 10b. E1 questionnaire-only, seeds 0-4 | `python run_q_only.py` | `runs/e1_questionnaire_only/<balance>/e1_questionnaire_only_test.csv` (ignored) |
 | 11. E5 linear probe | `python foundation_probe.py --backbone timm:<name>` (or `open_clip:` / `hf:`) | `runs/foundation_probe/<tag>/` (ignored) |
 | 12. External test (DDI, Fitzpatrick17k) | `python external_datasets.py --checkpoints "runs/e1_image_only/<exp>/seed_checkpoints/*.pt"` | `runs/external_eval/<exp>/external_eval.csv` + metrics (ignored) |
 

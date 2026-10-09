@@ -71,3 +71,14 @@ image_baseline:
     1: {epochs: 5, lr: 1.0e-3}
     2: {epochs: 15, lr: 3.0e-4}
     3: {epochs: 10, lr: 1.0e-4}
+
+# Questionnaire-only baseline (run_q_only.py, E1 arm 2): MLP over [q_vec, q_mask], no image.
+q_baseline:
+  hidden: 64
+  depth: 2
+  dropout: 0.2
+  lr: 1.0e-3
+  weight_decay: 0.01
+  epochs: 200
+  early_stopping_patience: 20   # epochs are fast (no images), so patience is longer
+  p_field_drop: 0.0             # 0 = plain baseline; > 0 hides single answers in training (robustness)

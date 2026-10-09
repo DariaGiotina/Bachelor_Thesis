@@ -192,7 +192,8 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
 
 # ------------------------------------------------------------------------------------ aggregation
 def aggregate_seeds(flat: pd.DataFrame) -> pd.DataFrame:
-    """Test metrics across seeds (mean, sd, min, max) from the stacked evaluate.py metrics_summary.csv.
+    """Test metrics across seeds (mean, sd, min, max) from the stacked evaluate.py metrics_summary.csv,
+    separately for every missing-answer rate (``missing_pct``).
 
     The worst tone group can differ between seeds, so its rows are pooled under group 'worst' (and
     'best-worst gap') with the per-seed group names listed in ``worst_groups``.
@@ -202,7 +203,7 @@ def aggregate_seeds(flat: pd.DataFrame) -> pd.DataFrame:
     df["seed_group"] = df["group"]
     df.loc[worst, "group"] = "worst"
     df.loc[df["metric"] == "gap_macro_f1", "group"] = "best-worst gap"
-    keys = ["scope", "group", "metric"]
+    keys = ["missing_pct", "scope", "group", "metric"]
     agg = df.groupby(keys, sort=False).agg(
         n_seeds=("value", "count"), mean=("value", "mean"), sd=("value", "std"), min=("value", "min"),
         max=("value", "max"), mean_n_cases=("n_cases", "mean")).reset_index()

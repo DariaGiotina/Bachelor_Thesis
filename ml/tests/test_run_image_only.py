@@ -46,10 +46,18 @@ def _flat(seed, worst, f1):
 
 def test_aggregate_seeds_mean_sd_and_tone_groups_kept():
     flat = pd.concat([_flat("0", "V-VI", 0.5), _flat("1", "V-VI", 0.6), _flat("2", "III-IV", 0.7)])
-    agg = r.aggregate_seeds(flat).set_index(["scope", "group", "metric"])
+    agg = r.aggregate_seeds(flat).set_index(["scope", "group", "metric"]).drop(columns="missing_pct")
     ov = agg.loc[("overall", "ALL", "macro_f1")]
     assert ov["n_seeds"] == 3 and np.isclose(ov["mean"], 0.6) and np.isclose(ov["sd"], 0.1)  # val rows ignored
     assert np.isclose(agg.loc[("eFST", "I-II", "macro_f1"), "mean"], 0.7)  # tone groups are summarised too
     w = agg.loc[("eFST", "worst", "worst_group_macro_f1")]
     assert w["n_seeds"] == 3 and w["worst_groups"] == "V-VI x2; III-IV x1"
     assert ov["mean_pm_sd"] == "0.600 ± 0.100"
+
+
+def test_aggregate_seeds_keeps_missing_rates_apart():
+    a, b = _flat("0", "V-VI", 0.5), _flat("0", "V-VI", 0.1)
+    b["missing_pct"] = 1.0
+    agg = r.aggregate_seeds(pd.concat([a, b]))
+    ov = agg[(agg.scope == "overall") & (agg.metric == "macro_f1")].set_index("missing_pct")["mean"]
+    assert ov.to_dict() == {0.0: 0.5, 1.0: 0.1}

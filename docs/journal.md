@@ -2,6 +2,14 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Questionnaire-only baseline (Task 3.1, E1 arm 2) - first real results
+
+- **Done:** `ml/models/q_model.py` (`QuestionnaireMLP`: [q_vec (40), q_mask (6)] -> 2 hidden layers of 64, ReLU, dropout 0.2 -> 4 logits) and `ml/run_q_only.py` (same cases, splits, seeds 0-4, class-weighted CE, early stopping on validation macro-F1 with patience 20, engine + evaluate.py; no image is read). Config block `q_baseline` in `configs/base.yaml`. `run_image_only.aggregate_seeds` now also groups by `missing_pct` (before, missing-answer rates would have been averaged together). 5 new tests (78 pass).
+- **Fairness of comparison:** the test split is scored at r = 0, 0.25, 0.5, 0.75, 1 hidden answers with the same generator use, batch size and case order as the fusion evaluation in `train.py`, so both models see exactly the same hidden answers (tested).
+- **Results (test, 5 seeds, mean ± sd):** macro-F1 0.390 ± 0.038, balanced accuracy 0.443 ± 0.043, accuracy 0.476 ± 0.048, ECE 0.083 ± 0.020, AURC 0.465 ± 0.040. Per class F1: eczema_dermatitis 0.569, normal_other 0.429, redness_rosacea 0.343 (about 6 test cases), acne 0.218. Hidden answers: 0.390 / 0.325 / 0.264 / 0.221 / 0.145 at 0 / 25 / 50 / 75 / 100%; at 100% one class is predicted for every case and balanced accuracy is exactly 0.250 (chance), as the mask design intends. eFST: I-II 0.401 ± 0.045 (117 cases), III-IV 0.342 ± 0.100 (120), V-VI 0.475 ± 0.131 (23); worst group III-IV x3, I-II x2 (mean 0.319); V-VI value is not an advantage (small group, spread larger than the gaps). Best epochs 16-51, 6-11 s per seed. Run folder: `ml/runs/e1_questionnaire_only/weighted_loss/` (git-ignored).
+- **Decisions:** no field dropout in this plain baseline (`--p-field-drop` available for a robustness variant); weighted loss like the default image arm.
+- **Docs:** method paragraph in thesis 5.8 / paper 3.8 (MLP, ReLU, dropout defined); new thesis 8.1 and paper 4.1 with Table 8.1 / Table 1; reference: Goodfellow et al. 2016.
+
 ## 2026-10-09: Fitzpatrick17k data-use terms
 
 - **Fact:** the full Fitzpatrick17k images were requested from the authors; the agreement requires deleting them once the research is complete.
