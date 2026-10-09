@@ -207,8 +207,29 @@ def bootstrap_standard_metrics(df: pd.DataFrame, n_bins: int = 15, n_boot: int =
         draws = (np.concatenate([rows_of[i] for i in rng.integers(0, len(uniques), len(uniques))])
                  for _ in range(n_boot))
     stats = np.array([_fast_metrics(t[i], p[i], conf[i], len(classes), n_bins) for i in draws])
-    lo, hi = np.nanquantile(stats, alpha / 2, axis=0), np.nanquantile(stats, 1 - alpha / 2, axis=0)
-    return {n: {"value": point[n], "ci_low": float(lo[j]), "ci_high": float(hi[j])} for j, n in enumerate(FAST_NAMES)}
+    out = {}
+    for j, n in enumerate(FAST_NAMES):
+        lo, hi = (bias_corrected_ci(point[n], stats[:, j], alpha) if n == "ece"
+                  else (float(np.nanquantile(stats[:, j], alpha / 2)), float(np.nanquantile(stats[:, j], 1 - alpha / 2))))
+        out[n] = {"value": point[n], "ci_low": lo, "ci_high": hi}
+    return out
+
+
+def bias_corrected_ci(point: float, samples: np.ndarray, alpha: float = 0.05, floor: float = 0.0) -> tuple[float, float]:
+    """Percentile interval shifted by the bootstrap bias (mean of the samples - point estimate).
+
+    Used for ECE: resampling cases with replacement makes the binned calibration error larger on
+    average (each bin holds fewer distinct cases, so |accuracy - confidence| is noisier and never
+    negative), so the plain percentile interval sits above the estimate and can even exclude it
+    (Roelofs et al., 2022, https://arxiv.org/abs/2012.08668). The shifted interval removes that bias.
+    """
+    s = np.asarray(samples, float)
+    s = s[~np.isnan(s)]
+    if len(s) == 0 or np.isnan(point):
+        return float("nan"), float("nan")
+    bias = s.mean() - point
+    lo, hi = np.quantile(s, alpha / 2) - bias, np.quantile(s, 1 - alpha / 2) - bias
+    return float(max(lo, floor)), float(max(hi, floor))
 
 
 # ---------------------------------------------------------- metrics on a predictions DataFrame

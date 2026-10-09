@@ -155,7 +155,8 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
 def run(options: dict | None = None) -> pd.DataFrame:
     defaults = {"config": ROOT / "configs" / "base.yaml", "balance": "weighted_loss", "seeds": [0, 1, 2, 3, 4],
                 "out_root": ROOT / "runs" / "e1_questionnaire_only", "epochs": None, "max_batches": None,
-                "n_boot": None, "only_available": False, "p_field_drop": None}
+                "n_boot": None, "only_available": False, "p_field_drop": None,
+                "skip_existing": False}
     opts = {**defaults, **(options or {})}
     if opts["balance"] not in BALANCES:
         raise ValueError(f"balance must be one of {BALANCES}, got {opts['balance']!r}")
@@ -174,11 +175,14 @@ def run(options: dict | None = None) -> pd.DataFrame:
     for seed in opts["seeds"]:
         out_dir, ckpt = root / f"seed{seed}", root / "seed_checkpoints" / f"q_only_seed{seed}.pt"
         out_dir.mkdir(exist_ok=True)
-        ckpt.unlink(missing_ok=True)  # never start from another run's weights
-        summary, _ = train_seed(seed, cfg, opts, out_dir, ckpt, device)
-        runs.append({"balance": opts["balance"], "p_field_drop": opts["p_field_drop"], **summary})
-        pd.DataFrame(runs).to_csv(root / "seed_runs.csv", index=False)
-        harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(n_boot)])
+        if opts["skip_existing"] and ckpt.exists() and (out_dir / "metrics_summary.csv").exists():
+            log.info("seed %d already done, skipped (--skip-existing)", seed)
+        else:
+            ckpt.unlink(missing_ok=True)  # never start from another run's weights
+            summary, _ = train_seed(seed, cfg, opts, out_dir, ckpt, device)
+            runs.append({"balance": opts["balance"], "p_field_drop": opts["p_field_drop"], **summary})
+            pd.DataFrame(runs).to_csv(root / "seed_runs.csv", index=False)
+            harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(n_boot)])
         flats.append(pd.read_csv(out_dir / "metrics_summary.csv", dtype={"seed": str}))
 
     summary = aggregate_seeds(pd.concat(flats, ignore_index=True))
@@ -207,6 +211,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--max-batches", type=int, default=None, help="limit batches per epoch (smoke test)")
     ap.add_argument("--n-boot", type=int, default=None, help="bootstrap resamples for evaluate.py")
     ap.add_argument("--only-available", action="store_true", help="only cases whose images exist (as the image runs)")
+    ap.add_argument("--skip-existing", action="store_true", help="reuse seeds that already have results")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
     run(vars(args))
