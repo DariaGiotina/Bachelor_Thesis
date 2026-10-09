@@ -82,3 +82,9 @@ def test_new_head_starts_near_uniform():
     with torch.no_grad():
         probs = m(torch.randn(8, 3, 224, 224)).softmax(1)
     assert torch.allclose(probs, torch.full_like(probs, 0.25), atol=0.05)
+
+
+@pytest.mark.parametrize("backbone", BACKBONES)
+def test_feature_mode_reports_its_output_size(backbone):
+    m = SkinImageBaseline(0, backbone, pretrained=False).eval()
+    assert m(torch.randn(1, 3, 224, 224)).shape == (1, m.num_features)

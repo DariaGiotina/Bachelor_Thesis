@@ -126,3 +126,17 @@ def test_across_seeds_keeps_tone_groups_and_drops_worst_and_gap_rows():
     agg = evaluate.across_seeds(pd.DataFrame(rows))
     assert set(agg["group"]) == {"I-II", "1-3"}
     assert (agg["n_seeds"] == 2).all() and np.allclose(agg["mean"], 0.5)
+
+
+def test_ece_interval_is_bias_corrected_and_contains_the_estimate():
+    rng = np.random.default_rng(0)
+    n = 150
+    conf = rng.uniform(0.3, 1.0, n)
+    correct = rng.uniform(size=n) < conf             # perfectly calibrated in expectation: small true ECE
+    df = pd.DataFrame({"case_id": np.arange(n).astype(str), "true_label": "a",
+                       "pred_label": np.where(correct, "a", "b"), "confidence": conf})
+    r = M.bootstrap_standard_metrics(df, n_boot=300, seed=0)["ece"]
+    assert r["ci_low"] <= r["value"] <= r["ci_high"]
+    assert r["ci_low"] >= 0
+    samples = np.full(100, 0.10)
+    assert M.bias_corrected_ci(0.04, samples) == pytest.approx((0.04, 0.04))   # pure bias is removed

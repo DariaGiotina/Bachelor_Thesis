@@ -1,0 +1,271 @@
+seed,answer,auroc,positive_share,n_test
+0,body_area: head_or_neck,0.6165,0.1574,216
+0,body_area: arm,0.7016,0.4815,216
+0,body_area: palm,0.3834,0.0370,216
+0,body_area: back_of_hand,0.5735,0.1435,216
+0,body_area: torso_front,0.5524,0.2130,216
+0,body_area: torso_back,0.6017,0.1898,216
+0,body_area: genitalia_or_groin,0.5282,0.0509,216
+0,body_area: buttocks,0.5883,0.1111,216
+0,body_area: leg,0.6034,0.4213,216
+0,body_area: foot_top_or_side,0.6039,0.1111,216
+0,body_area: foot_sole,0.5261,0.0231,216
+0,body_area: other,0.6396,0.1157,216
+0,texture: raised_or_bumpy,0.5052,0.7202,218
+0,texture: flat,0.4817,0.1697,218
+0,texture: rough_or_flaky,0.4525,0.2523,218
+0,texture: fluid_filled,0.5786,0.1284,218
+0,symptoms: bothersome_appearance,0.5064,0.3819,199
+0,symptoms: bleeding,0.5178,0.0754,199
+0,symptoms: increasing_size,0.5184,0.2513,199
+0,symptoms: darkening,0.6465,0.0955,199
+0,symptoms: itching,0.4816,0.7337,199
+0,symptoms: burning,0.5740,0.1960,199
+0,symptoms: pain,0.4848,0.1558,199
+0,symptoms: no_relevant_experience,0.5339,0.0955,199
+0,duration: longer than median,0.5862,0.5069,217
+0,age: 50 or older,0.6774,0.2097,124
+0,self-reported skin type: V-VI,0.5208,0.1322,121
+1,body_area: head_or_neck,0.5661,0.1651,218
+1,body_area: arm,0.6893,0.5183,218
+1,body_area: palm,0.6125,0.0688,218
+1,body_area: back_of_hand,0.6472,0.1514,218
+1,body_area: torso_front,0.5883,0.2018,218
+1,body_area: torso_back,0.6105,0.1789,218
+1,body_area: genitalia_or_groin,0.5898,0.0550,218
+1,body_area: buttocks,0.6413,0.1239,218
+1,body_area: leg,0.6277,0.4358,218
+1,body_area: foot_top_or_side,0.4518,0.0917,218
+1,body_area: foot_sole,0.4854,0.0321,218
+1,body_area: other,0.5318,0.0917,218
+1,texture: raised_or_bumpy,0.5738,0.7407,216
+1,texture: flat,0.5013,0.1574,216
+1,texture: rough_or_flaky,0.5380,0.2824,216
+1,texture: fluid_filled,0.5455,0.1620,216
+1,symptoms: bothersome_appearance,0.5129,0.3655,197
+1,symptoms: bleeding,0.4194,0.0558,197
+1,symptoms: increasing_size,0.5569,0.2538,197
+1,symptoms: darkening,0.5624,0.1015,197
+1,symptoms: itching,0.6164,0.8274,197
+1,symptoms: burning,0.5254,0.2741,197
+1,symptoms: pain,0.5715,0.1726,197
+1,symptoms: no_relevant_experience,0.5781,0.0508,197
+1,duration: longer than median,0.5482,0.4884,215
+1,age: 50 or older,0.7228,0.2203,118
+1,self-reported skin type: V-VI,0.5691,0.1538,130
+2,body_area: head_or_neck,0.7158,0.1396,222
+2,body_area: arm,0.6691,0.4730,222
+2,body_area: palm,0.6261,0.0811,222
+2,body_area: back_of_hand,0.5019,0.1757,222
+2,body_area: torso_front,0.5852,0.1712,222
+2,body_area: torso_back,0.5453,0.1622,222
+2,body_area: genitalia_or_groin,0.6937,0.0270,222
+2,body_area: buttocks,0.5846,0.1081,222
+2,body_area: leg,0.6026,0.4234,222
+2,body_area: foot_top_or_side,0.5060,0.1036,222
+2,body_area: foot_sole,0.5084,0.0495,222
+2,body_area: other,0.5082,0.1622,222
+2,texture: raised_or_bumpy,0.5162,0.8178,225
+2,texture: flat,0.4925,0.1200,225
+2,texture: rough_or_flaky,0.5388,0.2400,225
+2,texture: fluid_filled,0.4950,0.1556,225
+2,symptoms: bothersome_appearance,0.5809,0.3738,206
+2,symptoms: bleeding,0.6389,0.0631,206
+2,symptoms: increasing_size,0.5274,0.2718,206
+2,symptoms: darkening,0.4313,0.0777,206
+2,symptoms: itching,0.5868,0.7961,206
+2,symptoms: burning,0.6027,0.2476,206
+2,symptoms: pain,0.5679,0.1699,206
+2,symptoms: no_relevant_experience,0.5361,0.0534,206
+2,duration: longer than median,0.4793,0.4722,216
+2,age: 50 or older,0.5596,0.2083,120
+2,self-reported skin type: V-VI,0.6703,0.1957,138
+3,body_area: head_or_neck,0.6480,0.1602,231
+3,body_area: arm,0.7048,0.4459,231
+3,body_area: palm,0.7306,0.0519,231
+3,body_area: back_of_hand,0.6982,0.1385,231
+3,body_area: torso_front,0.5350,0.1861,231
+3,body_area: torso_back,0.5761,0.1169,231
+3,body_area: genitalia_or_groin,0.5419,0.0173,231
+3,body_area: buttocks,0.6647,0.0736,231
+3,body_area: leg,0.5862,0.4242,231
+3,body_area: foot_top_or_side,0.6251,0.0952,231
+3,body_area: foot_sole,0.7860,0.0087,231
+3,body_area: other,0.6238,0.1255,231
+3,texture: raised_or_bumpy,0.6008,0.7848,237
+3,texture: flat,0.4897,0.1730,237
+3,texture: rough_or_flaky,0.5667,0.2616,237
+3,texture: fluid_filled,0.5832,0.1350,237
+3,symptoms: bothersome_appearance,0.4929,0.4089,225
+3,symptoms: bleeding,0.4571,0.0889,225
+3,symptoms: increasing_size,0.5333,0.2667,225
+3,symptoms: darkening,0.6727,0.0844,225
+3,symptoms: itching,0.5163,0.7511,225
+3,symptoms: burning,0.5832,0.2267,225
+3,symptoms: pain,0.5624,0.1556,225
+3,symptoms: no_relevant_experience,0.4829,0.0844,225
+3,duration: longer than median,0.5835,0.4192,229
+3,age: 50 or older,0.7935,0.2258,124
+3,self-reported skin type: V-VI,0.5788,0.1613,124
+4,body_area: head_or_neck,0.5574,0.1397,229
+4,body_area: arm,0.7217,0.5066,229
+4,body_area: palm,0.6083,0.0611,229
+4,body_area: back_of_hand,0.6274,0.1354,229
+4,body_area: torso_front,0.5762,0.1921,229
+4,body_area: torso_back,0.6449,0.1528,229
+4,body_area: genitalia_or_groin,0.7051,0.0524,229
+4,body_area: buttocks,0.6098,0.1048,229
+4,body_area: leg,0.6302,0.4585,229
+4,body_area: foot_top_or_side,0.6051,0.1092,229
+4,body_area: foot_sole,0.5405,0.0306,229
+4,body_area: other,0.6510,0.1397,229
+4,texture: raised_or_bumpy,0.5497,0.7652,230
+4,texture: flat,0.5099,0.1565,230
+4,texture: rough_or_flaky,0.5547,0.3130,230
+4,texture: fluid_filled,0.5168,0.1435,230
+4,symptoms: bothersome_appearance,0.5351,0.3768,207
+4,symptoms: bleeding,0.5144,0.0676,207
+4,symptoms: increasing_size,0.4075,0.2754,207
+4,symptoms: darkening,0.5343,0.1014,207
+4,symptoms: itching,0.5093,0.8068,207
+4,symptoms: burning,0.4852,0.3092,207
+4,symptoms: pain,0.5802,0.1836,207
+4,symptoms: no_relevant_experience,0.4543,0.0483,207
+4,duration: longer than median,0.5244,0.4525,221
+4,age: 50 or older,0.7192,0.2045,132
+4,self-reported skin type: V-VI,0.6079,0.1871,139
+5,body_area: head_or_neck,0.5282,0.1491,228
+5,body_area: arm,0.6532,0.4605,228
+5,body_area: palm,0.7019,0.0614,228
+5,body_area: back_of_hand,0.6262,0.1535,228
+5,body_area: torso_front,0.6158,0.1798,228
+5,body_area: torso_back,0.6261,0.1711,228
+5,body_area: genitalia_or_groin,0.4879,0.0702,228
+5,body_area: buttocks,0.6030,0.1140,228
+5,body_area: leg,0.6452,0.4079,228
+5,body_area: foot_top_or_side,0.6679,0.0965,228
+5,body_area: foot_sole,0.3341,0.0351,228
+5,body_area: other,0.5370,0.1228,228
+5,texture: raised_or_bumpy,0.4617,0.7434,226
+5,texture: flat,0.4670,0.1372,226
+5,texture: rough_or_flaky,0.5944,0.3142,226
+5,texture: fluid_filled,0.5562,0.1549,226
+5,symptoms: bothersome_appearance,0.4629,0.3780,209
+5,symptoms: bleeding,0.5640,0.0622,209
+5,symptoms: increasing_size,0.5188,0.3014,209
+5,symptoms: darkening,0.5500,0.0861,209
+5,symptoms: itching,0.5858,0.7751,209
+5,symptoms: burning,0.5927,0.3541,209
+5,symptoms: pain,0.5220,0.2153,209
+5,symptoms: no_relevant_experience,0.5702,0.0574,209
+5,duration: longer than median,0.5395,0.4533,225
+5,age: 50 or older,0.7411,0.1890,127
+5,self-reported skin type: V-VI,0.6944,0.1769,130
+6,body_area: head_or_neck,0.7151,0.2108,223
+6,body_area: arm,0.6993,0.4709,223
+6,body_area: palm,0.6495,0.0987,223
+6,body_area: back_of_hand,0.5527,0.1839,223
+6,body_area: torso_front,0.6014,0.1839,223
+6,body_area: torso_back,0.5853,0.1749,223
+6,body_area: genitalia_or_groin,0.5864,0.0717,223
+6,body_area: buttocks,0.6643,0.0942,223
+6,body_area: leg,0.5985,0.4215,223
+6,body_area: foot_top_or_side,0.5044,0.1121,223
+6,body_area: foot_sole,0.7423,0.0448,223
+6,body_area: other,0.6004,0.1256,223
+6,texture: raised_or_bumpy,0.4833,0.7387,222
+6,texture: flat,0.5165,0.1351,222
+6,texture: rough_or_flaky,0.5469,0.2613,222
+6,texture: fluid_filled,0.6158,0.1396,222
+6,symptoms: bothersome_appearance,0.5486,0.3687,198
+6,symptoms: bleeding,0.5459,0.0556,198
+6,symptoms: increasing_size,0.5281,0.2576,198
+6,symptoms: darkening,0.6003,0.0808,198
+6,symptoms: itching,0.5884,0.7778,198
+6,symptoms: burning,0.6035,0.2475,198
+6,symptoms: pain,0.5764,0.2020,198
+6,symptoms: no_relevant_experience,0.5403,0.0606,198
+6,duration: longer than median,0.6061,0.4450,218
+6,age: 50 or older,0.5977,0.1743,109
+6,self-reported skin type: V-VI,0.5459,0.1709,117
+7,body_area: head_or_neck,0.6792,0.1532,235
+7,body_area: arm,0.6710,0.4468,235
+7,body_area: palm,0.7351,0.0511,235
+7,body_area: back_of_hand,0.5910,0.1362,235
+7,body_area: torso_front,0.5863,0.1957,235
+7,body_area: torso_back,0.6257,0.1660,235
+7,body_area: genitalia_or_groin,0.6335,0.0468,235
+7,body_area: buttocks,0.6054,0.0936,235
+7,body_area: leg,0.5841,0.3830,235
+7,body_area: foot_top_or_side,0.5455,0.1106,235
+7,body_area: foot_sole,0.6767,0.0128,235
+7,body_area: other,0.5648,0.1234,235
+7,texture: raised_or_bumpy,0.4900,0.7521,234
+7,texture: flat,0.5986,0.1667,234
+7,texture: rough_or_flaky,0.4784,0.2650,234
+7,texture: fluid_filled,0.5800,0.1496,234
+7,symptoms: bothersome_appearance,0.4925,0.3790,219
+7,symptoms: bleeding,0.4890,0.0457,219
+7,symptoms: increasing_size,0.4686,0.3242,219
+7,symptoms: darkening,0.6258,0.0685,219
+7,symptoms: itching,0.5921,0.7900,219
+7,symptoms: burning,0.5726,0.2603,219
+7,symptoms: pain,0.5470,0.1735,219
+7,symptoms: no_relevant_experience,0.6290,0.0776,219
+7,duration: longer than median,0.5115,0.4912,226
+7,age: 50 or older,0.6742,0.2206,136
+7,self-reported skin type: V-VI,0.5260,0.1583,139
+8,body_area: head_or_neck,0.6558,0.1689,225
+8,body_area: arm,0.7003,0.4400,225
+8,body_area: palm,0.6614,0.0444,225
+8,body_area: back_of_hand,0.6072,0.1200,225
+8,body_area: torso_front,0.5809,0.1822,225
+8,body_area: torso_back,0.6296,0.1244,225
+8,body_area: genitalia_or_groin,0.4804,0.0578,225
+8,body_area: buttocks,0.6236,0.0533,225
+8,body_area: leg,0.5710,0.4000,225
+8,body_area: foot_top_or_side,0.6857,0.0711,225
+8,body_area: foot_sole,0.4321,0.0178,225
+8,body_area: other,0.6212,0.1333,225
+8,texture: raised_or_bumpy,0.4988,0.7723,224
+8,texture: flat,0.5004,0.1384,224
+8,texture: rough_or_flaky,0.5013,0.3214,224
+8,texture: fluid_filled,0.5199,0.1562,224
+8,symptoms: bothersome_appearance,0.4940,0.4498,209
+8,symptoms: bleeding,0.6124,0.0335,209
+8,symptoms: increasing_size,0.4968,0.2775,209
+8,symptoms: darkening,0.4470,0.1053,209
+8,symptoms: itching,0.5647,0.7943,209
+8,symptoms: burning,0.5488,0.2823,209
+8,symptoms: pain,0.6004,0.2010,209
+8,symptoms: no_relevant_experience,0.5722,0.0431,209
+8,duration: longer than median,0.6146,0.4679,218
+8,age: 50 or older,0.7913,0.1905,126
+8,self-reported skin type: V-VI,0.5901,0.1940,134
+9,body_area: head_or_neck,0.6004,0.1858,226
+9,body_area: arm,0.6731,0.4513,226
+9,body_area: palm,0.7356,0.0575,226
+9,body_area: back_of_hand,0.5851,0.1372,226
+9,body_area: torso_front,0.5922,0.1903,226
+9,body_area: torso_back,0.5913,0.1416,226
+9,body_area: genitalia_or_groin,0.6901,0.0575,226
+9,body_area: buttocks,0.5863,0.0796,226
+9,body_area: leg,0.5629,0.3673,226
+9,body_area: foot_top_or_side,0.5843,0.1018,226
+9,body_area: foot_sole,0.6956,0.0487,226
+9,body_area: other,0.6148,0.1681,226
+9,texture: raised_or_bumpy,0.4400,0.7939,228
+9,texture: flat,0.4314,0.1447,228
+9,texture: rough_or_flaky,0.5658,0.2675,228
+9,texture: fluid_filled,0.5287,0.1360,228
+9,symptoms: bothersome_appearance,0.4835,0.3714,210
+9,symptoms: bleeding,0.6404,0.0619,210
+9,symptoms: increasing_size,0.4983,0.2476,210
+9,symptoms: darkening,0.6104,0.0667,210
+9,symptoms: itching,0.5548,0.7524,210
+9,symptoms: burning,0.6425,0.2667,210
+9,symptoms: pain,0.5655,0.1714,210
+9,symptoms: no_relevant_experience,0.5448,0.0762,210
+9,duration: longer than median,0.5708,0.4578,225
+9,age: 50 or older,0.7093,0.2480,125
+9,self-reported skin type: V-VI,0.5902,0.1556,135
