@@ -30,18 +30,25 @@ _NECK_NAMES = ("conv_head", "bn2", "norm_head")
 
 
 class SkinImageBaseline(nn.Module):
+    """timm backbone + linear head; ``num_classes=0`` returns the pooled features instead of logits."""
+
     def __init__(self, num_classes: int, backbone: str = "efficientnet_b0", pretrained: bool = True,
                  top_blocks: int = 2, drop_rate: float = 0.2):
         super().__init__()
         if not backbone.startswith(SUPPORTED):
             raise ValueError(f"backbone must be an EfficientNet or MobileNetV3 timm model, got {backbone!r}")
-        # timm replaces the ImageNet classifier with a new Linear(num_features, num_classes)
+        # timm replaces the ImageNet classifier with a new Linear(num_features, num_classes);
+        # num_classes=0 gives a feature extractor (pooled features, no classifier), used by the fusion model
         self.net = timm.create_model(backbone, pretrained=pretrained, num_classes=num_classes, drop_rate=drop_rate)
+        # size of what forward() returns without a classifier: MobileNetV3 has a conv_head after pooling
+        # (960 -> 1280), so num_features alone would be wrong for it
+        self.num_features = getattr(self.net, "head_hidden_size", None) or self.net.num_features
         # timm's default init for these models scales the head by its fan-out (= num_classes), which gives
         # large initial logits (start loss ~4.5 instead of ~ln(num_classes)); start from near-uniform outputs
         head = self.net.get_classifier()
-        nn.init.normal_(head.weight, std=0.01)
-        nn.init.zeros_(head.bias)
+        if isinstance(head, nn.Linear):
+            nn.init.normal_(head.weight, std=0.01)
+            nn.init.zeros_(head.bias)
         self.backbone_name = backbone
         n_blocks = len(self.net.blocks)
         if not 0 <= top_blocks <= n_blocks:

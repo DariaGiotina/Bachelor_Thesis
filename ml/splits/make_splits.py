@@ -1,4 +1,4 @@
-"""Create case-level 70/15/15 train/val/test splits for seeds 0-4.
+"""Create case-level 70/15/15 train/val/test splits for seeds 0-9 (0-4 first, 5-9 added later; each seed is independent).
 
 Every row of ``scin_labels.csv`` is one ``case_id`` (all images of a case share it), so a case
 can never appear in more than one split. Cases that share an identical image file (listed in
@@ -28,7 +28,7 @@ import pandas as pd
 from sklearn.model_selection import train_test_split
 
 ROOT = Path(__file__).resolve().parents[1]
-SEEDS = (0, 1, 2, 3, 4)
+SEEDS = tuple(range(10))
 FRACTIONS = {"train": 0.70, "val": 0.15, "test": 0.15}
 MIN_STRATUM = 4  # a stratum must survive two stratified splits (>= 2 cases per side)
 EFST_GROUPS = {1: "I-II", 2: "I-II", 3: "III-IV", 4: "III-IV", 5: "V-VI", 6: "V-VI"}

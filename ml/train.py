@@ -11,8 +11,10 @@ Models (``--model``):
   dummy       tiny CNN, image only (placeholder to test the pipeline)
   image_only  timm EfficientNet-B0 or MobileNetV3 (``--backbone``), image only, trained in stages
               (head only -> top blocks -> all layers; see ``image_baseline`` in the config)
-  fusion      EfficientNet-B0 + questionnaire branch; questionnaire input is q_vec + q_mask and
-              answers are hidden at random during training (modality dropout, never imputed)
+  fusion      LateFusionNet (models/fusion_model.py): the image_only backbone + a questionnaire branch
+              over q_vec + q_mask, fused by ``--fusion concat|gated|film``; trained with the same
+              stages as image_only; answers are hidden at random during training (modality dropout,
+              never imputed)
 
 Missing-answer evaluation: the fusion model is tested with a share r of the questionnaire fields
 hidden (each field independently, on top of the answers that are naturally missing), for every r
@@ -44,7 +46,7 @@ from data_loading import ROOT, get_dataloaders, load_config  # noqa: E402
 from engine import EarlyStopping, evaluate, image_only_adapt, timed, train_one_epoch  # noqa: E402
 from losses import build_loss  # noqa: E402
 from models.image_model import SkinImageBaseline  # noqa: E402
-from skinconcern.model import FusionClassifier  # noqa: E402
+from models.fusion_model import FUSIONS, LateFusionNet  # noqa: E402
 from utils.seed import seed_everything  # noqa: E402
 
 log = logging.getLogger("train")
@@ -115,9 +117,16 @@ def build_model(name: str, cfg: dict, n_classes: int, n_q_features: int, n_q_fie
     if name == "image_only":
         return SkinImageBaseline(n_classes, ib["backbone"], tc["pretrained"], ib["top_blocks"], ib["drop_rate"])
     if name == "fusion":
-        return FusionClassifier(n_classes, n_q_features, n_q_fields, tc["backbone"], tc["pretrained"],
-                                tc["q_hidden"], use_questionnaire=True)
+        return build_fusion(cfg, n_classes, n_q_features, n_q_fields)
     raise ValueError(f"unknown model {name!r}")
+
+
+def build_fusion(cfg: dict, n_classes: int, n_q_features: int, n_q_fields: int) -> LateFusionNet:
+    """Fusion model on the same backbone and stage settings as the image-only baseline (fair comparison)."""
+    ib, fc = cfg["image_baseline"], cfg["fusion"]
+    return LateFusionNet(n_classes, n_q_features, n_q_fields, ib["backbone"], fc["variant"], cfg["train"]["pretrained"],
+                         ib["top_blocks"], ib["drop_rate"], fc["q_hidden"], fc["q_depth"], fc["q_dropout"],
+                         fc["fused_dim"], fc["head_dropout"])
 
 
 def stage_plan(model: nn.Module, cfg: dict, epochs_override: int | None) -> list[dict]:
@@ -147,7 +156,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--exp-name", default=None, help="run folder name (default: <model>[_<backbone>]_seed<seed>)")
     ap.add_argument("--epochs", type=int, default=None, help="epochs (per stage for staged models)")
-    ap.add_argument("--backbone", default=None, help="image_only backbone, e.g. mobilenetv3_large_100")
+    ap.add_argument("--backbone", default=None, help="image backbone (image_only and fusion), e.g. mobilenetv3_large_100")
+    ap.add_argument("--fusion", choices=FUSIONS, default=None, help="fusion variant (default: config)")
     ap.add_argument("--stages", default=None, help="image_only stages to run, e.g. 1,2 (default: config)")
     ap.add_argument("--loss-type", choices=["weighted_ce", "focal"], default=None)
     ap.add_argument("--patience", type=int, default=None)
@@ -169,9 +179,12 @@ def main(argv: list[str] | None = None) -> int:
         cfg["loader"]["num_workers"] = args.num_workers
     if args.backbone:
         cfg["image_baseline"]["backbone"] = args.backbone
+    if args.fusion:
+        cfg["fusion"]["variant"] = args.fusion
     if args.stages:
         cfg["image_baseline"]["run_stages"] = [int(s) for s in args.stages.split(",")]
-    tag = f"_{cfg['image_baseline']['backbone']}" if args.model == "image_only" else ""
+    tag = {"image_only": f"_{cfg['image_baseline']['backbone']}",
+           "fusion": f"_{cfg['fusion']['variant']}_{cfg['image_baseline']['backbone']}"}.get(args.model, "")
     exp = args.exp_name or f"{args.model}{tag}_seed{args.seed}"
     out_dir = ROOT / "runs" / exp
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -232,7 +245,8 @@ def main(argv: list[str] | None = None) -> int:
     # One final test evaluation with the best-validation weights.
     model.load_state_dict(torch.load(out_dir / "best_model.pt", map_location=device))
     results = {"run": exp, "model": args.model, "seed": args.seed, "loss_type": loss_type,
-               "backbone": cfg["image_baseline"]["backbone"] if args.model == "image_only" else tc["backbone"],
+               "backbone": cfg["image_baseline"]["backbone"] if args.model != "dummy" else None,
+               "fusion": cfg["fusion"]["variant"] if args.model == "fusion" else None,
                "best_epoch": stopper.best_epoch, "best_stage": best_stage, "best_val_macro_f1": stopper.best,
                "test": {}}
     rates = tc["eval_missing_rates"] if args.model == "fusion" else [0.0]
