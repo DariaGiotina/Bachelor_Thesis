@@ -1,4 +1,4 @@
 source,licence,case_count,image_count,notes
-DDI,TO VERIFY (https://ddi-dataset.github.io/),,,image-only baselines and skin-tone analysis
-Fitzpatrick17k,TO VERIFY (https://github.com/mattgroh/fitzpatrick17k),,,image-only baselines and skin-tone analysis
+DDI,TO VERIFY: Stanford AIMI / Redivis terms (https://stanford.redivis.com/datasets/3r16-5mby7gfer),,,"external image-only test; 656 images, biopsy-confirmed, FST groups 12/34/56; download needs a Redivis account"
+Fitzpatrick17k,CC BY-NC-SA 3.0 (https://github.com/mattgroh/fitzpatrick17k),16577,16577,"external image-only test; 4012 rows map to target classes; most image URLs (DermaAmin) are dead, full set via the authors' request form; verified 2026-10-09"
 SCIN,SCIN Data Use License (https://github.com/google-research-datasets/scin/blob/main/LICENSE),5033,10407,release 1.0.0; gs://dx-scin-public-data; audited 2026-10-07; split by case_id
