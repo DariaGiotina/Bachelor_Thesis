@@ -113,3 +113,16 @@ def test_evaluate_rejects_duplicate_rows(tmp_path):
     pd.concat([d, d.iloc[:1]]).to_csv(path, index=False)
     with pytest.raises(ValueError):
         evaluate.main([str(path), "--n-boot", "10"])
+
+
+def test_across_seeds_keeps_tone_groups_and_drops_worst_and_gap_rows():
+    rows = []
+    for seed, v in (("0", 0.4), ("1", 0.6)):
+        base = {"split": "test", "seed": seed, "missing_pct": 0.0, "n_cases": 50, "ci_low": 0, "ci_high": 1}
+        rows += [{**base, "scope": "eFST", "group": "I-II", "metric": "macro_f1", "value": v},
+                 {**base, "scope": "eMST", "group": "1-3", "metric": "macro_f1", "value": v},
+                 {**base, "scope": "eFST", "group": "worst=V-VI", "metric": "worst_group_macro_f1", "value": v},
+                 {**base, "scope": "eFST", "group": "I-II-V-VI", "metric": "gap_macro_f1", "value": v}]
+    agg = evaluate.across_seeds(pd.DataFrame(rows))
+    assert set(agg["group"]) == {"I-II", "1-3"}
+    assert (agg["n_seeds"] == 2).all() and np.allclose(agg["mean"], 0.5)

@@ -194,6 +194,7 @@ def main(argv: list[str] | None = None) -> int:
 
     stopper, history, epoch, best_stage = EarlyStopping(patience), [], 0, None
     best_path = out_dir / "best_model.pt"
+    best_path.unlink(missing_ok=True)  # a rerun in the same folder must not start from the old run's weights
     for phase in plan:
         if phase["stage"] is not None and best_path.exists():
             model.load_state_dict(torch.load(best_path, map_location=device))  # continue from the best so far

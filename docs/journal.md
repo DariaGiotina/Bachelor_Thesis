@@ -2,6 +2,13 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-09: Bug fixes in evaluate.py and train.py
+
+- **evaluate.py:** `across_seeds` filtered rows with the pattern `worst=|-`, meant to drop the worst-group and gap rows, but every tone group name contains "-" (I-II, III-IV, 1-3, ...), so the across-seed summary in `metrics_summary.json` kept only the overall and "missing" rows. It now drops rows whose group starts with `worst=` and the `gap_macro_f1` metric only. Regression test added in `ml/tests/test_metrics.py` (65 tests pass). No reported numbers were affected (no real results exist yet).
+- **train.py:** before stage 1, a `best_model.pt` left in the run folder by an earlier run with the same name was loaded, so a rerun silently started from the old weights instead of ImageNet. The file is now deleted at the start of each run (`run_image_only.py` already did this).
+- **Process:** new standing rule: bugs are always repaired, even when a task says not to change a file.
+- **Docs:** the thesis and paper already describe the intended behaviour (5.10 / 3.9), so no text change was needed.
+
 ## 2026-10-09: Multi-seed image-only baseline and imbalance ablation (Task 2.4, E1 arm 1)
 
 - **Done:** `ml/run_image_only.py` trains `SkinImageBaseline` with the three-stage recipe on split seeds 0-4 (engine and evaluate.py are imported, not changed), keeps the best-validation checkpoint per seed (`seed_checkpoints/img_only_seed{seed}.pt`), writes val + test predictions, runs `evaluate.py` on the test split per seed and writes `e1_image_only_test.csv` (mean, sd, min, max and "mean ± sd" per metric, class and tone group). Options: `--backbone efficientnet_b0|mobilenetv3_large_100`, `--balance weighted_loss|sampler`, `--seeds`, `--skip-existing`; also callable as `run({...})` from a notebook. Tests in `ml/tests/test_run_image_only.py` (64 pass in total).
