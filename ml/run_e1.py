@@ -7,6 +7,9 @@
      fusion_<variant>        run_fusion.py --fusion <variant>          (concat, gated, film)
      fusion_<variant>_nodrop run_fusion.py --fusion <variant> --q_dropout none
      fusion_<variant>_randdrop run_fusion.py --fusion <variant> --q_dropout random (Task 3.4)
+     stack_photo, stack_photo_q, stack_q, stack_photo_qmlp
+                             run_stacking.py (cross-fitted stacking: out-of-fold photo predictions
+                             + questionnaire in a logistic-regression combiner)
      ensemble_image_q        ensemble_image_q.py (diagnostic: the two single-input models combined,
                              weight chosen on validation; no retraining)
    All arms share the backbone and imbalance correction given here.
@@ -68,6 +71,9 @@ def arm_spec(arm: str, backbone: str, balance: str) -> dict:
     if arm == "ensemble_image_q":  # diagnostic: photo-only x questionnaire-only probabilities (ensemble_image_q.py)
         return {"dir": ROOT / "runs" / "e1_ensemble" / f"{backbone}_{balance}", "questionnaire": True,
                 "train": lambda o: __import__("ensemble_image_q").run({**o, "backbone": backbone})}
+    if arm in ("stack_photo", "stack_photo_q", "stack_q", "stack_photo_qmlp"):  # cross-fitted stacking (run_stacking.py)
+        return {"dir": ROOT / "runs" / "e1_stacking" / f"{backbone}_{balance}" / arm, "questionnaire": arm != "stack_photo",
+                "train": lambda o: __import__("run_stacking").run({**o, "backbone": backbone})}
     if arm.startswith("fusion_"):
         variant, mode = arm.removeprefix("fusion_"), "fixed"
         for suffix, m in (("_nodrop", "none"), ("_randdrop", "random")):
@@ -182,14 +188,17 @@ def pairs(arms: list[str]) -> list[tuple[str, str]]:
     """Every fusion arm against image-only and questionnaire-only, image vs questionnaire, and fusion
     variants against fusion_concat."""
     out = []
-    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_"))]
+    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo"))]
     for f in fusion:
         out += [(f, b) for b in ("image_only", "questionnaire_only") if b in arms]
     if {"image_only", "questionnaire_only"} <= set(arms):
         out.append(("image_only", "questionnaire_only"))
     if "fusion_concat" in arms:
         out += [(f, "fusion_concat") for f in fusion if f != "fusion_concat"]
-    return out
+    for a in ("stack_photo_q", "stack_photo_qmlp"):  # same photo predictions: isolates the questionnaire
+        if {a, "stack_photo"} <= set(arms):
+            out.append((a, "stack_photo"))
+    return [(a, b) for a, b in out if a != b]
 
 
 
