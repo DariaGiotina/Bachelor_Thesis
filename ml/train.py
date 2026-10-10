@@ -14,7 +14,15 @@ Models (``--model``):
   fusion      LateFusionNet (models/fusion_model.py): the image_only backbone + a questionnaire branch
               over q_vec + q_mask, fused by ``--fusion concat|gated|film``; trained with the same
               stages as image_only; answers are hidden at random during training (modality dropout,
-              never imputed)
+              never imputed; dropout_utils.py)
+
+Answer dropout in training (``--q_dropout``, fusion only):
+  none    no answers hidden
+  fixed   whole questionnaire hidden with train.p_modality_drop, each field with train.p_field_drop
+          (default; the E1 setting)
+  random  a field-drop rate drawn uniformly from 0-100% for every batch, plus the whole questionnaire
+          hidden with answer_dropout.p_full; the checkpoint is saved as
+          fusion_dropout_<variant>_seed<seed>.pt instead of best_model.pt
 
 Missing-answer evaluation: the fusion model is tested with a share r of the questionnaire fields
 hidden (each field independently, on top of the answers that are naturally missing), for every r
@@ -25,6 +33,7 @@ Usage::
     python train.py --model dummy --epochs 3
     python train.py --model image_only --backbone mobilenetv3_large_100 --seed 0
     python train.py --model fusion --seed 0 --loss-type focal
+    python train.py --model fusion --seed 0 --q_dropout random
     python train.py --model dummy --epochs 2 --max-batches 5 --only-available --num-workers 0
 """
 from __future__ import annotations
@@ -42,6 +51,7 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 import evaluate as harness  # noqa: E402
+from dropout_utils import MODES, apply_answer_dropout, field_index, make_dropout_adapt, training_rates  # noqa: E402,F401
 from data_loading import ROOT, get_dataloaders, load_config  # noqa: E402
 from engine import EarlyStopping, evaluate, image_only_adapt, timed, train_one_epoch  # noqa: E402
 from losses import build_loss  # noqa: E402
@@ -53,45 +63,22 @@ log = logging.getLogger("train")
 
 
 # ------------------------------------------------------------------ missing-answer simulation
-def field_index(q_cols: list[str], m_cols: list[str]) -> list[torch.Tensor]:
-    """For each mask column m__<field>, the indices of its feature columns f__<field>__*."""
-    out = []
-    for m in m_cols:
-        field = m.split("__", 1)[1]
-        out.append(torch.tensor([i for i, c in enumerate(q_cols) if c.split("__")[1] == field]))
-    return out
-
-
+# Answer hiding lives in dropout_utils.py; these names are kept for the other runners and tests.
 def hide_answers(q_vec, q_mask, fields, p_modality: float, p_field: float, gen: torch.Generator | None = None):
     """Simulate missing answers: zero the features and set the mask to 1 (never imputes)."""
-    q_vec, q_mask = q_vec.clone(), q_mask.clone()
-    n = q_vec.size(0)
-    whole = torch.rand(n, generator=gen) < p_modality
-    for j, cols in enumerate(fields):
-        drop = whole | (torch.rand(n, generator=gen) < p_field)
-        q_vec[drop.nonzero().squeeze(1).unsqueeze(1), cols.unsqueeze(0)] = 0.0
-        q_mask[drop, j] = 1.0
-    return q_vec, q_mask
+    return apply_answer_dropout(q_vec, q_mask, p_field, p_modality, fields, gen)
 
 
 def make_fusion_adapt(fields, p_modality_train: float, p_field_train: float,
                       p_field_eval: float = 0.0, seed: int = 0):
-    """Batch -> model kwargs for the fusion model.
+    """Batch -> model kwargs for the fusion model with fixed training rates.
 
     Training: whole questionnaire hidden with p_modality_train, single fields with p_field_train.
     Evaluation: each field hidden with p_field_eval (fixed generator, so every model sees the same
     hidden answers).
     """
-    gen = torch.Generator().manual_seed(seed)
-
-    def adapt(batch: dict, training: bool) -> dict:
-        pm, pf = (p_modality_train, p_field_train) if training else (0.0, p_field_eval)
-        q_vec, q_mask = batch["q_vec"], batch["q_mask"]
-        if pm > 0 or pf > 0:
-            q_vec, q_mask = hide_answers(q_vec, q_mask, fields, pm, pf, gen)
-        return {"image": batch["image"], "q_vec": q_vec, "q_mask": q_mask}
-
-    return adapt
+    rates = {"mode": "fixed", "p_full": p_modality_train, "p_field": p_field_train}
+    return make_dropout_adapt(fields, rates, p_field_eval, seed)
 
 
 # --------------------------------------------------------------------------------------- models
@@ -163,6 +150,10 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--patience", type=int, default=None)
     ap.add_argument("--p-modality-drop", type=float, default=None)
     ap.add_argument("--p-field-drop", type=float, default=None)
+    ap.add_argument("--q_dropout", "--q-dropout", choices=MODES, default="fixed",
+                    help="answer dropout in training (fusion): none | fixed | random (rate sampled per batch)")
+    ap.add_argument("--p-full", type=float, default=None, help="--q_dropout random: chance of hiding the whole "
+                    "questionnaire (default: answer_dropout.p_full)")
     ap.add_argument("--max-batches", type=int, default=None, help="limit batches per epoch (smoke test)")
     ap.add_argument("--num-workers", type=int, default=None)
     ap.add_argument("--only-available", action="store_true", help="skip cases whose images are missing")
@@ -177,6 +168,9 @@ def main(argv: list[str] | None = None) -> int:
     p_fld = tc["p_field_drop"] if args.p_field_drop is None else args.p_field_drop
     if args.num_workers is not None:
         cfg["loader"]["num_workers"] = args.num_workers
+    cfg["train"]["p_modality_drop"], cfg["train"]["p_field_drop"] = p_mod, p_fld
+    if args.p_full is not None:
+        cfg.setdefault("answer_dropout", {})["p_full"] = args.p_full
     if args.backbone:
         cfg["image_baseline"]["backbone"] = args.backbone
     if args.fusion:
@@ -184,7 +178,8 @@ def main(argv: list[str] | None = None) -> int:
     if args.stages:
         cfg["image_baseline"]["run_stages"] = [int(s) for s in args.stages.split(",")]
     tag = {"image_only": f"_{cfg['image_baseline']['backbone']}",
-           "fusion": f"_{cfg['fusion']['variant']}_{cfg['image_baseline']['backbone']}"}.get(args.model, "")
+           "fusion": f"_{cfg['fusion']['variant']}_{cfg['image_baseline']['backbone']}"
+                     + {"none": "_nodrop", "fixed": "", "random": "_randdrop"}[args.q_dropout]}.get(args.model, "")
     exp = args.exp_name or f"{args.model}{tag}_seed{args.seed}"
     out_dir = ROOT / "runs" / exp
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -201,12 +196,16 @@ def main(argv: list[str] | None = None) -> int:
     loss_fn = build_loss(loss_type, train_ds.labels, n_classes, device, tc["focal_gamma"])
     plan = stage_plan(model, cfg, args.epochs)
     scaler = torch.amp.GradScaler(enabled=tc["amp"] and device.type == "cuda")
-    adapt = make_fusion_adapt(fields, p_mod, p_fld, seed=args.seed) if args.model == "fusion" else image_only_adapt
+    drop_rates = training_rates(args.q_dropout, cfg)
+    adapt = make_dropout_adapt(fields, drop_rates, seed=args.seed) if args.model == "fusion" else image_only_adapt
     log.info("%s | device=%s loss=%s classes=%s train=%d val=%d test=%d", exp, device, loss_type,
              train_ds.classes, len(train_ds), len(loaders["val"].dataset), len(loaders["test"].dataset))
+    if args.model == "fusion":
+        log.info("answer dropout in training: %s", drop_rates)
 
     stopper, history, epoch, best_stage = EarlyStopping(patience), [], 0, None
-    best_path = out_dir / "best_model.pt"
+    best_path = out_dir / ("best_model.pt" if args.model != "fusion" or args.q_dropout != "random"
+                           else f"fusion_dropout_{cfg['fusion']['variant']}_seed{args.seed}.pt")
     best_path.unlink(missing_ok=True)  # a rerun in the same folder must not start from the old run's weights
     for phase in plan:
         if phase["stage"] is not None and best_path.exists():
@@ -243,10 +242,11 @@ def main(argv: list[str] | None = None) -> int:
                 break
 
     # One final test evaluation with the best-validation weights.
-    model.load_state_dict(torch.load(out_dir / "best_model.pt", map_location=device))
+    model.load_state_dict(torch.load(best_path, map_location=device))
     results = {"run": exp, "model": args.model, "seed": args.seed, "loss_type": loss_type,
                "backbone": cfg["image_baseline"]["backbone"] if args.model != "dummy" else None,
                "fusion": cfg["fusion"]["variant"] if args.model == "fusion" else None,
+               "answer_dropout": drop_rates if args.model == "fusion" else None,
                "best_epoch": stopper.best_epoch, "best_stage": best_stage, "best_val_macro_f1": stopper.best,
                "test": {}}
     rates = tc["eval_missing_rates"] if args.model == "fusion" else [0.0]

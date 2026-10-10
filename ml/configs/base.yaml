@@ -94,3 +94,13 @@ fusion:
   q_dropout: 0.1
   fused_dim: 256         # gated fusion only
   head_dropout: 0.2
+
+# Answer dropout with a sampled rate (dropout_utils.py; train.py / run_fusion.py --q_dropout random).
+# For every training batch a field-drop rate p ~ Uniform(p_field_low, p_field_high) is drawn and each
+# questionnaire field is hidden with probability p; independently, a case loses its whole
+# questionnaire with probability p_full. Hidden fields are zeroed and their mask bits set to 1.
+# (Not to be confused with fusion.q_dropout, the ordinary dropout layer inside the questionnaire MLP.)
+answer_dropout:
+  p_field_low: 0.0
+  p_field_high: 1.0
+  p_full: 0.1
