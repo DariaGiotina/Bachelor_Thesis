@@ -5,13 +5,17 @@ Same protocol as ``run_image_only.py`` (same cases, splits, backbone, staged fin
 checkpoint, evaluate.py, mean +- sd over seeds), with ``LateFusionNet`` instead of the image-only model.
 
 Training hides answers at random (modality dropout): the whole questionnaire with
-``p_modality_drop`` and single answers with ``p_field_drop`` (``configs/base.yaml``, ``train`` block);
-``--no-dropout`` trains without it, the "without dropout" arm of E2. The test split is scored with a
+``p_modality_drop`` and single answers with ``p_field_drop`` (``configs/base.yaml``, ``train`` block).
+``--q_dropout`` picks the training mode (``dropout_utils.py``): ``fixed`` (default, the rates above),
+``none`` (no hidden answers, the "without dropout" arm of E2; ``--no-dropout`` is the old spelling) or
+``random`` (a field-drop rate drawn from 0-100% for every batch, plus the whole questionnaire hidden
+with ``answer_dropout.p_full``; Task 3.4). The test split is scored with a
 share r of the answers hidden for every r in ``train.eval_missing_rates``, with the same hidden
 answers as ``run_q_only.py`` (same generator use, batch size and order).
 
-Outputs in ``runs/e1_fusion/<backbone>_<variant>_<balance>[_nodrop]/`` (git-ignored):
-  seed_checkpoints/fusion_late_<variant>_seed{seed}.pt   best-validation weights (state_dict)
+Outputs in ``runs/e1_fusion/<backbone>_<variant>_<balance>[_nodrop|_randdrop]/`` (git-ignored):
+  seed_checkpoints/fusion_late_<variant>_seed{seed}.pt   best-validation weights (state_dict);
+                   fusion_dropout_<variant>_seed{seed}.pt for --q_dropout random
   seed{seed}/log.csv, predictions.csv, metrics_summary.* per seed
   seed_runs.csv, e1_fusion_test.csv                       across-seed summary, per missing rate
 
@@ -19,7 +23,8 @@ Usage::
 
     python run_fusion.py                                    # concat, config backbone, seeds 0-4
     python run_fusion.py --fusion gated --balance sampler
-    python run_fusion.py --no-dropout                       # E2: trained without hidden answers
+    python run_fusion.py --q_dropout none                   # E2: trained without hidden answers
+    python run_fusion.py --q_dropout random --seeds 0 1 2 3 4 5 6 7 8 9   # E2: per-batch sampled rate
     python run_fusion.py --epochs 1 --max-batches 3 --seeds 0 --n-boot 50 --num-workers 0   # smoke test
 """
 from __future__ import annotations
@@ -42,7 +47,10 @@ from engine import evaluate  # noqa: E402
 from models.fusion_model import FUSIONS  # noqa: E402
 from run_image_only import (BACKBONES, BALANCES, aggregate_seeds, build_balanced_training, fit_staged,  # noqa: E402
                             write_seed_runs)
+from dropout_utils import MODES, make_dropout_adapt, training_rates  # noqa: E402
 from train import build_fusion, field_index, make_fusion_adapt, predictions_frame  # noqa: E402
+
+SUFFIX = {"none": "_nodrop", "fixed": "", "random": "_randdrop"}
 from utils.seed import seed_everything  # noqa: E402
 
 log = logging.getLogger("run_fusion")
@@ -56,10 +64,10 @@ def train_seed(seed: int, cfg: dict, opts: dict, out_dir: Path, ckpt: Path, devi
     train_ds = loaders["train"].dataset
     classes, fields = train_ds.classes, field_index(train_ds.q_cols, train_ds.m_cols)
     model = build_fusion(cfg, len(classes), len(train_ds.q_cols), len(train_ds.m_cols)).to(device)
-    adapt = make_fusion_adapt(fields, opts["p_modality_drop"], opts["p_field_drop"], seed=seed)
-    log.info("seed %d | %s %s %s | train=%d val=%d test=%d | dropout: questionnaire %.2f, field %.2f", seed,
+    adapt = make_dropout_adapt(fields, opts["drop_rates"], seed=seed)
+    log.info("seed %d | %s %s %s | train=%d val=%d test=%d | answer dropout: %s", seed,
              cfg["image_baseline"]["backbone"], cfg["fusion"]["variant"], opts["balance"], len(train_ds),
-             len(loaders["val"].dataset), len(loaders["test"].dataset), opts["p_modality_drop"], opts["p_field_drop"])
+             len(loaders["val"].dataset), len(loaders["test"].dataset), opts["drop_rates"])
     fit = fit_staged(model, loaders, loss_fn, adapt, cfg, ckpt, out_dir, device, seed, opts["epochs"],
                      opts["max_batches"])
 
@@ -83,8 +91,12 @@ def run(options: dict | None = None) -> pd.DataFrame:
     defaults = {"config": ROOT / "configs" / "base.yaml", "backbone": None, "fusion": None,
                 "balance": "weighted_loss", "seeds": [0, 1, 2, 3, 4], "out_root": ROOT / "runs" / "e1_fusion",
                 "epochs": None, "max_batches": None, "num_workers": None, "n_boot": None, "only_available": False,
-                "no_dropout": False, "skip_existing": False}
+                "no_dropout": False, "q_dropout": None, "skip_existing": False}
     opts = {**defaults, **(options or {})}
+    mode = opts["q_dropout"] or ("none" if opts["no_dropout"] else "fixed")
+    if opts["no_dropout"] and mode != "none":
+        raise ValueError("--no-dropout conflicts with --q_dropout " + mode)
+    opts["q_dropout"] = mode
     if opts["balance"] not in BALANCES:
         raise ValueError(f"balance must be one of {BALANCES}, got {opts['balance']!r}")
     cfg = copy.deepcopy(load_config(opts["config"]))
@@ -95,10 +107,10 @@ def run(options: dict | None = None) -> pd.DataFrame:
     if opts["num_workers"] is not None:
         cfg["loader"]["num_workers"] = opts["num_workers"]
     tc = cfg["train"]
-    opts["p_modality_drop"], opts["p_field_drop"] = (0.0, 0.0) if opts["no_dropout"] else (
-        tc["p_modality_drop"], tc["p_field_drop"])
+    opts["drop_rates"] = training_rates(mode, cfg)
     variant, n_boot = cfg["fusion"]["variant"], opts["n_boot"] or tc.get("n_boot", 1000)
-    exp = f"{cfg['image_baseline']['backbone']}_{variant}_{opts['balance']}" + ("_nodrop" if opts["no_dropout"] else "")
+    exp = f"{cfg['image_baseline']['backbone']}_{variant}_{opts['balance']}" + SUFFIX[mode]
+    ckpt_name = "fusion_dropout" if mode == "random" else "fusion_late"
     root = Path(opts["out_root"]) / exp
     (root / "seed_checkpoints").mkdir(parents=True, exist_ok=True)
     (root / "config_used.yaml").write_text(yaml.safe_dump(cfg), encoding="utf-8")
@@ -107,14 +119,16 @@ def run(options: dict | None = None) -> pd.DataFrame:
 
     runs, flats = [], []
     for seed in opts["seeds"]:
-        out_dir, ckpt = root / f"seed{seed}", root / "seed_checkpoints" / f"fusion_late_{variant}_seed{seed}.pt"
+        out_dir, ckpt = root / f"seed{seed}", root / "seed_checkpoints" / f"{ckpt_name}_{variant}_seed{seed}.pt"
         out_dir.mkdir(exist_ok=True)
         if opts["skip_existing"] and ckpt.exists() and (out_dir / "metrics_summary.csv").exists():
             log.info("seed %d already done, skipped (--skip-existing)", seed)
         else:
             ckpt.unlink(missing_ok=True)  # never resume from another run's weights
             runs.append({"backbone": cfg["image_baseline"]["backbone"], "fusion": variant, "balance": opts["balance"],
-                         "p_modality_drop": opts["p_modality_drop"], "p_field_drop": opts["p_field_drop"],
+                         "q_dropout": mode, "p_full": opts["drop_rates"]["p_full"],
+                         "p_field": opts["drop_rates"].get("p_field", "U(%g,%g)" % (
+                             opts["drop_rates"].get("p_field_low", 0), opts["drop_rates"].get("p_field_high", 1))),
                          **train_seed(seed, cfg, opts, out_dir, ckpt, device)})
             write_seed_runs(root / "seed_runs.csv", runs[-1:])
             harness.main([str(out_dir / "predictions.csv"), "--split", "test", "--n-boot", str(n_boot)])
@@ -123,7 +137,7 @@ def run(options: dict | None = None) -> pd.DataFrame:
     summary = aggregate_seeds(pd.concat(flats, ignore_index=True))
     for i, (k, v) in enumerate((("experiment", "E1_fusion"), ("backbone", cfg["image_baseline"]["backbone"]),
                                 ("fusion", variant), ("balance", opts["balance"]),
-                                ("modality_dropout", not opts["no_dropout"]))):
+                                ("modality_dropout", mode != "none"), ("q_dropout", mode))):
         summary.insert(i, k, v)
     summary.to_csv(root / "e1_fusion_test.csv", index=False)
     (root / "run_options.json").write_text(json.dumps({k: str(v) for k, v in opts.items()}, indent=2),
@@ -144,7 +158,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--balance", choices=BALANCES, default="weighted_loss")
     ap.add_argument("--seeds", type=int, nargs="+", default=[0, 1, 2, 3, 4])
     ap.add_argument("--out-root", type=Path, default=ROOT / "runs" / "e1_fusion")
-    ap.add_argument("--no-dropout", action="store_true", help="train without hidden answers (E2 control arm)")
+    ap.add_argument("--no-dropout", action="store_true", help="same as --q_dropout none (E2 control arm)")
+    ap.add_argument("--q_dropout", "--q-dropout", choices=MODES, default=None,
+                    help="answer dropout in training: none | fixed (default) | random (rate sampled per batch)")
     ap.add_argument("--epochs", type=int, default=None, help="epochs per stage (default: config)")
     ap.add_argument("--max-batches", type=int, default=None, help="limit batches per epoch (smoke test)")
     ap.add_argument("--num-workers", type=int, default=None)

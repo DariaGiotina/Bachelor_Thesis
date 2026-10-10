@@ -5,7 +5,8 @@
      image_only              run_image_only.py
      questionnaire_only      run_q_only.py
      fusion_<variant>        run_fusion.py --fusion <variant>          (concat, gated, film)
-     fusion_<variant>_nodrop run_fusion.py --fusion <variant> --no-dropout
+     fusion_<variant>_nodrop run_fusion.py --fusion <variant> --q_dropout none
+     fusion_<variant>_randdrop run_fusion.py --fusion <variant> --q_dropout random (Task 3.4)
      ensemble_image_q        ensemble_image_q.py (diagnostic: the two single-input models combined,
                              weight chosen on validation; no retraining)
    All arms share the backbone and imbalance correction given here.
@@ -68,13 +69,16 @@ def arm_spec(arm: str, backbone: str, balance: str) -> dict:
         return {"dir": ROOT / "runs" / "e1_ensemble" / f"{backbone}_{balance}", "questionnaire": True,
                 "train": lambda o: __import__("ensemble_image_q").run({**o, "backbone": backbone})}
     if arm.startswith("fusion_"):
-        variant, nodrop = arm.removeprefix("fusion_").removesuffix("_nodrop"), arm.endswith("_nodrop")
+        variant, mode = arm.removeprefix("fusion_"), "fixed"
+        for suffix, m in (("_nodrop", "none"), ("_randdrop", "random")):
+            if variant.endswith(suffix):
+                variant, mode = variant.removesuffix(suffix), m
         if variant not in FUSIONS:
             raise ValueError(f"unknown fusion variant in {arm!r} (choose from {FUSIONS})")
-        name = f"{backbone}_{variant}_{balance}" + ("_nodrop" if nodrop else "")
+        name = f"{backbone}_{variant}_{balance}" + {"none": "_nodrop", "fixed": "", "random": "_randdrop"}[mode]
         return {"dir": ROOT / "runs" / "e1_fusion" / name, "questionnaire": True,
                 "train": lambda o: __import__("run_fusion").run({**o, "backbone": backbone, "fusion": variant,
-                                                                  "no_dropout": nodrop})}
+                                                                  "q_dropout": mode})}
     raise ValueError(f"unknown arm {arm!r}")
 
 

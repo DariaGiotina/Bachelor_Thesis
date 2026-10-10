@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-10: Answer dropout with a sampled rate (Task 3.4, E2)
+
+- **Done:** `ml/dropout_utils.py` with `apply_answer_dropout(q_vec, q_mask, p_field, p_full, fields)` (hidden fields zeroed, mask bits set to 1; never imputed), `sample_p_field`, `training_rates` and `make_dropout_adapt`. `train.py` and `run_fusion.py` gained `--q_dropout none|fixed|random` (default `fixed` = the E1 setting, so earlier runs are unchanged; `--no-dropout` still works). In `random` mode a field-drop rate p ~ Uniform(0, 1) is drawn per batch and the whole questionnaire is hidden for 10% of cases (config block `answer_dropout`); checkpoints `fusion_dropout_<variant>_seed<k>.pt`. `train.hide_answers` / `make_fusion_adapt` now call the new module with the same random-draw order, so the hidden answers of `run_q_only.py` and earlier evaluations are unchanged (test checks this). New `ml/run_e2_dropout.py` compares none / fixed / random / photo-only at every test missing rate -> `ml/results/e2/`. `run_e1.py` accepts `fusion_<variant>_randdrop`. 10 new tests (144 pass).
+- **Naming note:** `--q_dropout` (answer dropout) is not `fusion.q_dropout` in the config (the ordinary dropout layer inside the questionnaire MLP); documented in the config.
+- **Run:** concat fusion, EfficientNet-B0, weighted loss, seeds 0-9 (about 30 min).
+- **Results (test macro-F1, r = share of questions hidden):** random 0.510 / 0.509 / 0.508 / 0.508 / 0.507 for r = 0 / 0.25 / 0.5 / 0.75 / 1; none 0.505 ... 0.504; fixed 0.514 ... 0.505; photo 0.519. random - none: +0.001 to +0.009, all CIs include 0; random - fixed: -0.004 to +0.002. Loss from r = 0 to r = 1: none -0.001 [-0.016, +0.015], fixed -0.010 [-0.022, +0.003], random -0.003 [-0.009, +0.003]. No tone-group difference survives Holm.
+- **Interpretation:** even the model trained without hiding loses nothing when all answers are hidden: the fusion model relies almost only on the photo, so dropout has nothing to protect. RQ2 answer must say robustness comes from the questionnaire's small contribution, not from dropout training. Consistent with 8.5 / 4.5.
+- **Docs:** thesis 5.8 / paper 3.8 (method; dropout, modality dropout, batch, uniform distribution defined; references Srivastava et al. 2014, Neverova et al. 2016); new thesis 8.6 / paper 4.6 with Table 8.6 / Table 5.
+- **Next (suggested):** the RQ2 question is only interesting if the questionnaire matters; options: test on the SCIN cases with naturally missing answers, or a synthetic check where the questionnaire is made informative to show dropout works when there is something to protect.
+
 ## 2026-10-09: Why the questionnaire does not help (diagnostics; corrects an earlier hypothesis)
 
 - **Fact checked:** SCIN dermatologists labelled each submission seeing the images and the self-reported answers, and their confidence rose with the number of answers (Ward et al. 2024, arXiv 2402.18545). So the null result is not built into how the labels were made.
