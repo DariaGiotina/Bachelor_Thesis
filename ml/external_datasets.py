@@ -23,6 +23,8 @@ the evaluate.py format (split = dataset name, seed = SCIN seed) plus ``logit_<cl
 Expected layout (git-ignored, not redistributed):
   data/ddi/ddi_metadata.csv + images (in data/ddi/ or data/ddi/images/), from Stanford AIMI
   data/fitzpatrick17k/fitzpatrick17k.csv + images/<md5hash>.jpg (``--download-fitzpatrick``)
+  data/fitzpatrick17k_allData/finalfitz17k/<md5hash>.jpg: full set from the authors (16,577 images),
+      read through its cache images_448/<md5hash>.png when present (see FITZPATRICK_IMAGE_DIRS)
 
 Usage::
 
@@ -57,6 +59,10 @@ log = logging.getLogger("external_datasets")
 DATASETS = ("ddi", "fitzpatrick17k")
 DEFAULT_ROOTS = {"ddi": ROOT / "data" / "ddi", "fitzpatrick17k": ROOT / "data" / "fitzpatrick17k"}
 DDI_TONE = {12: 1, 34: 3, 56: 5}  # DDI groups -> one FST value inside the same evaluate.py group
+# Full Fitzpatrick17k image set received from the authors (<md5hash>.jpg) and its 448 px PNG cache
+# (scripts/resize_image_cache.py); searched before <root>/images. Empty entries are skipped.
+FITZPATRICK_IMAGE_DIRS = [ROOT / "data" / "fitzpatrick17k_allData" / "images_448",
+                          ROOT / "data" / "fitzpatrick17k_allData" / "finalfitz17k"]
 
 
 # ---------------------------------------------------------------------------------- label mapping
@@ -115,13 +121,22 @@ def read_ddi(root: Path) -> pd.DataFrame:
         "eFST": tone.map(DDI_TONE).astype("Int64"), "qc_wrong": False})
 
 
+def _find_fitzpatrick(root: Path, md5: str) -> Path | None:
+    """Downscaled cache copy first, then the full set from the authors, then the old URL downloads."""
+    for d in FITZPATRICK_IMAGE_DIRS:
+        for name in (f"{md5}.png", f"{md5}.jpg"):
+            if (d / name).exists():
+                return d / name
+    return _find(root, f"{md5}.jpg")
+
+
 def read_fitzpatrick17k(root: Path) -> pd.DataFrame:
     """Fitzpatrick17k CSV: md5hash, fitzpatrick_scale (1-6, -1 unknown), label, qc, url."""
     meta = pd.read_csv(root / "fitzpatrick17k.csv")
     tone = pd.to_numeric(meta["fitzpatrick_scale"], errors="coerce")
     return pd.DataFrame({
         "case_id": meta["md5hash"].astype(str),
-        "image_path": [_find(root, f"{h}.jpg") for h in meta["md5hash"].astype(str)],
+        "image_path": [_find_fitzpatrick(root, h) for h in meta["md5hash"].astype(str)],
         "raw_label": meta["label"], "tone_raw": tone,
         "eFST": tone.where(tone.between(1, 6)).astype("Int64"),
         "qc_wrong": meta["qc"].astype(str).str.startswith("3"), "url": meta["url"]})

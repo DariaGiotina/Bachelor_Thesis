@@ -9,6 +9,8 @@ back to the originals.
 Usage::
 
     python scripts/resize_image_cache.py
+    python scripts/resize_image_cache.py --src data/fitzpatrick17k_allData/finalfitz17k \
+        --dst data/fitzpatrick17k_allData/images_448 --pattern "*.jpg"
 """
 from __future__ import annotations
 
@@ -48,11 +50,13 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--dst", type=Path, default=ROOT / "data" / "scin" / "images_448")
     p.add_argument("--max-side", type=int, default=448)
     p.add_argument("--workers", type=int, default=8)
+    p.add_argument("--pattern", default="*.png", help="source files to cache, e.g. '*.jpg' for Fitzpatrick17k")
     args = p.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
     args.dst.mkdir(parents=True, exist_ok=True)
-    jobs = [(f, args.dst / f.name, args.max_side) for f in sorted(args.src.glob("*.png"))]
+    # the copy is always a PNG, so its suffix is .png whatever the source format
+    jobs = [(f, args.dst / f"{f.stem}.png", args.max_side) for f in sorted(args.src.glob(args.pattern))]
     with ProcessPoolExecutor(args.workers) as ex:
         ok = sum(ex.map(resize_one, jobs, chunksize=32))
     log.info("cached %d/%d images (longest side <= %d px) -> %s", ok, len(jobs), args.max_side, args.dst)
