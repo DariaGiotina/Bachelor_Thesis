@@ -2,6 +2,17 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-17: Full Fitzpatrick17k set - complete zero-shot test and pooled training (E7)
+
+- **Data:** the full image set from the authors (16,577 files) is in `ml/data/fitzpatrick17k_allData/finalfitz17k/` (git-ignored), with a 448 px PNG cache in `images_448/` (`scripts/resize_image_cache.py --pattern "*.jpg"`). `external_datasets.py` now finds the images there first, so all 4,012 mapped images are usable (was 619).
+- **Zero-shot (10 E1 photo-only checkpoints, all 4,012 images):** macro-F1 0.393 ± 0.016 (SCIN test 0.519). eFST I-II 0.412, III-IV 0.371, V-VI 0.312; redness_rosacea F1 0.237. Results in `ml/runs/external_eval/fitz_full_efficientnet_b0_weighted_loss/`.
+- **Leakage control:** `ml/splits/make_fitzpatrick_splits.py` links images by 256-bit dHash distance <= 20 or ImageNet EfficientNet-B0 cosine similarity >= 0.88 (threshold set by looking at sampled pairs: above 0.88 almost always the same patient/lesion, incl. mirrored copies; the 64-bit dHash was rejected because it chained unrelated images into a group of 41 at distance 2). 588 pairs, 903 images in groups, largest group 71. StratifiedGroupKFold per seed 0-9: 803 test / 3,209 train images. Output `ml/splits/fitzpatrick17k_splits.csv` (ids only).
+- **E7 (`ml/run_fitz_pooling.py`, 10 seeds, EffNet-B0, early stopping on SCIN val):** SCIN test macro-F1: photo-only 0.519; pooled (SCIN + Fitzpatrick17k) 0.484, -0.035 [-0.071, -0.002], 2/10 seeds, t p = 0.016 (balanced accuracy 0.610 -> 0.499; rosacea F1 -0.107, acne -0.057, eczema +0.042); sequential (Fitzpatrick17k then SCIN) 0.496, -0.024 [-0.049, +0.001]. Fitzpatrick17k test fold: zero-shot 0.410; pooled 0.626 (+0.216, 10/10), tone gap nearly gone (0.633 / 0.615 / 0.606); sequential 0.464. Tables `ml/results/e7/`.
+- **Conclusion:** extra clinical-atlas images do NOT make the app model (smartphone photos) more accurate; they help only in their own domain. The zero-shot skin-tone gap is mostly domain shift. Shipped model stays SCIN-only.
+- **Decision change:** the 2026-10-09 rule "Fitzpatrick17k test only, never train" is relaxed at the user's request to allow research-only training (E7). Still: never redistributed, never in the shipped model, E7 checkpoints deleted together with the images when the research ends. Re-read the signed agreement for any clause on training/derived models.
+- **Code:** `run_e1.pairs` also pairs `fitz_*` arms with image_only; `resize_image_cache.py` gets `--pattern` and always writes `.png` names. New tests `ml/tests/test_fitz_pooling.py` (147 pass).
+- **Docs:** thesis 8.8 / paper 4.8 with Table 8.8 / Table 7 (terms: zero-shot, data leakage, dHash, Hamming distance, cosine similarity, union-find, StratifiedGroupKFold, data pooling, sequential transfer, fine-tuning, in-domain gain); reference Abhishek, Jain, Hamarneh 2025 (Scientific Data, Fitzpatrick17k duplicates).
+
 ## 2026-10-15: Scope statement and WBS (Software Project Management course)
 
 - **Why:** the course asks for the scope statement (10 sections) and the coded WBS of the team project; the chosen project is this thesis. Both start from the project charter (`docs/Carta_proiectului_Giotina.docx`, 09.10.2026).
