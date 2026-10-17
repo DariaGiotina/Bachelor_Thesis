@@ -188,7 +188,7 @@ def pairs(arms: list[str]) -> list[tuple[str, str]]:
     """Every fusion arm against image-only and questionnaire-only, image vs questionnaire, and fusion
     variants against fusion_concat."""
     out = []
-    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo"))]
+    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo", "fitz_"))]
     for f in fusion:
         out += [(f, b) for b in ("image_only", "questionnaire_only") if b in arms]
     if {"image_only", "questionnaire_only"} <= set(arms):
