@@ -105,3 +105,30 @@ def test_backbone_spec_must_name_a_loader():
         fp.load_encoder("vit_base_patch16_224")
     assert fp.backbone_tag("open_clip:hf-hub:redlessone/DermLIP_ViT-B-16", None) == \
         "open_clip_hf-hub_redlessone_DermLIP_ViT-B-16"
+
+
+def test_panderm_conversion_matches_timm_names_and_biases():
+    q, v = torch.ones(4), torch.full((4,), 2.0)
+    sd = {"blocks.0.attn.q_bias": q, "blocks.0.attn.v_bias": v, "blocks.0.gamma_1": torch.zeros(4),
+          "blocks.0.gamma_2": torch.zeros(4), "norm.weight": torch.ones(4)}
+    out = fp.panderm_to_timm(sd)
+    assert set(out) == {"blocks.0.attn.qkv.bias", "blocks.0.ls1.gamma", "blocks.0.ls2.gamma", "norm.weight"}
+    assert torch.equal(out["blocks.0.attn.qkv.bias"], torch.cat([q, torch.zeros(4), v]))  # key has no bias
+
+
+def test_panderm_needs_weights_and_a_known_size():
+    with pytest.raises(ValueError, match="needs --weights"):
+        fp.load_encoder("panderm:base")
+    with pytest.raises(ValueError, match="size"):
+        fp.load_panderm("huge", Path("missing.pth"))
+
+
+def test_keep_all_adds_out_of_scope_images_with_label_minus_one(tmp_path):
+    root = _ddi(tmp_path)
+    Image.fromarray(np.zeros((8, 8, 3), np.uint8)).save(root / "images" / "000003.png")  # melanoma: out of scope
+    assert len(ext.DDIDataset(CFG, root, LABEL_MAP)) == 2
+    ds = ext.DDIDataset(CFG, root, LABEL_MAP, keep_all=True)
+    labels = {ds[i]["case_id"]: int(ds[i]["label"]) for i in range(len(ds))}
+    assert labels["000003"] == -1 and labels["000001"] >= 0 and len(ds) == 3
+    df = ext.predict_frame(_Fixed(), ds, 0, torch.device("cpu"))
+    assert (df.set_index("case_id").loc["000003", "true_label"]) == "out_of_scope"

@@ -10,8 +10,10 @@ summarised as mean +- sd (``foundation_probe_test.csv``), like ``run_image_only.
 
 Backbones (``--backbone``), all loaded through one interface (``load_encoder``):
   timm:<model name>       any timm model, pooled features (``num_classes=0``);
-                          ``--weights file.pt`` loads a local checkpoint into it (e.g. PanDerm ViT
-                          weights into ``timm:vit_large_patch16_224``)
+                          ``--weights file.pt`` loads a local checkpoint into it (same architecture
+                          only; a poor key match is refused)
+  panderm:<base|large>   PanDerm (BEiT-style ViT) with ``--weights`` = the authors' checkpoint, converted
+                          to timm names and loaded strictly; CLS token after the final norm
   open_clip:<model id>    image tower of an OpenCLIP model, e.g.
                           ``open_clip:hf-hub:redlessone/DermLIP_ViT-B-16`` (DermLIP; ``pip install open_clip_torch``)
   hf:<model id>           Hugging Face ``transformers`` vision model (pooled output, else the CLS token)
@@ -24,7 +26,7 @@ Usage::
 
     python foundation_probe.py --backbone timm:vit_base_patch16_224.augreg2_in21k_ft_in1k
     python foundation_probe.py --backbone open_clip:hf-hub:redlessone/DermLIP_ViT-B-16
-    python foundation_probe.py --backbone timm:vit_large_patch16_224 --weights panderm_large.pth
+    python foundation_probe.py --backbone panderm:base --weights data/models/panderm/panderm_bb_data6_checkpoint-499.pth
 """
 from __future__ import annotations
 
@@ -67,9 +69,47 @@ class Encoder:
     dim: int
 
 
+PANDERM_SIZES = {"base": "vit_base_patch16_224", "large": "vit_large_patch16_224"}
+PANDERM_MEAN, PANDERM_STD = (0.485, 0.456, 0.406), (0.228, 0.224, 0.225)  # PanDerm's get_encoder.py constants
+
+
+def panderm_to_timm(sd: dict) -> dict:
+    """Rename a PanDerm (BEiT-style ViT) state dict to timm ``VisionTransformer`` names.
+
+    PanDerm keeps separate query and value biases (the key has none) and calls the layer-scale
+    weights ``gamma_1`` / ``gamma_2``; timm uses one ``qkv.bias`` and ``ls1.gamma`` / ``ls2.gamma``.
+    """
+    out = {}
+    for k, v in sd.items():
+        if k.endswith("attn.q_bias"):
+            pre = k[: -len("q_bias")]
+            q, vb = v, sd[pre + "v_bias"]
+            out[pre + "qkv.bias"] = torch.cat([q, torch.zeros_like(q), vb])
+        elif k.endswith("attn.v_bias"):
+            continue
+        else:
+            out[k.replace(".gamma_1", ".ls1.gamma").replace(".gamma_2", ".ls2.gamma")] = v
+    return out
+
+
+def load_panderm(size: str, weights: Path) -> nn.Module:
+    """PanDerm encoder as a timm ViT with the authors' linear-probe output: final-norm CLS token."""
+    import timm
+    if size not in PANDERM_SIZES:
+        raise ValueError(f"panderm size must be one of {list(PANDERM_SIZES)}, got {size!r}")
+    model = timm.create_model(PANDERM_SIZES[size], pretrained=False, num_classes=0, init_values=1.0,
+                              qkv_bias=True, global_pool="token")
+    sd = torch.load(weights, map_location="cpu", weights_only=True)
+    sd = sd.get("model", sd) if isinstance(sd, dict) else sd
+    if any(k.startswith("encoder.") for k in sd):  # full pretraining checkpoint (PanDerm-Large): encoder only
+        sd = {k.removeprefix("encoder."): v for k, v in sd.items() if k.startswith("encoder.")}
+    model.load_state_dict(panderm_to_timm(sd), strict=True)  # every tensor must match
+    return model
+
+
 def _load_local_weights(model: nn.Module, path: Path) -> None:
     """Load a checkpoint into ``model``, tolerating wrapper keys and prefixes; refuse a poor match."""
-    sd = torch.load(path, map_location="cpu", weights_only=False)
+    sd = torch.load(path, map_location="cpu", weights_only=True)
     for key in ("model", "state_dict", "model_state", "teacher"):
         if isinstance(sd, dict) and key in sd and isinstance(sd[key], dict):
             sd = sd[key]
@@ -94,6 +134,11 @@ def load_encoder(spec: str, weights: Path | None = None, device: torch.device = 
         dc = timm.data.resolve_model_data_config(model)
         size, mean, std = dc["input_size"][-1], tuple(dc["mean"]), tuple(dc["std"])
         fwd = model
+    elif kind == "panderm":
+        if weights is None:
+            raise ValueError("panderm:<base|large> needs --weights (the authors' .pth checkpoint)")
+        model = load_panderm(name, Path(weights))
+        size, mean, std, fwd = 224, PANDERM_MEAN, PANDERM_STD, model
     elif kind == "open_clip":
         import open_clip
         model, _ = open_clip.create_model_from_pretrained(name)
@@ -115,7 +160,7 @@ def load_encoder(spec: str, weights: Path | None = None, device: torch.device = 
             pooled = getattr(out, "pooler_output", None)
             return pooled if pooled is not None else out.last_hidden_state[:, 0]
     else:
-        raise ValueError(f"backbone must start with timm:, open_clip: or hf:, got {spec!r}")
+        raise ValueError(f"backbone must start with timm:, panderm:, open_clip: or hf:, got {spec!r}")
     model.eval().requires_grad_(False).to(device)
     with torch.no_grad():
         dim = fwd(torch.zeros(1, 3, size, size, device=device)).shape[-1]
