@@ -56,6 +56,14 @@ from skinconcern.metrics import (FAST_NAMES, _fast_metrics, bias_corrected_ci, e
 
 log = logging.getLogger("run_e1")
 DEFAULT_ARMS = ["image_only", "questionnaire_only", "fusion_concat", "fusion_gated"]
+# E5 linear-probe arms -> foundation_probe.py --backbone (frozen encoder, ImageNet / self-supervised weights)
+PANDERM = ROOT / "data" / "models" / "panderm"
+PROBES = {"probe_effb0": ("timm:efficientnet_b0", None),
+          "probe_vit_in21k": ("timm:vit_base_patch16_224.augreg2_in21k_ft_in1k", None),
+          "probe_dinov2": ("timm:vit_base_patch14_dinov2.lvd142m", None),
+          "probe_dermlip": ("open_clip:hf-hub:redlessone/DermLIP_ViT-B-16", None),
+          "probe_panderm_base": ("panderm:base", PANDERM / "panderm_bb_data6_checkpoint-499.pth"),
+          "probe_panderm_large": ("panderm:large", PANDERM / "panderm_ll_data6_checkpoint-499.pth")}
 REFERENCE_PAIRS = [("fusion", "image_only"), ("fusion", "questionnaire_only"), ("image_only", "questionnaire_only")]
 
 
@@ -74,6 +82,12 @@ def arm_spec(arm: str, backbone: str, balance: str) -> dict:
     if arm in ("stack_photo", "stack_photo_q", "stack_q", "stack_photo_qmlp"):  # cross-fitted stacking (run_stacking.py)
         return {"dir": ROOT / "runs" / "e1_stacking" / f"{backbone}_{balance}" / arm, "questionnaire": arm != "stack_photo",
                 "train": lambda o: __import__("run_stacking").run({**o, "backbone": backbone})}
+    if arm in PROBES:  # E5: frozen encoder + linear probe (foundation_probe.py)
+        spec, weights = PROBES[arm]
+        fp = __import__("foundation_probe")
+        extra = ["--weights", str(weights)] if weights else []
+        return {"dir": ROOT / "runs" / "foundation_probe" / fp.backbone_tag(spec, weights), "questionnaire": False,
+                "train": lambda o: fp.main(["--backbone", spec, *extra, "--seeds", *map(str, o["seeds"])])}
     if arm.startswith("fusion_"):
         variant, mode = arm.removeprefix("fusion_"), "fixed"
         for suffix, m in (("_nodrop", "none"), ("_randdrop", "random")):
@@ -188,7 +202,7 @@ def pairs(arms: list[str]) -> list[tuple[str, str]]:
     """Every fusion arm against image-only and questionnaire-only, image vs questionnaire, and fusion
     variants against fusion_concat."""
     out = []
-    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo", "fitz_"))]
+    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo", "fitz_", "probe_"))]
     for f in fusion:
         out += [(f, b) for b in ("image_only", "questionnaire_only") if b in arms]
     if {"image_only", "questionnaire_only"} <= set(arms):

@@ -173,18 +173,23 @@ def log_report(dataset: str, rep: pd.DataFrame) -> None:
 class ExternalImageDataset(Dataset):
     """Kept rows of an external set; items look like SCIN items (image, label, eFST, eMST, case_id).
 
-    An unreadable image gives a black image and ``image_ok = 0`` instead of an exception.
+    An unreadable image gives a black image and ``image_ok = 0`` instead of an exception. With
+    ``keep_all`` the rows whose diagnosis is outside the target categories (status ``unmapped`` or
+    ``excluded_class``) are kept too, with label -1 (``out_of_scope``): used to test whether the model
+    abstains on conditions it was never trained for (E4).
     """
 
     name = "external"
 
     def __init__(self, config: str | Path | dict, root: Path | None = None,
-                 label_map: Path = ROOT / "labels" / "label_map.yaml"):
+                 label_map: Path = ROOT / "labels" / "label_map.yaml", keep_all: bool = False):
         self.cfg = load_config(config)
         self.classes = list(self.cfg["data"]["classes"])
         self.class_to_idx = {c: i for i, c in enumerate(self.classes)}
         self.report = mapping_report(self.name, root or DEFAULT_ROOTS[self.name], label_map, self.classes)
-        self.rows = self.report[self.report["status"] == "mapped"].reset_index(drop=True)
+        keep = ["mapped", "unmapped", "excluded_class"] if keep_all else ["mapped"]
+        rows = self.report[self.report["status"].isin(keep)]
+        self.rows = rows[rows["image_path"].notna()].reset_index(drop=True)
         self.transform = build_transform(self.cfg, train=False)
         self._warned: set[str] = set()
 
@@ -204,7 +209,7 @@ class ExternalImageDataset(Dataset):
             img, ok = np.zeros((size, size, 3), dtype=np.uint8), 0
         efst = row["eFST"]
         return {"image": self.transform(image=img)["image"],
-                "label": torch.tensor(self.class_to_idx[row["label"]]),
+                "label": torch.tensor(self.class_to_idx[row["label"]] if row["status"] == "mapped" else -1),
                 "eFST": torch.tensor(int(efst) if pd.notna(efst) else -1),
                 "eMST": torch.tensor(-1), "case_id": str(row["case_id"]), "image_ok": torch.tensor(ok)}
 
@@ -242,7 +247,8 @@ def predict_frame(model: torch.nn.Module, ds: ExternalImageDataset, seed: int, d
     conf, pred = prob.max(1)
     classes, efst = ds.classes, np.concatenate(efst)
     df = pd.DataFrame({
-        "case_id": ids, "split": ds.name, "true_label": [classes[i] for i in np.concatenate(labels)],
+        "case_id": ids, "split": ds.name,
+        "true_label": [classes[i] if i >= 0 else "out_of_scope" for i in np.concatenate(labels)],
         "pred_label": [classes[i] for i in pred.numpy()], "confidence": conf.numpy().round(6),
         "eFST": pd.Series(efst).where(lambda s: s > 0).astype("Int64"), "eMST": pd.array([pd.NA] * len(ids), "Int64"),
         "seed": seed, "missing_pct": 0.0, "image_ok": np.concatenate(ok),
