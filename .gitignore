@@ -72,13 +72,15 @@ wandb/
 *.synctex.gz
 ~$*.docx
 
-# --- Local tooling / private notes ---
-.claude/
-CLAUDE.md
-docs/thesis_context_card.txt
+# --- Local tooling ---
 *.tgz
 
 !ml/features/questionnaire_features.parquet
 
 # SCIN photos in a sanity grid must not be redistributed
 ml/sanity_batch.png
+
+# Design references that are not my own work (third-party images) and
+# generated Figma Make code exports (regenerable, kept local)
+docs/Design ideas/pinterest/
+docs/Design ideas/**/*.zip
