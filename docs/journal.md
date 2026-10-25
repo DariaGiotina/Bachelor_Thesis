@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-25: Warmer visual layer for the app (Lumière v3)
+
+- **Why:** v2 felt too minimal and "boring to look at". Goal: more colour and soul, still pink, cozy and clean.
+- **Research:** the eight Pinterest images in `docs/Design ideas/pinterest` (photo heroes, pink product photography, colour-coded metric tiles, rounded product cards, coquette bow details) and Dribbble pink skincare concepts (for example N. Laraswati's routine app). Pinterest search itself needs a login.
+- **Photos:** 11 free Unsplash photos (products without visible brands, textures, faces) uploaded into Figma; 2 portraits generated with Figma AI before the user asked to save credits, so no further AI generation was used. All sit in the "v3 · Photo library" frame. Faces cover fair, medium and deep skin tones.
+- **Done:** pastel family added as variables (peach, butter, mint, lilac, sky, each with a dark ink; contrast 5.45-6.27:1) plus rose-strong; "v3/Soft shadow" effect style; product swatch component now shows photos, so every product row updated at once; raised pink Scan button in the tab bar; lists rounded to 20 px. Screens enriched: photo heroes (welcome, log in, sign up, skin check, consent, product, ingredient, routine), photo banner, pastel quick-action tiles and streak card on Today, real photo in the camera, analysing and progress screens, colour-coded concerns in Result and Past checks, routine step pills by category, mood colours in the daily log, photo grid catalogue, pastel stats on Me, coloured icon tiles in lists and question headers.
+- **Bugs fixed:** Today's check card collapsed after reshaping (rebuilt); camera viewfinder overlay turned opaque (variable-bound translucent paint, replaced by an unbound overlay); product title clipped by the new benefit pills; 12 prototype links re-attached to replaced elements.
+- **Docs:** thesis 4.2 gets a paragraph on the v3 layer, the limitation now names the photo sources, Figure 4.3 shows v3 screens; references Unsplash License and the Dribbble concept. Paper unchanged.
+- **Open:** replace placeholders with Open Beauty Facts or manufacturer images in the real app; export a v3 `.fig` copy.
+
 ## 2026-10-25: Click-through prototype for Lumière v2
 
 - **Done (Figma):** 105 screen-to-screen links on buttons, list rows, text links and back arrows; the five tabs are wired once inside the TabBar component (25 links), so every screen inherits them; the analysing screen moves to the result after 2.5 s. Eight named flows: Onboarding, Skin check, Products, Routine, Profile and privacy, plus three edge cases (uncertain result, photo not usable, outside what we check), so screens that the happy path never reaches can still be demonstrated.
