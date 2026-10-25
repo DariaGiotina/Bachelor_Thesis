@@ -2,6 +2,15 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-25: Layered, more intricate UI details
+
+- **Why:** the user wanted the depth of their references (the ice-cream app, the analysis overlay in `download (1).jpg`, the medicube look in `download (2).jpg`) instead of flat square photos.
+- **Research:** Pinterest searches after the user logged in (skincare app UI pink, skin analysis face scan, cosmetic product app 3D, pastel dessert app, coquette beauty app): 22 references. Recurring techniques: cut-out objects breaking out of cards, face overlays with landmarks and callouts, photo with an overlapping sheet and round button, gauges.
+- **Cut-outs:** backgrounds removed locally with rembg (IS-Net general use) in a scratch environment, no Figma AI credits. Five unbranded products kept (cleanser pump, serum dropper, SPF tube, cream jar, mask set); two cut-outs with a readable real brand label and one with backdrop artefacts were dropped.
+- **Done:** Result shows the face photo with the 478 MediaPipe landmarks (computed with the project's own `face.py` on the placeholder photo), face outline, scan frame, Grad-CAM heat and callouts to frosted labels; confidence as a ring gauge. Camera shows live landmarks. Products pop out of cards on Today ("Your shelf"), the catalogue and the welcome photo; the product page has a gradient stage with pedestal, bows and pagination dots; Log in has the photo + round arrow overlap. Prototype links added for the new arrow and shelf cards.
+- **Honesty rule kept:** no invented "hydration 72%" style metrics; the overlay only shows what the system computes.
+- **Docs:** thesis 4.2 paragraph and Figure 4.3 refreshed; references rembg and MediaPipe Face Landmarker.
+
 ## 2026-10-25: Warmer visual layer for the app (Lumière v3)
 
 - **Why:** v2 felt too minimal and "boring to look at". Goal: more colour and soul, still pink, cozy and clean.
