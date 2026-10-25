@@ -2,6 +2,14 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-25: Click-through prototype for Lumière v2
+
+- **Done (Figma):** 105 screen-to-screen links on buttons, list rows, text links and back arrows; the five tabs are wired once inside the TabBar component (25 links), so every screen inherits them; the analysing screen moves to the result after 2.5 s. Eight named flows: Onboarding, Skin check, Products, Routine, Profile and privacy, plus three edge cases (uncertain result, photo not usable, outside what we check), so screens that the happy path never reaches can still be demonstrated.
+- **Decisions:** transitions by meaning: push left for the next step, slide up for camera and consent, dissolve for tab changes; Back uses Figma's Back action, so it returns to wherever the user came from. On the 16 screens taller than the phone, the bottom buttons and tab bar are pinned (absolute position, fixed while scrolling) and the footer gets the canvas colour with a hairline, so content scrolls underneath.
+- **Checked:** every link target was found (0 missing); the pinned screens keep their layout.
+- **Docs:** thesis 4.2 gets a paragraph on the prototype; the limitation about missing links is removed. Paper unchanged.
+- **Open:** in Figma, set the prototype device to a 393 × 852 phone (iPhone 16) so tall screens scroll; export a v2 `.fig` copy for `docs/Design ideas/`.
+
 ## 2026-10-25: App interface redesigned in Figma (Lumière v2)
 
 - **Why:** the first Figma version looked machine-generated: blurred gradient blobs, italic serif accent words inside headings, a shadowed card around every block, a floating pill tab bar with a raised centre button, a 2 × 2 feature grid, sparkles and four competing pastel accents. Goal: keep the pink, friendly identity but make it look designed by a person.
