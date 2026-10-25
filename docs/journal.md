@@ -2,6 +2,17 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-25: App interface redesigned in Figma (Lumière v2)
+
+- **Why:** the first Figma version looked machine-generated: blurred gradient blobs, italic serif accent words inside headings, a shadowed card around every block, a floating pill tab bar with a raised centre button, a 2 × 2 feature grid, sparkles and four competing pastel accents. Goal: keep the pink, friendly identity but make it look designed by a person.
+- **Research:** public write-ups on "vibe-coded" interface tells (one dominant colour, no decorative glow, no emoji icons, group with whitespace instead of nested cards, no meaningless status dots). The two TikTok videos supplied as references require a login, so only their titles could be read.
+- **Done (Figma, page "Lumière v2 · Redesign"):** variable collection "Lumière v2" (18 colours, spacing 4-32 px, radii 10/14/18), 12 text styles, components (status bar, home indicator, 5-tab bar, button with 5 variants, chip, field with 3 states, checkbox, radio, toggle, product swatch with 4 shapes, logo) and 38 line icons; 36 screens in 5 rows (onboarding 01-07, skin check 10-24, products 30-34, routine 40-44, profile 50-53); design-notes panel. The old page is kept as "Lumière v1 · Archive".
+- **Decisions:** one accent, Peony #BF3F68; Young Serif for titles only, Hanken Grotesk for the rest (both SIL OFL); lists with hairline dividers, no shadows; standard tab bar (Today, Skin, Scan, Routine, Me); plain copy, never "diagnose" or "treat".
+- **New screens from the ML results:** 23 "photo hard to read" (38.3% of SCIN images were rated insufficient quality) and 24 "outside what Lumière checks" (no score shown, because E4 found confidence is not a safety filter: DINOv2 labelled 79.5% of DDI malignant lesions benign with confidence).
+- **Bugs fixed:** status colours failed WCAG AA on their tinted badges (green 4.38:1, amber 3.96:1), darkened to #356B4E and #8C5710 (5.39 and 5.34:1). In the Figma plugin API, translucent paints bound to a variable lost their opacity when set on a node in the same script that created it; they were re-applied afterwards (camera viewfinders, face zones, heatmap).
+- **Docs:** thesis new section 4.2 with Table 4.1 (flows vs MVP requirements) and Figure 4.3 (`docs/diagrams/ui_redesign_v2.png`, eight screens); references WCAG 2.2, Apple HIG tab bars, Young Serif, Hanken Grotesk and the vibe-coded UI article. The paper is unchanged (ML only). Update script kept outside the repository.
+- **Open:** rebuild the prototype links (click-through) for v2; replace product illustrations and photo placeholders with real images; refresh the table of contents in Word; the local `.fig` copy in `docs/Design ideas/` is still v1 (export a new one from Figma).
+
 ## 2026-10-24: Risk management: RBS, 5x5 matrix and risk register (MPS course)
 
 - **Why:** the Software Project Management course asks for a risk matrix and an RBS with a risk register: 10 risks from at least 3 RBS categories, written cause -> event -> effect and linked to WBS packages, P and I on 1-5 scales, score P x I with its zone, strategy + concrete action, trigger, owner, and a plan B for critical risks.
