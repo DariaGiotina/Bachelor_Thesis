@@ -2,6 +2,23 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-26: One statistics procedure for every contrast and generated result assets (Task 4.4)
+
+- **Why:** each experiment runner tested its own contrasts; the thesis needs one rule for all of them and a way to rebuild every table from the stored results.
+- **Done:** `ml/stats_tests.py` recomputes 31 main contrasts (E1, E2, E5, E7, E4 AURC, Task 4.2b detectors) from per-seed results: difference per seed, 95% t interval over seeds, paired t and Wilcoxon, Holm within each family and over all 31. Where a runner stored the same contrast (20 cases) the mean and p must agree, otherwise the script stops; all 20 agree. `ml/make_report_assets.py` rebuilds 8 tables (CSV + Markdown, optional decimal comma for the Romanian thesis) and collects 6 figures into `ml/reports/assets/` with an index.
+- **Results:** 12 of 31 contrasts survive Holm over all. PanDerm-Large (+0.047) and the E7 pooled-training loss (-0.035) no longer pass. DINOv2's +0.032 has a case-bootstrap interval above 0 but a seed-level t interval [-0.018, +0.082]: the macro-F1 advantage is likely, not certain, so the app choice rests on calibration, selective accuracy and the licence.
+- **Decision:** the per-seed t interval is the primary interval in the summary table (it reflects split-to-split variation); the runners' case-bootstrap intervals are kept beside it.
+- **Thesis:** paragraph in 8.8.
+
+## 2026-10-26: Skin-tone consolidation (Task 4.1, E3)
+
+- **Why:** the per-tone results were spread over E1, E2, E5 and E7 tables, without the missing-answer loss per tone or a second dataset.
+- **Done:** `ml/analyze_fairness.py` reads the stored test predictions (no retraining) and reports per eFST / eMST group the macro-F1 and balanced accuracy of every main model, the paired difference vs the photo model, the loss when all answers are hidden, the best-minus-worst gap and Fitzpatrick17k zero-shot per tone. Groups below 30 test cases per seed are flagged descriptive.
+- **Decision:** the gap gets no bootstrap interval: the range of noisy group estimates is biased upwards (the first version gave intervals that did not even contain the point estimate), so it is shown as mean ± sd over seeds and used only to compare models.
+- **Results:** photo model weakest on eMST 4-6 (0.457); DINOv2 0.532 (+0.075, not Holm-significant), DermLIP 0.577 (+0.120, significant). Hiding answers costs at most 0.023 in groups with >= 30 cases. On Fitzpatrick17k DINOv2 is better in every tone (+0.105 to +0.153) and the gap shrinks from 0.100 to 0.068, but eFST V-VI stays the worst group.
+- **Thesis:** 8.8 with Table 8.11 (53 pages after the field refresh).
+- **Git:** today's history rewritten into three commits (thesis + database documents, ML 4.2b + 4.1, ML 4.4) to respect the limit of 2-3 commits per day.
+
 ## 2026-10-26: Out-of-scope detector for the app model (Task 4.2b)
 
 - **Why:** E4 showed that calibrated confidence does not stop the DINOv2 model from answering on conditions it never saw (79.5% of DDI malignant lesions got a confident benign label). Task 4.2b tests whether a distance in the encoder's feature space can flag such photos before the classifier answers.

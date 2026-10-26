@@ -87,13 +87,12 @@ Status of every task of the original four-week program, and the changes made to 
 
 ## Week 4: Fairness, calibration, explainability & freeze
 
-Recommended order (changed): 4.2 (done), 4.3 (done), 4.2b (done), then 4.1, 4.4, 4.5. 4.2 and 4.3 go first because the app needs the "uncertain, see a professional" output and the explanation screen for the photo-only model, and E4 is the only research question without results.
+Recommended order (changed): 4.2, 4.3, 4.2b, 4.1, 4.4 (all done), then 4.5. 4.2 and 4.3 go first because the app needs the "uncertain, see a professional" output and the explanation screen for the photo-only model, and E4 is the only research question without results.
 
-**Task 4.1: Skin-Tone Stratified Analysis (E3) - PARTIAL, revised to a consolidation**
-- **Done:** per-tone (eFST, eMST) and per-category results with Holm correction are in `results/e1/e1_table.md`: no fusion variant helps any group; gated fusion hurts eFST III-IV; the photo model is weakest on eMST 4-6 (0.457) and eFST V-VI (0.496, 23 cases).
-- **Revised objective:** do not recompute. Collect the existing predictions into one tone table and figure; add the missingness loss per tone (needs the 3.5 outputs); flag groups with n < 30 (eFST V-VI has 23 test cases in some seeds); add the Fitzpatrick17k per-tone result as a second dataset.
-- **Deliverable:** `analyze_fairness.py`, `e3_by_tone.csv`, `e3_benefit_by_tone.png`.
-- **Prompt Blueprint:** "Write `analyze_fairness.py` that reads the existing prediction CSVs of all E1/E2/E7 arms, computes macro-F1, balanced accuracy and the worst-group gap per eFST/eMST group, the group-wise fusion-minus-photo delta and the missingness drop with bootstrap CIs, and marks groups with n < 30. Include Git commit commands."
+**Task 4.1: Skin-Tone Stratified Analysis (E3) - DONE (2026-10-26)**
+- **Code:** `analyze_fairness.py` reads the stored test predictions (nothing retrained) of the E1 arms, the E5 probes (DINOv2, DermLIP, PanDerm-Large), the E7 pooled model and the E2 hidden-answer runs (r = 1 vs 0), plus the Fitzpatrick17k zero-shot predictions of the two app candidates. Per eFST / eMST group: macro-F1 and balanced accuracy, paired difference vs the photo model (Holm within each model), missingness drop, best-minus-worst gap (groups with >= 20 cases; mean +- sd, no bootstrap interval because the range of noisy groups is biased upwards), groups with < 30 test cases per seed flagged as descriptive. Tests `tests/test_fairness_and_stats.py`.
+- **Results (`results/e3/e3_table.md`, `e3_by_tone.csv`, `e3_benefit_by_tone.png`):** photo model weakest on eMST 4-6 (0.457); DINOv2 probe 0.532 (+0.075 [+0.023, +0.119], not Holm-significant), DermLIP 0.577 (+0.120, Holm-significant). No fusion helps any group (gated hurts eFST III-IV). Hiding all answers costs at most 0.023 in groups with >= 30 cases (FiLM eMST 4-6, CI includes 0); only significant loss -0.015 (concat with dropout, eMST 1-3). eFST V-VI (~23 cases) and eMST 7-10 (~11) are descriptive only. Fitzpatrick17k: photo 0.412 / 0.371 / 0.312 (gap 0.100), DINOv2 0.517 / 0.524 / 0.460 (gap 0.068), DINOv2 better in every tone (+0.105 to +0.153, all Holm-significant); V-VI stays the worst group.
+- **Thesis:** 8.8 with Table 8.11.
 
 **Task 4.2: Calibration & Abstention (E4) - DONE (2026-10-24)**
 - **Code:** `calibrate.py` (temperature scaling by golden-section search on the validation NLL; re-exports full class probabilities for the photo-only and FiLM checkpoints, 100% agreement with the stored predictions), `abstain.py` (tau for a target coverage on validation, selective metrics, per-group bootstrap; cluster bootstrap by image for external sets), `run_e4.py`; tests `tests/test_calibrate_abstain.py`.
@@ -122,11 +121,10 @@ Recommended order (changed): 4.2 (done), 4.3 (done), 4.2b (done), then 4.1, 4.4,
 - **Outputs:** `results/gradcam/gradcam_cases.csv`, `gradcam_summary.md`; overlay grids in `runs/gradcam/` (git-ignored, SCIN photos). Thesis 8.12 / paper 4.12.
 - **Possible follow-up:** reflection padding instead of black borders, or DINOv2 with registers (`vit_base_patch14_reg4_dinov2`).
 
-**Task 4.4: Statistical Tests & Paper Tables/Figures - PARTIAL**
-- **Done:** paired bootstrap, paired t test and Holm correction already run inside `run_e1.py` and the E2 / E7 runners.
-- **Still to do:** `stats_tests.py` as one place that reproduces every contrast (fusion vs photo, dropout vs no dropout, pooled vs photo) and `make_paper_assets.py` that exports all tables and figures from `results/*.csv`.
-- **Deliverable:** `stats_tests.py`, `make_paper_assets.py`, `tables/*.tex|csv`, `figures/*.pdf`.
-- **Prompt Blueprint:** "Write `stats_tests.py` for paired tests on seed-matched macro-F1 for the main contrasts with Holm correction, and `make_paper_assets.py` to export all result tables and figures from `results/*.csv`. Include Git commit commands."
+**Task 4.4: Statistical Tests & Result Tables/Figures - DONE (2026-10-26)**
+- **Code:** `stats_tests.py` recomputes all 31 main contrasts (RQ1 E1, RQ2 E2, E5 encoders, E7 extra data, RQ4 AURC, Task 4.2b detectors) from the stored per-seed results with one procedure: per-seed difference, 95% t interval over seeds, paired t and Wilcoxon, Holm within each family and over all contrasts; the runners' stored contrasts (20) must agree (mean within 1e-4, p within 0.005) or the script stops. `make_report_assets.py` rebuilds 8 tables (CSV + Markdown, `--decimal-comma` for the Romanian thesis) and collects 6 figures with an index in `reports/assets/`.
+- **Results (`results/stats/contrasts.md`):** all 20 stored contrasts reproduced. 12 of 31 stay significant after Holm over all: questionnaire-only and ImageNet-probe losses, DermLIP +0.084, AURC reduction of the three probes, detector differences. PanDerm-Large +0.047 (Holm all 0.381) and E7 pooled -0.035 (0.289) no longer pass; DINOv2 +0.032 has t interval over seeds [-0.018, +0.082] (case bootstrap [+0.005, +0.061]), so its macro-F1 advantage is likely but not certain; the app choice rests on calibration, selective accuracy and licence.
+- **Thesis:** 8.8 (statistics paragraph).
 
 **Task 4.5: Reproducibility Freeze & Model Export - TODO (model chosen 2026-10-24: DINOv2 + linear probe)**
 - **Revised objective:** lock the environment (`requirements.txt`), the config for every reported number, and the split files; add a one-command rerun script. Export the **photo-only** model (trained on SCIN only; recommended after E4: DINOv2 ViT-B/14 + linear probe with its temperature and tau (Apache 2.0, selective accuracy 0.676 vs 0.607, lowest ECE after scaling 0.061); DermLIP / PanDerm are more accurate but CC BY-NC-ND, so research only; ViT-B has 86 M parameters vs 5.3 M, so server inference only) with its calibration temperature and abstention tau to ONNX (or TorchScript) for the FastAPI service. Fusion is not exported: it gives no benefit.
