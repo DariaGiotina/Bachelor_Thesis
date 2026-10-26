@@ -8,4 +8,4 @@ Informational tool only; not a medical device.
 - `app/` React Native (Expo) client
 - `api/` backend
 - `ml/` Python ML environment and experiments
-- `docs/` thesis and paper drafts
+- `docs/` thesis draft, planning documents and journal
