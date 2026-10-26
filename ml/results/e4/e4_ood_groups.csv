@@ -1,0 +1,721 @@
+scale,group,metric,value,ci_low,ci_high,n_cases,set,rule
+eFST_group,ALL,coverage,0.9486706056129985,0.939807976366322,0.956794682422452,2708,scin_test,flag
+eFST_group,ALL,abstention_rate,0.05132939438700146,0.043205317577547975,0.06019202363367804,2708,scin_test,flag
+eFST_group,ALL,selective_accuracy,0.6337096146360451,0.6148722081719571,0.6520105821219955,2708,scin_test,flag
+eFST_group,ALL,abstention_precision,0.5107913669064749,0.43211259079903147,0.5928245204506242,2708,scin_test,flag
+eFST_group,ALL,accuracy,0.6262924667651403,0.608557976366322,0.6436576809453471,2708,scin_test,flag
+eFST_group,I-II,coverage,0.964133219470538,0.9520261492108245,0.9744047444373966,1171,scin_test,flag
+eFST_group,I-II,abstention_rate,0.03586678052946202,0.02559525556260344,0.04797385078917545,1171,scin_test,flag
+eFST_group,I-II,selective_accuracy,0.6191319751992914,0.5915088479486093,0.647025060769361,1171,scin_test,flag
+eFST_group,I-II,abstention_precision,0.5,0.3488119312436805,0.6587398373983738,1171,scin_test,flag
+eFST_group,I-II,accuracy,0.6148590947907772,0.5868247765969272,0.6414535262230422,1171,scin_test,flag
+eFST_group,III-IV,coverage,0.9400499583680266,0.9275338144105595,0.952931704473697,1201,scin_test,flag
+eFST_group,III-IV,abstention_rate,0.05995004163197337,0.04706829552630301,0.07246618558944046,1201,scin_test,flag
+eFST_group,III-IV,selective_accuracy,0.6412754650132861,0.6137471901590059,0.6681215488011398,1201,scin_test,flag
+eFST_group,III-IV,abstention_precision,0.5416666666666666,0.42857142857142855,0.6583162695457929,1201,scin_test,flag
+eFST_group,III-IV,accuracy,0.630308076602831,0.6035359245469208,0.6557478459128293,1201,scin_test,flag
+eFST_group,V-VI,coverage,0.911504424778761,0.8721345011516548,0.9471423603060515,226,scin_test,flag
+eFST_group,V-VI,abstention_rate,0.08849557522123896,0.052857639693948494,0.12786549884834525,226,scin_test,flag
+eFST_group,V-VI,selective_accuracy,0.6456310679611651,0.5789473684210527,0.7130164508489948,226,scin_test,flag
+eFST_group,V-VI,abstention_precision,0.45,0.25,0.6818779904306219,226,scin_test,flag
+eFST_group,V-VI,accuracy,0.6371681415929203,0.5720411036036036,0.7004951803153934,226,scin_test,flag
+eFST_group,V-VI - I-II,coverage,-0.05262879469177695,-0.09329172731541989,-0.014463349125987934,1397,scin_test,flag
+eFST_group,V-VI - I-II,abstention_rate,0.05262879469177695,0.014463349125987927,0.09329172731541988,1397,scin_test,flag
+eFST_group,V-VI - I-II,selective_accuracy,0.026499092761873677,-0.04304132547323992,0.09461288910289702,1397,scin_test,flag
+eFST_group,V-VI - I-II,abstention_precision,-0.04999999999999999,-0.31700781664016964,0.21667521994134892,1397,scin_test,flag
+eFST_group,V-VI - I-II,accuracy,0.022309046802143184,-0.044189171694393174,0.09138126385997371,1397,scin_test,flag
+eFST_group,III-IV - I-II,coverage,-0.024083261102511355,-0.04039242044669224,-0.006879976097050925,2372,scin_test,flag
+eFST_group,III-IV - I-II,abstention_rate,0.024083261102511355,0.0068799760970509214,0.04039242044669223,2372,scin_test,flag
+eFST_group,III-IV - I-II,selective_accuracy,0.02214348981399472,-0.016407740607835248,0.06027383152867803,2372,scin_test,flag
+eFST_group,III-IV - I-II,abstention_precision,0.04166666666666663,-0.15389957264957266,0.2347664324100868,2372,scin_test,flag
+eFST_group,III-IV - I-II,accuracy,0.015448981812053786,-0.023797760674704158,0.052179891699473215,2372,scin_test,flag
+eMST_group,ALL,coverage,0.9486706056129985,0.939807976366322,0.956794682422452,2708,scin_test,flag
+eMST_group,ALL,abstention_rate,0.05132939438700146,0.043205317577547975,0.06019202363367804,2708,scin_test,flag
+eMST_group,ALL,selective_accuracy,0.6337096146360451,0.6148722081719571,0.6520105821219955,2708,scin_test,flag
+eMST_group,ALL,abstention_precision,0.5107913669064749,0.43211259079903147,0.5928245204506242,2708,scin_test,flag
+eMST_group,ALL,accuracy,0.6262924667651403,0.608557976366322,0.6436576809453471,2708,scin_test,flag
+eMST_group,1-3,coverage,0.954983922829582,0.9450785426862426,0.964072014449706,1866,scin_test,flag
+eMST_group,1-3,abstention_rate,0.045016077170418,0.03592798555029397,0.05492145731375743,1866,scin_test,flag
+eMST_group,1-3,selective_accuracy,0.6408529741863075,0.6189076237990002,0.6625285658423623,1866,scin_test,flag
+eMST_group,1-3,abstention_precision,0.5119047619047619,0.40860215053763443,0.6173409822866344,1866,scin_test,flag
+eMST_group,1-3,accuracy,0.6339764201500536,0.6116467979075905,0.6545274336101267,1866,scin_test,flag
+eMST_group,4-6,coverage,0.9336099585062241,0.9157894736842105,0.9520562415589428,723,scin_test,flag
+eMST_group,4-6,abstention_rate,0.06639004149377592,0.04794375844105728,0.08421052631578951,723,scin_test,flag
+eMST_group,4-6,selective_accuracy,0.6014814814814815,0.5650856260527793,0.6388467374810318,723,scin_test,flag
+eMST_group,4-6,abstention_precision,0.5,0.359974358974359,0.640025641025641,723,scin_test,flag
+eMST_group,4-6,accuracy,0.5947441217150761,0.5590704357842962,0.6295876842900595,723,scin_test,flag
+eMST_group,7-10,coverage,0.9385964912280702,0.8899977064220184,0.9805871919342793,114,scin_test,flag
+eMST_group,7-10,abstention_rate,0.06140350877192979,0.01941280806572068,0.11000229357798164,114,scin_test,flag
+eMST_group,7-10,selective_accuracy,0.719626168224299,0.6260597826086957,0.8039266221952699,114,scin_test,flag
+eMST_group,7-10,abstention_precision,0.5714285714285714,0.16666666666666666,1.0,114,scin_test,flag
+eMST_group,7-10,accuracy,0.7017543859649122,0.6105978847399093,0.7864077669902912,114,scin_test,flag
+eMST_group,4-6 - 1-3,coverage,-0.02137396432335792,-0.042110062486683864,-0.0009698473017881575,2589,scin_test,flag
+eMST_group,4-6 - 1-3,abstention_rate,0.02137396432335792,0.0009698473017881493,0.042110062486683864,2589,scin_test,flag
+eMST_group,4-6 - 1-3,selective_accuracy,-0.03937149270482598,-0.08008125579344594,0.0024715565015012977,2589,scin_test,flag
+eMST_group,4-6 - 1-3,abstention_precision,-0.011904761904761862,-0.18811686360367905,0.17430798361018504,2589,scin_test,flag
+eMST_group,4-6 - 1-3,accuracy,-0.03923229843497755,-0.07958156263762352,0.0015365369545859951,2589,scin_test,flag
+eMST_group,7-10 - 1-3,coverage,-0.016387431601511793,-0.06713982999532814,0.025726297763649507,1980,scin_test,flag
+eMST_group,7-10 - 1-3,abstention_rate,0.016387431601511793,-0.025726297763649514,0.06713982999532814,1980,scin_test,flag
+eMST_group,7-10 - 1-3,selective_accuracy,0.07877319403799155,-0.014648582658155839,0.16578058544710525,1980,scin_test,flag
+eMST_group,7-10 - 1-3,abstention_precision,0.059523809523809534,-0.3597799003322259,0.4936688311688311,1980,scin_test,flag
+eMST_group,7-10 - 1-3,accuracy,0.06777796581485862,-0.02526787600229746,0.15252669545131006,1980,scin_test,flag
+eFST_group,ALL,coverage,0.7980059084194978,0.7836041358936484,0.8127769571639586,2708,scin_test,confidence
+eFST_group,ALL,abstention_rate,0.2019940915805022,0.1872230428360414,0.2163958641063516,2708,scin_test,confidence
+eFST_group,ALL,selective_accuracy,0.6770013882461823,0.6579527955226895,0.6973696348805593,2708,scin_test,confidence
+eFST_group,ALL,abstention_precision,0.5740402193784278,0.5338985507246377,0.61371103117506,2708,scin_test,confidence
+eFST_group,ALL,accuracy,0.6262924667651403,0.608557976366322,0.6436576809453471,2708,scin_test,confidence
+eFST_group,I-II,coverage,0.7745516652433817,0.7503875273376851,0.7989521219860832,1171,scin_test,confidence
+eFST_group,I-II,abstention_rate,0.2254483347566183,0.20104787801391674,0.2496124726623149,1171,scin_test,confidence
+eFST_group,I-II,selective_accuracy,0.6846747519294377,0.6531154248663821,0.7141347795921063,1171,scin_test,confidence
+eFST_group,I-II,abstention_precision,0.625,0.5673581560283688,0.6806123866627669,1171,scin_test,confidence
+eFST_group,I-II,accuracy,0.6148590947907772,0.5868247765969272,0.6414535262230422,1171,scin_test,confidence
+eFST_group,III-IV,coverage,0.8084929225645295,0.7871545487146793,0.8305102255217818,1201,scin_test,confidence
+eFST_group,III-IV,abstention_rate,0.19150707743547046,0.16948977447821822,0.21284545128532067,1201,scin_test,confidence
+eFST_group,III-IV,selective_accuracy,0.666323377960865,0.6374477386895108,0.6943867464659048,1201,scin_test,confidence
+eFST_group,III-IV,abstention_precision,0.5217391304347826,0.4568580665024631,0.5932272288824583,1201,scin_test,confidence
+eFST_group,III-IV,accuracy,0.630308076602831,0.6035359245469208,0.6557478459128293,1201,scin_test,confidence
+eFST_group,V-VI,coverage,0.8097345132743363,0.7575684024713151,0.8597497171945702,226,scin_test,confidence
+eFST_group,V-VI,abstention_rate,0.19026548672566368,0.1402502828054298,0.2424315975286849,226,scin_test,confidence
+eFST_group,V-VI,selective_accuracy,0.6721311475409836,0.5988014711318104,0.7425149700598802,226,scin_test,confidence
+eFST_group,V-VI,abstention_precision,0.5116279069767442,0.35135135135135137,0.658562532433835,226,scin_test,confidence
+eFST_group,V-VI,accuracy,0.6371681415929203,0.5720411036036036,0.7004951803153934,226,scin_test,confidence
+eFST_group,V-VI - I-II,coverage,0.03518284803095462,-0.01806869200246768,0.09037701651062903,1397,scin_test,confidence
+eFST_group,V-VI - I-II,abstention_rate,-0.03518284803095462,-0.09037701651062903,0.018068692002467624,1397,scin_test,confidence
+eFST_group,V-VI - I-II,selective_accuracy,-0.012543604388454144,-0.0931837819701881,0.06588088142730872,1397,scin_test,confidence
+eFST_group,V-VI - I-II,abstention_precision,-0.1133720930232558,-0.2753972749540722,0.04742214337094766,1397,scin_test,confidence
+eFST_group,V-VI - I-II,accuracy,0.022309046802143184,-0.044189171694393174,0.09138126385997371,1397,scin_test,confidence
+eFST_group,III-IV - I-II,coverage,0.03394125732114783,0.0013656482174779804,0.06623864449532764,2372,scin_test,confidence
+eFST_group,III-IV - I-II,abstention_rate,-0.03394125732114783,-0.06623864449532764,-0.0013656482174779873,2372,scin_test,confidence
+eFST_group,III-IV - I-II,selective_accuracy,-0.01835137396857267,-0.06092705793562654,0.022085332623497267,2372,scin_test,confidence
+eFST_group,III-IV - I-II,abstention_precision,-0.1032608695652174,-0.18680173742492945,-0.008855564511746988,2372,scin_test,confidence
+eFST_group,III-IV - I-II,accuracy,0.015448981812053786,-0.023797760674704158,0.052179891699473215,2372,scin_test,confidence
+eMST_group,ALL,coverage,0.7980059084194978,0.7836041358936484,0.8127769571639586,2708,scin_test,confidence
+eMST_group,ALL,abstention_rate,0.2019940915805022,0.1872230428360414,0.2163958641063516,2708,scin_test,confidence
+eMST_group,ALL,selective_accuracy,0.6770013882461823,0.6579527955226895,0.6973696348805593,2708,scin_test,confidence
+eMST_group,ALL,abstention_precision,0.5740402193784278,0.5338985507246377,0.61371103117506,2708,scin_test,confidence
+eMST_group,ALL,accuracy,0.6262924667651403,0.608557976366322,0.6436576809453471,2708,scin_test,confidence
+eMST_group,1-3,coverage,0.8038585209003215,0.7862455967106707,0.8221554863385475,1866,scin_test,confidence
+eMST_group,1-3,abstention_rate,0.1961414790996785,0.17784451366145243,0.2137544032893293,1866,scin_test,confidence
+eMST_group,1-3,selective_accuracy,0.6886666666666666,0.6655360779076532,0.7106797082868942,1866,scin_test,confidence
+eMST_group,1-3,abstention_precision,0.5901639344262295,0.5415445075907487,0.6373677248677249,1866,scin_test,confidence
+eMST_group,1-3,accuracy,0.6339764201500536,0.6116467979075905,0.6545274336101267,1866,scin_test,confidence
+eMST_group,4-6,coverage,0.7717842323651453,0.7421535103066235,0.8011784217495619,723,scin_test,confidence
+eMST_group,4-6,abstention_rate,0.22821576763485474,0.19882157825043809,0.25784648969337653,723,scin_test,confidence
+eMST_group,4-6,selective_accuracy,0.6397849462365591,0.5992688056503763,0.6780340909090908,723,scin_test,confidence
+eMST_group,4-6,abstention_precision,0.5575757575757576,0.47876085697741744,0.6312582236842105,723,scin_test,confidence
+eMST_group,4-6,accuracy,0.5947441217150761,0.5590704357842962,0.6295876842900595,723,scin_test,confidence
+eMST_group,7-10,coverage,0.868421052631579,0.8035641100702576,0.926829268292683,114,scin_test,confidence
+eMST_group,7-10,abstention_rate,0.13157894736842102,0.07317073170731703,0.19643588992974234,114,scin_test,confidence
+eMST_group,7-10,selective_accuracy,0.7171717171717171,0.6262310606060606,0.8095488721804511,114,scin_test,confidence
+eMST_group,7-10,abstention_precision,0.4,0.15779352226720647,0.6666666666666666,114,scin_test,confidence
+eMST_group,7-10,accuracy,0.7017543859649122,0.6105978847399093,0.7864077669902912,114,scin_test,confidence
+eMST_group,4-6 - 1-3,coverage,-0.03207428853517624,-0.06480671098807855,0.0033875684729401828,2589,scin_test,confidence
+eMST_group,4-6 - 1-3,abstention_rate,0.03207428853517624,-0.003387568472940186,0.06480671098807854,2589,scin_test,confidence
+eMST_group,4-6 - 1-3,selective_accuracy,-0.04888172043010752,-0.09338716847023189,-0.003794980341999738,2589,scin_test,confidence
+eMST_group,4-6 - 1-3,abstention_precision,-0.032588176850471884,-0.12435080373895628,0.058273461572244355,2589,scin_test,confidence
+eMST_group,4-6 - 1-3,accuracy,-0.03923229843497755,-0.07958156263762352,0.0015365369545859951,2589,scin_test,confidence
+eMST_group,7-10 - 1-3,coverage,0.06456253173125748,-0.005728567090627766,0.12405060709266501,1980,scin_test,confidence
+eMST_group,7-10 - 1-3,abstention_rate,-0.06456253173125748,-0.12405060709266502,0.005728567090627744,1980,scin_test,confidence
+eMST_group,7-10 - 1-3,selective_accuracy,0.028505050505050478,-0.07003878389224343,0.12087016679456414,1980,scin_test,confidence
+eMST_group,7-10 - 1-3,abstention_precision,-0.19016393442622948,-0.43490338208387236,0.08352340358493199,1980,scin_test,confidence
+eMST_group,7-10 - 1-3,accuracy,0.06777796581485862,-0.02526787600229746,0.15252669545131006,1980,scin_test,confidence
+eFST_group,ALL,coverage,0.7588626292466765,0.7429745199409158,0.7751107828655834,2708,scin_test,combined
+eFST_group,ALL,abstention_rate,0.24113737075332353,0.22488921713441656,0.25702548005908415,2708,scin_test,combined
+eFST_group,ALL,selective_accuracy,0.683698296836983,0.6634097485987321,0.7045851047679621,2708,scin_test,combined
+eFST_group,ALL,abstention_precision,0.554364471669219,0.517594722344542,0.5917065390749602,2708,scin_test,combined
+eFST_group,ALL,accuracy,0.6262924667651403,0.608557976366322,0.6436576809453471,2708,scin_test,combined
+eFST_group,I-II,coverage,0.7463706233988044,0.7209188713915947,0.771604561084458,1171,scin_test,combined
+eFST_group,I-II,abstention_rate,0.25362937660119556,0.228395438915542,0.27908112860840534,1171,scin_test,combined
+eFST_group,I-II,selective_accuracy,0.6876430205949656,0.6559333400598661,0.717637331228223,1171,scin_test,combined
+eFST_group,I-II,abstention_precision,0.5993265993265994,0.5451702149195317,0.6548104703212767,1171,scin_test,combined
+eFST_group,I-II,accuracy,0.6148590947907772,0.5868247765969272,0.6414535262230422,1171,scin_test,combined
+eFST_group,III-IV,coverage,0.7635303913405496,0.7394182890673798,0.7880153655244663,1201,scin_test,combined
+eFST_group,III-IV,abstention_rate,0.23646960865945044,0.21198463447553373,0.2605817109326201,1201,scin_test,combined
+eFST_group,III-IV,selective_accuracy,0.6772082878953108,0.6469865205499044,0.7065232048215375,1201,scin_test,combined
+eFST_group,III-IV,abstention_precision,0.5211267605633803,0.4623970197771657,0.5820908848614073,1201,scin_test,combined
+eFST_group,III-IV,accuracy,0.630308076602831,0.6035359245469208,0.6557478459128293,1201,scin_test,combined
+eFST_group,V-VI,coverage,0.7433628318584071,0.6828193832599119,0.8008472965696367,226,scin_test,combined
+eFST_group,V-VI,abstention_rate,0.2566371681415929,0.19915270343036326,0.31718061674008813,226,scin_test,combined
+eFST_group,V-VI,selective_accuracy,0.6785714285714286,0.604906278229449,0.7517061307593695,226,scin_test,combined
+eFST_group,V-VI,abstention_precision,0.4827586206896552,0.3559048660470202,0.6071428571428571,226,scin_test,combined
+eFST_group,V-VI,accuracy,0.6371681415929203,0.5720411036036036,0.7004951803153934,226,scin_test,combined
+eFST_group,V-VI - I-II,coverage,-0.00300779154039732,-0.06897687646849386,0.055456893469724045,1397,scin_test,combined
+eFST_group,V-VI - I-II,abstention_rate,0.00300779154039732,-0.05545689346972405,0.06897687646849382,1397,scin_test,combined
+eFST_group,V-VI - I-II,selective_accuracy,-0.009071592023537023,-0.09091309980252814,0.07008470171863249,1397,scin_test,combined
+eFST_group,V-VI - I-II,abstention_precision,-0.11656797863694418,-0.25474974548345064,0.023738054549951617,1397,scin_test,combined
+eFST_group,V-VI - I-II,accuracy,0.022309046802143184,-0.044189171694393174,0.09138126385997371,1397,scin_test,combined
+eFST_group,III-IV - I-II,coverage,0.01715976794174512,-0.016492859484154142,0.051352482007439484,2372,scin_test,combined
+eFST_group,III-IV - I-II,abstention_rate,-0.01715976794174512,-0.05135248200743949,0.016492859484154142,2372,scin_test,combined
+eFST_group,III-IV - I-II,selective_accuracy,-0.01043473269965478,-0.05352781253097867,0.03144069522192619,2372,scin_test,combined
+eFST_group,III-IV - I-II,abstention_precision,-0.07819983876321912,-0.15922069441190348,0.004198679156134417,2372,scin_test,combined
+eFST_group,III-IV - I-II,accuracy,0.015448981812053786,-0.023797760674704158,0.052179891699473215,2372,scin_test,combined
+eMST_group,ALL,coverage,0.7588626292466765,0.7429745199409158,0.7751107828655834,2708,scin_test,combined
+eMST_group,ALL,abstention_rate,0.24113737075332353,0.22488921713441656,0.25702548005908415,2708,scin_test,combined
+eMST_group,ALL,selective_accuracy,0.683698296836983,0.6634097485987321,0.7045851047679621,2708,scin_test,combined
+eMST_group,ALL,abstention_precision,0.554364471669219,0.517594722344542,0.5917065390749602,2708,scin_test,combined
+eMST_group,ALL,accuracy,0.6262924667651403,0.608557976366322,0.6436576809453471,2708,scin_test,combined
+eMST_group,1-3,coverage,0.7695605573419079,0.7511997067739244,0.7884722517327302,1866,scin_test,combined
+eMST_group,1-3,abstention_rate,0.23043944265809213,0.21152774826726983,0.24880029322607555,1866,scin_test,combined
+eMST_group,1-3,selective_accuracy,0.6928969359331476,0.6698687790949241,0.7156829578188801,1866,scin_test,combined
+eMST_group,1-3,abstention_precision,0.5627906976744186,0.5198044518410652,0.6098670610310721,1866,scin_test,combined
+eMST_group,1-3,accuracy,0.6339764201500536,0.6116467979075905,0.6545274336101267,1866,scin_test,combined
+eMST_group,4-6,coverage,0.7219917012448133,0.6914384275534345,0.7547848554990793,723,scin_test,combined
+eMST_group,4-6,abstention_rate,0.27800829875518673,0.24521514450092072,0.3085615724465654,723,scin_test,combined
+eMST_group,4-6,selective_accuracy,0.6513409961685823,0.6119629244629244,0.6923112338858195,723,scin_test,combined
+eMST_group,4-6,abstention_precision,0.5522388059701493,0.4845561622303572,0.6197301598049837,723,scin_test,combined
+eMST_group,4-6,accuracy,0.5947441217150761,0.5590704357842962,0.6295876842900595,723,scin_test,combined
+eMST_group,7-10,coverage,0.8157894736842105,0.7403365384615385,0.8866069027341998,114,scin_test,combined
+eMST_group,7-10,abstention_rate,0.1842105263157895,0.11339309726580013,0.2596634615384615,114,scin_test,combined
+eMST_group,7-10,selective_accuracy,0.7311827956989247,0.6391299422227257,0.8222274143302181,114,scin_test,combined
+eMST_group,7-10,abstention_precision,0.42857142857142855,0.2222222222222222,0.6364545454545454,114,scin_test,combined
+eMST_group,7-10,accuracy,0.7017543859649122,0.6105978847399093,0.7864077669902912,114,scin_test,combined
+eMST_group,4-6 - 1-3,coverage,-0.0475688560970946,-0.08525536697501752,-0.008807122344758181,2589,scin_test,combined
+eMST_group,4-6 - 1-3,abstention_rate,0.0475688560970946,0.008807122344758181,0.08525536697501752,2589,scin_test,combined
+eMST_group,4-6 - 1-3,selective_accuracy,-0.041555939764565286,-0.08544536342886082,0.005452286961613653,2589,scin_test,combined
+eMST_group,4-6 - 1-3,abstention_precision,-0.01055189170426929,-0.09593611836040046,0.06769425559578178,2589,scin_test,combined
+eMST_group,4-6 - 1-3,accuracy,-0.03923229843497755,-0.07958156263762352,0.0015365369545859951,2589,scin_test,combined
+eMST_group,7-10 - 1-3,coverage,0.04622891634230264,-0.03367580943254192,0.11929871276643857,1980,scin_test,combined
+eMST_group,7-10 - 1-3,abstention_rate,-0.04622891634230264,-0.11929871276643857,0.033675809432541906,1980,scin_test,combined
+eMST_group,7-10 - 1-3,selective_accuracy,0.03828585976577714,-0.06230204285244906,0.1313622348750674,1980,scin_test,combined
+eMST_group,7-10 - 1-3,abstention_precision,-0.13421926910299004,-0.3453267780463188,0.09105110316176192,1980,scin_test,combined
+eMST_group,7-10 - 1-3,accuracy,0.06777796581485862,-0.02526787600229746,0.15252669545131006,1980,scin_test,combined
+eFST_group,ALL,coverage,0.95377969762419,0.934767818574514,0.9714902807775379,4630,scin_ood,flag
+eFST_group,ALL,abstention_rate,0.046220302375809985,0.02850971922246215,0.06523218142548601,4630,scin_ood,flag
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,4630,scin_ood,flag
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,4630,scin_ood,flag
+eFST_group,ALL,accuracy,0.0,0.0,0.0,4630,scin_ood,flag
+eFST_group,I-II,coverage,0.9575949367088608,0.9246746387415401,0.986748452141901,1580,scin_ood,flag
+eFST_group,I-II,abstention_rate,0.042405063291139244,0.013251547858099028,0.07532536125845987,1580,scin_ood,flag
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,1580,scin_ood,flag
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,1580,scin_ood,flag
+eFST_group,I-II,accuracy,0.0,0.0,0.0,1580,scin_ood,flag
+eFST_group,III-IV,coverage,0.9580508474576271,0.9318548984445051,0.9801764716491127,2360,scin_ood,flag
+eFST_group,III-IV,abstention_rate,0.04194915254237286,0.019823528350887278,0.06814510155549486,2360,scin_ood,flag
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,2360,scin_ood,flag
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,2360,scin_ood,flag
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,2360,scin_ood,flag
+eFST_group,V-VI,coverage,0.95,0.8799642857142858,0.9981527777777778,440,scin_ood,flag
+eFST_group,V-VI,abstention_rate,0.050000000000000044,0.0018472222222222531,0.12003571428571425,440,scin_ood,flag
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,440,scin_ood,flag
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,440,scin_ood,flag
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,440,scin_ood,flag
+eFST_group,V-VI - I-II,coverage,-0.0075949367088608,-0.07691743038228739,0.05457068302612523,2020,scin_ood,flag
+eFST_group,V-VI - I-II,abstention_rate,0.0075949367088608,-0.05457068302612524,0.07691743038228736,2020,scin_ood,flag
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,2020,scin_ood,flag
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,2020,scin_ood,flag
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,2020,scin_ood,flag
+eFST_group,III-IV - I-II,coverage,0.00045591074876638604,-0.03801087604696056,0.039542672274268734,3940,scin_ood,flag
+eFST_group,III-IV - I-II,abstention_rate,-0.00045591074876638604,-0.03954267227426874,0.03801087604696056,3940,scin_ood,flag
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,3940,scin_ood,flag
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,3940,scin_ood,flag
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,3940,scin_ood,flag
+eMST_group,ALL,coverage,0.95377969762419,0.934767818574514,0.9714902807775379,4630,scin_ood,flag
+eMST_group,ALL,abstention_rate,0.046220302375809985,0.02850971922246215,0.06523218142548601,4630,scin_ood,flag
+eMST_group,ALL,selective_accuracy,0.0,0.0,0.0,4630,scin_ood,flag
+eMST_group,ALL,abstention_precision,1.0,1.0,1.0,4630,scin_ood,flag
+eMST_group,ALL,accuracy,0.0,0.0,0.0,4630,scin_ood,flag
+eMST_group,1-3,coverage,0.9595394736842106,0.9374573060952639,0.9791427966737393,3040,scin_ood,flag
+eMST_group,1-3,abstention_rate,0.04046052631578945,0.02085720332626077,0.06254269390473609,3040,scin_ood,flag
+eMST_group,1-3,selective_accuracy,0.0,0.0,0.0,3040,scin_ood,flag
+eMST_group,1-3,abstention_precision,1.0,1.0,1.0,3040,scin_ood,flag
+eMST_group,1-3,accuracy,0.0,0.0,0.0,3040,scin_ood,flag
+eMST_group,4-6,coverage,0.9496402877697842,0.9124954710144927,0.9779434046345811,1390,scin_ood,flag
+eMST_group,4-6,abstention_rate,0.05035971223021585,0.022056595365418926,0.08750452898550727,1390,scin_ood,flag
+eMST_group,4-6,selective_accuracy,0.0,0.0,0.0,1390,scin_ood,flag
+eMST_group,4-6,abstention_precision,1.0,1.0,1.0,1390,scin_ood,flag
+eMST_group,4-6,accuracy,0.0,0.0,0.0,1390,scin_ood,flag
+eMST_group,7-10,coverage,0.8894736842105263,0.7272575757575758,1.0,190,scin_ood,flag
+eMST_group,7-10,abstention_rate,0.1105263157894737,0.0,0.27274242424242423,190,scin_ood,flag
+eMST_group,7-10,selective_accuracy,0.0,0.0,0.0,190,scin_ood,flag
+eMST_group,7-10,abstention_precision,1.0,1.0,1.0,190,scin_ood,flag
+eMST_group,7-10,accuracy,0.0,0.0,0.0,190,scin_ood,flag
+eMST_group,4-6 - 1-3,coverage,-0.0098991859144264,-0.053626082065828785,0.02781961621880806,4430,scin_ood,flag
+eMST_group,4-6 - 1-3,abstention_rate,0.0098991859144264,-0.027819616218808085,0.053626082065828785,4430,scin_ood,flag
+eMST_group,4-6 - 1-3,selective_accuracy,0.0,0.0,0.0,4430,scin_ood,flag
+eMST_group,4-6 - 1-3,abstention_precision,0.0,0.0,0.0,4430,scin_ood,flag
+eMST_group,4-6 - 1-3,accuracy,0.0,0.0,0.0,4430,scin_ood,flag
+eMST_group,7-10 - 1-3,coverage,-0.07006578947368425,-0.23331874409167414,0.044059987631416185,3230,scin_ood,flag
+eMST_group,7-10 - 1-3,abstention_rate,0.07006578947368425,-0.04405998763141619,0.23331874409167408,3230,scin_ood,flag
+eMST_group,7-10 - 1-3,selective_accuracy,0.0,0.0,0.0,3230,scin_ood,flag
+eMST_group,7-10 - 1-3,abstention_precision,0.0,0.0,0.0,3230,scin_ood,flag
+eMST_group,7-10 - 1-3,accuracy,0.0,0.0,0.0,3230,scin_ood,flag
+eFST_group,ALL,coverage,0.803023758099352,0.7794654427645789,0.8274352051835854,4630,scin_ood,confidence
+eFST_group,ALL,abstention_rate,0.196976241900648,0.17256479481641465,0.22053455723542117,4630,scin_ood,confidence
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,4630,scin_ood,confidence
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,4630,scin_ood,confidence
+eFST_group,ALL,accuracy,0.0,0.0,0.0,4630,scin_ood,confidence
+eFST_group,I-II,coverage,0.8120253164556962,0.7737764664073021,0.8503321069413785,1580,scin_ood,confidence
+eFST_group,I-II,abstention_rate,0.1879746835443038,0.14966789305862155,0.22622353359269787,1580,scin_ood,confidence
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,1580,scin_ood,confidence
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,1580,scin_ood,confidence
+eFST_group,I-II,accuracy,0.0,0.0,0.0,1580,scin_ood,confidence
+eFST_group,III-IV,coverage,0.7860169491525424,0.74796706317473,0.8247219632109859,2360,scin_ood,confidence
+eFST_group,III-IV,abstention_rate,0.2139830508474576,0.1752780367890141,0.25203293682526995,2360,scin_ood,confidence
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,2360,scin_ood,confidence
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,2360,scin_ood,confidence
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,2360,scin_ood,confidence
+eFST_group,V-VI,coverage,0.8227272727272728,0.7473684210526316,0.8868505398110661,440,scin_ood,confidence
+eFST_group,V-VI,abstention_rate,0.17727272727272725,0.11314946018893389,0.25263157894736843,440,scin_ood,confidence
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,440,scin_ood,confidence
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,440,scin_ood,confidence
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,440,scin_ood,confidence
+eFST_group,V-VI - I-II,coverage,0.010701956271576551,-0.07467697724810399,0.0872222222222221,2020,scin_ood,confidence
+eFST_group,V-VI - I-II,abstention_rate,-0.010701956271576551,-0.08722222222222213,0.07467697724810396,2020,scin_ood,confidence
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,2020,scin_ood,confidence
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,2020,scin_ood,confidence
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,2020,scin_ood,confidence
+eFST_group,III-IV - I-II,coverage,-0.026008367303153812,-0.08078114813379383,0.029786127687237953,3940,scin_ood,confidence
+eFST_group,III-IV - I-II,abstention_rate,0.026008367303153812,-0.02978612768723797,0.08078114813379383,3940,scin_ood,confidence
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,3940,scin_ood,confidence
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,3940,scin_ood,confidence
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,3940,scin_ood,confidence
+eMST_group,ALL,coverage,0.803023758099352,0.7794654427645789,0.8274352051835854,4630,scin_ood,confidence
+eMST_group,ALL,abstention_rate,0.196976241900648,0.17256479481641465,0.22053455723542117,4630,scin_ood,confidence
+eMST_group,ALL,selective_accuracy,0.0,0.0,0.0,4630,scin_ood,confidence
+eMST_group,ALL,abstention_precision,1.0,1.0,1.0,4630,scin_ood,confidence
+eMST_group,ALL,accuracy,0.0,0.0,0.0,4630,scin_ood,confidence
+eMST_group,1-3,coverage,0.7970394736842106,0.7665588034804924,0.826798377497964,3040,scin_ood,confidence
+eMST_group,1-3,abstention_rate,0.20296052631578942,0.173201622502036,0.23344119651950757,3040,scin_ood,confidence
+eMST_group,1-3,selective_accuracy,0.0,0.0,0.0,3040,scin_ood,confidence
+eMST_group,1-3,abstention_precision,1.0,1.0,1.0,3040,scin_ood,confidence
+eMST_group,1-3,accuracy,0.0,0.0,0.0,3040,scin_ood,confidence
+eMST_group,4-6,coverage,0.820863309352518,0.7758986565111604,0.862694745450828,1390,scin_ood,confidence
+eMST_group,4-6,abstention_rate,0.17913669064748206,0.13730525454917192,0.22410134348883956,1390,scin_ood,confidence
+eMST_group,4-6,selective_accuracy,0.0,0.0,0.0,1390,scin_ood,confidence
+eMST_group,4-6,abstention_precision,1.0,1.0,1.0,1390,scin_ood,confidence
+eMST_group,4-6,accuracy,0.0,0.0,0.0,1390,scin_ood,confidence
+eMST_group,7-10,coverage,0.7789473684210526,0.6578759398496241,0.8889166666666666,190,scin_ood,confidence
+eMST_group,7-10,abstention_rate,0.2210526315789474,0.11108333333333338,0.3421240601503759,190,scin_ood,confidence
+eMST_group,7-10,selective_accuracy,0.0,0.0,0.0,190,scin_ood,confidence
+eMST_group,7-10,abstention_precision,1.0,1.0,1.0,190,scin_ood,confidence
+eMST_group,7-10,accuracy,0.0,0.0,0.0,190,scin_ood,confidence
+eMST_group,4-6 - 1-3,coverage,0.02382383566830737,-0.029566343030151213,0.07743843204433135,4430,scin_ood,confidence
+eMST_group,4-6 - 1-3,abstention_rate,-0.02382383566830737,-0.07743843204433135,0.029566343030151203,4430,scin_ood,confidence
+eMST_group,4-6 - 1-3,selective_accuracy,0.0,0.0,0.0,4430,scin_ood,confidence
+eMST_group,4-6 - 1-3,abstention_precision,0.0,0.0,0.0,4430,scin_ood,confidence
+eMST_group,4-6 - 1-3,accuracy,0.0,0.0,0.0,4430,scin_ood,confidence
+eMST_group,7-10 - 1-3,coverage,-0.018092105263157965,-0.14341567389758186,0.09875839192132013,3230,scin_ood,confidence
+eMST_group,7-10 - 1-3,abstention_rate,0.018092105263157965,-0.09875839192132013,0.14341567389758186,3230,scin_ood,confidence
+eMST_group,7-10 - 1-3,selective_accuracy,0.0,0.0,0.0,3230,scin_ood,confidence
+eMST_group,7-10 - 1-3,abstention_precision,0.0,0.0,0.0,3230,scin_ood,confidence
+eMST_group,7-10 - 1-3,accuracy,0.0,0.0,0.0,3230,scin_ood,confidence
+eFST_group,ALL,coverage,0.7684665226781857,0.7438390928725702,0.7948164146868251,4630,scin_ood,combined
+eFST_group,ALL,abstention_rate,0.23153347732181428,0.20518358531317493,0.2561609071274298,4630,scin_ood,combined
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,4630,scin_ood,combined
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,4630,scin_ood,combined
+eFST_group,ALL,accuracy,0.0,0.0,0.0,4630,scin_ood,combined
+eFST_group,I-II,coverage,0.7810126582278482,0.7388145539906104,0.8256586826347305,1580,scin_ood,combined
+eFST_group,I-II,abstention_rate,0.21898734177215184,0.1743413173652695,0.2611854460093896,1580,scin_ood,combined
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,1580,scin_ood,combined
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,1580,scin_ood,combined
+eFST_group,I-II,accuracy,0.0,0.0,0.0,1580,scin_ood,combined
+eFST_group,III-IV,coverage,0.7555084745762712,0.7145982959116507,0.7964670399133105,2360,scin_ood,combined
+eFST_group,III-IV,abstention_rate,0.24449152542372876,0.20353296008668953,0.28540170408834936,2360,scin_ood,combined
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,2360,scin_ood,combined
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,2360,scin_ood,combined
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,2360,scin_ood,combined
+eFST_group,V-VI,coverage,0.7886363636363637,0.6971079027355623,0.8689057971014493,440,scin_ood,combined
+eFST_group,V-VI,abstention_rate,0.2113636363636363,0.13109420289855067,0.3028920972644376,440,scin_ood,combined
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,440,scin_ood,combined
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,440,scin_ood,combined
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,440,scin_ood,combined
+eFST_group,V-VI - I-II,coverage,0.007623705408515535,-0.09276677892000468,0.10307996254454652,2020,scin_ood,combined
+eFST_group,V-VI - I-II,abstention_rate,-0.007623705408515535,-0.10307996254454653,0.09276677892000466,2020,scin_ood,combined
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,2020,scin_ood,combined
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,2020,scin_ood,combined
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,2020,scin_ood,combined
+eFST_group,III-IV - I-II,coverage,-0.025504183651576917,-0.08761884971526065,0.035776307633846934,3940,scin_ood,combined
+eFST_group,III-IV - I-II,abstention_rate,0.025504183651576917,-0.035776307633846934,0.08761884971526064,3940,scin_ood,combined
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,3940,scin_ood,combined
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,3940,scin_ood,combined
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,3940,scin_ood,combined
+eMST_group,ALL,coverage,0.7684665226781857,0.7438390928725702,0.7948164146868251,4630,scin_ood,combined
+eMST_group,ALL,abstention_rate,0.23153347732181428,0.20518358531317493,0.2561609071274298,4630,scin_ood,combined
+eMST_group,ALL,selective_accuracy,0.0,0.0,0.0,4630,scin_ood,combined
+eMST_group,ALL,abstention_precision,1.0,1.0,1.0,4630,scin_ood,combined
+eMST_group,ALL,accuracy,0.0,0.0,0.0,4630,scin_ood,combined
+eMST_group,1-3,coverage,0.76875,0.7352733766721075,0.7993798494853153,3040,scin_ood,combined
+eMST_group,1-3,abstention_rate,0.23124999999999996,0.20062015051468468,0.26472662332789254,3040,scin_ood,combined
+eMST_group,1-3,selective_accuracy,0.0,0.0,0.0,3040,scin_ood,combined
+eMST_group,1-3,abstention_precision,1.0,1.0,1.0,3040,scin_ood,combined
+eMST_group,1-3,accuracy,0.0,0.0,0.0,3040,scin_ood,combined
+eMST_group,4-6,coverage,0.7776978417266187,0.7251753597122302,0.8264269858886951,1390,scin_ood,combined
+eMST_group,4-6,abstention_rate,0.2223021582733813,0.17357301411130485,0.27482464028776976,1390,scin_ood,combined
+eMST_group,4-6,selective_accuracy,0.0,0.0,0.0,1390,scin_ood,combined
+eMST_group,4-6,abstention_precision,1.0,1.0,1.0,1390,scin_ood,combined
+eMST_group,4-6,accuracy,0.0,0.0,0.0,1390,scin_ood,combined
+eMST_group,7-10,coverage,0.7052631578947368,0.53,0.854570707070707,190,scin_ood,combined
+eMST_group,7-10,abstention_rate,0.2947368421052632,0.145429292929293,0.47,190,scin_ood,combined
+eMST_group,7-10,selective_accuracy,0.0,0.0,0.0,190,scin_ood,combined
+eMST_group,7-10,abstention_precision,1.0,1.0,1.0,190,scin_ood,combined
+eMST_group,7-10,accuracy,0.0,0.0,0.0,190,scin_ood,combined
+eMST_group,4-6 - 1-3,coverage,0.008947841726618666,-0.04927747804947844,0.0730487769439326,4430,scin_ood,combined
+eMST_group,4-6 - 1-3,abstention_rate,-0.008947841726618666,-0.0730487769439326,0.049277478049478435,4430,scin_ood,combined
+eMST_group,4-6 - 1-3,selective_accuracy,0.0,0.0,0.0,4430,scin_ood,combined
+eMST_group,4-6 - 1-3,abstention_precision,0.0,0.0,0.0,4430,scin_ood,combined
+eMST_group,4-6 - 1-3,accuracy,0.0,0.0,0.0,4430,scin_ood,combined
+eMST_group,7-10 - 1-3,coverage,-0.06348684210526323,-0.23335017039922099,0.09411646715823116,3230,scin_ood,combined
+eMST_group,7-10 - 1-3,abstention_rate,0.06348684210526323,-0.09411646715823116,0.23335017039922096,3230,scin_ood,combined
+eMST_group,7-10 - 1-3,selective_accuracy,0.0,0.0,0.0,3230,scin_ood,combined
+eMST_group,7-10 - 1-3,abstention_precision,0.0,0.0,0.0,3230,scin_ood,combined
+eMST_group,7-10 - 1-3,accuracy,0.0,0.0,0.0,3230,scin_ood,combined
+eFST_group,ALL,coverage,0.8257477567298106,0.8155527168494516,0.8368401046859423,40120,fitz_in,flag
+eFST_group,ALL,abstention_rate,0.1742522432701894,0.16315989531405778,0.1844472831505483,40120,fitz_in,flag
+eFST_group,ALL,selective_accuracy,0.5667843883002808,0.552917344905068,0.5805089865640404,40120,fitz_in,flag
+eFST_group,ALL,abstention_precision,0.5957659848376484,0.5707730740492625,0.6198052428249118,40120,fitz_in,flag
+eFST_group,ALL,accuracy,0.5384596211365902,0.5253988035892323,0.5507091226321037,40120,fitz_in,flag
+eFST_group,I-II,coverage,0.8371837708830548,0.8236304267614057,0.8501467103266458,20950,fitz_in,flag
+eFST_group,I-II,abstention_rate,0.16281622911694515,0.14985328967335423,0.1763695732385942,20950,fitz_in,flag
+eFST_group,I-II,selective_accuracy,0.5529391641484691,0.5334986716230085,0.5718373203327173,20950,fitz_in,flag
+eFST_group,I-II,abstention_precision,0.5968924069187922,0.5619073513398667,0.6298460540549407,20950,fitz_in,flag
+eFST_group,I-II,accuracy,0.5285441527446301,0.511853363694538,0.5461469313094751,20950,fitz_in,flag
+eFST_group,III-IV,coverage,0.8369803063457331,0.8190066659604733,0.8566249970492422,13710,fitz_in,flag
+eFST_group,III-IV,abstention_rate,0.16301969365426694,0.14337500295075778,0.1809933340395266,13710,fitz_in,flag
+eFST_group,III-IV,selective_accuracy,0.5891067538126362,0.5656807551833644,0.6127443448276318,13710,fitz_in,flag
+eFST_group,III-IV,abstention_precision,0.6085011185682326,0.5649657489291269,0.6528344483470565,13710,fitz_in,flag
+eFST_group,III-IV,accuracy,0.5568927789934355,0.535497857751406,0.5782125791830494,13710,fitz_in,flag
+eFST_group,V-VI,coverage,0.7993071593533487,0.7614674011907747,0.8344267364168436,4330,fitz_in,flag
+eFST_group,V-VI,abstention_rate,0.20069284064665127,0.16557326358315635,0.2385325988092253,4330,fitz_in,flag
+eFST_group,V-VI,selective_accuracy,0.5848020803236059,0.5445865197992623,0.624330273438123,4330,fitz_in,flag
+eFST_group,V-VI,abstention_precision,0.5684695051783659,0.5006223028572637,0.6390632400715484,4330,fitz_in,flag
+eFST_group,V-VI,accuracy,0.5540415704387991,0.517786658422365,0.5898646378971899,4330,fitz_in,flag
+eFST_group,V-VI - I-II,coverage,-0.03787661152970612,-0.07664433788490466,0.0007655402491405735,25280,fitz_in,flag
+eFST_group,V-VI - I-II,abstention_rate,0.03787661152970612,-0.0007655402491405884,0.07664433788490466,25280,fitz_in,flag
+eFST_group,V-VI - I-II,selective_accuracy,0.03186291617513681,-0.011767088267854543,0.07389325338293493,25280,fitz_in,flag
+eFST_group,V-VI - I-II,abstention_precision,-0.028422901740426276,-0.10331681473452065,0.04968276365750519,25280,fitz_in,flag
+eFST_group,V-VI - I-II,accuracy,0.025497417694169022,-0.015736432119713747,0.06476993992536238,25280,fitz_in,flag
+eFST_group,III-IV - I-II,coverage,-0.0002034645373217847,-0.023284220958644283,0.02242511384197871,34660,fitz_in,flag
+eFST_group,III-IV - I-II,abstention_rate,0.0002034645373217847,-0.022425113841978712,0.023284220958644276,34660,fitz_in,flag
+eFST_group,III-IV - I-II,selective_accuracy,0.03616758966416711,0.0072076217931332925,0.06525686171490531,34660,fitz_in,flag
+eFST_group,III-IV - I-II,abstention_precision,0.01160871164944044,-0.04187478328125604,0.06795563905109056,34660,fitz_in,flag
+eFST_group,III-IV - I-II,accuracy,0.02834862624880541,0.0016472360221442578,0.05554286725921198,34660,fitz_in,flag
+eFST_group,ALL,coverage,0.8306580259222333,0.8242485044865404,0.8372389082751746,40120,fitz_in,confidence
+eFST_group,ALL,abstention_rate,0.16934197407776674,0.1627610917248255,0.17575149551345962,40120,fitz_in,confidence
+eFST_group,ALL,selective_accuracy,0.5689251635359779,0.5550219102941701,0.5829586432000934,40120,fitz_in,confidence
+eFST_group,ALL,abstention_precision,0.6109802767147483,0.5968262524837645,0.6276582985237394,40120,fitz_in,confidence
+eFST_group,ALL,accuracy,0.5384596211365902,0.5253988035892323,0.5507091226321037,40120,fitz_in,confidence
+eFST_group,I-II,coverage,0.8341766109785202,0.8246046346807481,0.8433975523183517,20950,fitz_in,confidence
+eFST_group,I-II,abstention_rate,0.16582338902147975,0.15660244768164835,0.17539536531925193,20950,fitz_in,confidence
+eFST_group,I-II,selective_accuracy,0.5560196841382468,0.5370258645476909,0.5763447342705589,20950,fitz_in,confidence
+eFST_group,I-II,abstention_precision,0.6096718480138169,0.5899569862905323,0.6303038987005918,20950,fitz_in,confidence
+eFST_group,I-II,accuracy,0.5285441527446301,0.511853363694538,0.5461469313094751,20950,fitz_in,confidence
+eFST_group,III-IV,coverage,0.8180889861415026,0.8056647624717579,0.8300108443767655,13710,fitz_in,confidence
+eFST_group,III-IV,abstention_rate,0.1819110138584974,0.16998915562323447,0.1943352375282421,13710,fitz_in,confidence
+eFST_group,III-IV,selective_accuracy,0.5920114122681883,0.56705470883669,0.6165449848762785,13710,fitz_in,confidence
+eFST_group,III-IV,abstention_precision,0.6010425020048116,0.5758845685294843,0.6269858016748513,13710,fitz_in,confidence
+eFST_group,III-IV,accuracy,0.5568927789934355,0.535497857751406,0.5782125791830494,13710,fitz_in,confidence
+eFST_group,V-VI,coverage,0.8602771362586605,0.8423765844467282,0.8769639723431139,4330,fitz_in,confidence
+eFST_group,V-VI,abstention_rate,0.13972286374133946,0.12303602765688615,0.1576234155532717,4330,fitz_in,confidence
+eFST_group,V-VI,selective_accuracy,0.5844295302013423,0.5445271657351144,0.6213933818041323,4330,fitz_in,confidence
+eFST_group,V-VI,abstention_precision,0.6330578512396694,0.5872325502067965,0.6779697388521132,4330,fitz_in,confidence
+eFST_group,V-VI,accuracy,0.5540415704387991,0.517786658422365,0.5898646378971899,4330,fitz_in,confidence
+eFST_group,V-VI - I-II,coverage,0.026100525280140285,0.00514494140669557,0.045564647752936484,25280,fitz_in,confidence
+eFST_group,V-VI - I-II,abstention_rate,-0.026100525280140285,-0.04556464775293649,-0.005144941406695578,25280,fitz_in,confidence
+eFST_group,V-VI - I-II,selective_accuracy,0.02840984606309549,-0.016166326037886612,0.06883895426608683,25280,fitz_in,confidence
+eFST_group,V-VI - I-II,abstention_precision,0.023386003225852492,-0.027641348030013814,0.07269258253686875,25280,fitz_in,confidence
+eFST_group,V-VI - I-II,accuracy,0.025497417694169022,-0.015736432119713747,0.06476993992536238,25280,fitz_in,confidence
+eFST_group,III-IV - I-II,coverage,-0.016087624837017644,-0.031369676415807554,0.000138572305101009,34660,fitz_in,confidence
+eFST_group,III-IV - I-II,abstention_rate,0.016087624837017644,-0.00013857230510101165,0.031369676415807554,34660,fitz_in,confidence
+eFST_group,III-IV - I-II,selective_accuracy,0.03599172812994156,0.005967700047869027,0.06573129377616725,34660,fitz_in,confidence
+eFST_group,III-IV - I-II,abstention_precision,-0.008629346009005334,-0.0435578247647887,0.022338063056352168,34660,fitz_in,confidence
+eFST_group,III-IV - I-II,accuracy,0.02834862624880541,0.0016472360221442578,0.05554286725921198,34660,fitz_in,confidence
+eFST_group,ALL,coverage,0.6900299102691925,0.679034147557328,0.7011016949152542,40120,fitz_in,combined
+eFST_group,ALL,abstention_rate,0.30997008973080753,0.29889830508474574,0.320965852442672,40120,fitz_in,combined
+eFST_group,ALL,selective_accuracy,0.598793526946973,0.5831442103239561,0.6145380406621317,40120,fitz_in,combined
+eFST_group,ALL,abstention_precision,0.5958507558700546,0.5789444182213269,0.6121536368597049,40120,fitz_in,combined
+eFST_group,ALL,accuracy,0.5384596211365902,0.5253988035892323,0.5507091226321037,40120,fitz_in,combined
+eFST_group,I-II,coverage,0.700381861575179,0.685988075387941,0.7130225222869869,20950,fitz_in,combined
+eFST_group,I-II,abstention_rate,0.299618138424821,0.28697747771301313,0.31401192461205896,20950,fitz_in,combined
+eFST_group,I-II,selective_accuracy,0.5834526000136305,0.5620716632443447,0.6047700349263372,20950,fitz_in,combined
+eFST_group,I-II,abstention_precision,0.5998088258722319,0.5775334061976357,0.6211046154488419,20950,fitz_in,combined
+eFST_group,I-II,accuracy,0.5285441527446301,0.511853363694538,0.5461469313094751,20950,fitz_in,combined
+eFST_group,III-IV,coverage,0.6892778993435449,0.67026487583056,0.7087151434654465,13710,fitz_in,combined
+eFST_group,III-IV,abstention_rate,0.3107221006564551,0.29128485653455344,0.32973512416944,13710,fitz_in,combined
+eFST_group,III-IV,selective_accuracy,0.6255026455026454,0.6003429778239543,0.6521490547345731,13710,fitz_in,combined
+eFST_group,III-IV,abstention_precision,0.5953051643192488,0.5678162233517353,0.6231461900905155,13710,fitz_in,combined
+eFST_group,III-IV,accuracy,0.5568927789934355,0.535497857751406,0.5782125791830494,13710,fitz_in,combined
+eFST_group,V-VI,coverage,0.6939953810623557,0.6571311475409836,0.7273681705368374,4330,fitz_in,combined
+eFST_group,V-VI,abstention_rate,0.3060046189376443,0.27263182946316256,0.3428688524590164,4330,fitz_in,combined
+eFST_group,V-VI,selective_accuracy,0.6136439267886855,0.569499398048943,0.656261315485362,4330,fitz_in,combined
+eFST_group,V-VI,abstention_precision,0.5811320754716981,0.5314962361324413,0.6328742756330648,4330,fitz_in,combined
+eFST_group,V-VI,accuracy,0.5540415704387991,0.517786658422365,0.5898646378971899,4330,fitz_in,combined
+eFST_group,V-VI - I-II,coverage,-0.0063864805128233115,-0.045881891252517695,0.03033479263799412,25280,fitz_in,combined
+eFST_group,V-VI - I-II,abstention_rate,0.0063864805128233115,-0.030334792637994122,0.04588189125251769,25280,fitz_in,combined
+eFST_group,V-VI - I-II,selective_accuracy,0.030191326775054983,-0.017779034256357674,0.07515810493773595,25280,fitz_in,combined
+eFST_group,V-VI - I-II,abstention_precision,-0.018676750400533848,-0.07084337380040925,0.032635250607184106,25280,fitz_in,combined
+eFST_group,V-VI - I-II,accuracy,0.025497417694169022,-0.015736432119713747,0.06476993992536238,25280,fitz_in,combined
+eFST_group,III-IV - I-II,coverage,-0.011103962231634124,-0.03425666829532082,0.01239235259527772,34660,fitz_in,combined
+eFST_group,III-IV - I-II,abstention_rate,0.011103962231634124,-0.012392352595277727,0.03425666829532082,34660,fitz_in,combined
+eFST_group,III-IV - I-II,selective_accuracy,0.04205004548901492,0.009826680536171462,0.07384891880562812,34660,fitz_in,combined
+eFST_group,III-IV - I-II,abstention_precision,-0.004503661552983096,-0.038313712722073054,0.029230074694062882,34660,fitz_in,combined
+eFST_group,III-IV - I-II,accuracy,0.02834862624880541,0.0016472360221442578,0.05554286725921198,34660,fitz_in,combined
+eFST_group,ALL,coverage,0.8106537144677124,0.8041157735488494,0.8171044669161558,125590,fitz_out,flag
+eFST_group,ALL,abstention_rate,0.1893462855322876,0.1828955330838442,0.19588422645115056,125590,fitz_out,flag
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,125590,fitz_out,flag
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,125590,fitz_out,flag
+eFST_group,ALL,accuracy,0.0,0.0,0.0,125590,fitz_out,flag
+eFST_group,I-II,coverage,0.8210535619586353,0.8121737217834247,0.8300782058040467,56570,fitz_out,flag
+eFST_group,I-II,abstention_rate,0.17894643804136467,0.16992179419595335,0.1878262782165753,56570,fitz_out,flag
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,56570,fitz_out,flag
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,56570,fitz_out,flag
+eFST_group,I-II,accuracy,0.0,0.0,0.0,56570,fitz_out,flag
+eFST_group,III-IV,coverage,0.8381386474454102,0.8275604840086062,0.8483110661627007,47170,fitz_out,flag
+eFST_group,III-IV,abstention_rate,0.16186135255458978,0.15168893383729928,0.17243951599139382,47170,fitz_out,flag
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,47170,fitz_out,flag
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,47170,fitz_out,flag
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,47170,fitz_out,flag
+eFST_group,V-VI,coverage,0.7899019042123485,0.7723211815817326,0.8065597169019384,17330,fitz_out,flag
+eFST_group,V-VI,abstention_rate,0.21009809578765148,0.19344028309806158,0.22767881841826743,17330,fitz_out,flag
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,17330,fitz_out,flag
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,17330,fitz_out,flag
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,17330,fitz_out,flag
+eFST_group,V-VI - I-II,coverage,-0.03115165774628681,-0.051977865608074374,-0.012850383085216842,73900,fitz_out,flag
+eFST_group,V-VI - I-II,abstention_rate,0.03115165774628681,0.01285038308521684,0.051977865608074374,73900,fitz_out,flag
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,73900,fitz_out,flag
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,73900,fitz_out,flag
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,73900,fitz_out,flag
+eFST_group,III-IV - I-II,coverage,0.017085085486774898,0.0037896508734862142,0.029912780161715287,103740,fitz_out,flag
+eFST_group,III-IV - I-II,abstention_rate,-0.017085085486774898,-0.029912780161715287,-0.0037896508734862173,103740,fitz_out,flag
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,103740,fitz_out,flag
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,103740,fitz_out,flag
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,103740,fitz_out,flag
+eFST_group,ALL,coverage,0.8144040130583645,0.810508599410781,0.8181710327255355,125590,fitz_out,confidence
+eFST_group,ALL,abstention_rate,0.18559598694163548,0.18182896727446451,0.18949140058921893,125590,fitz_out,confidence
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,125590,fitz_out,confidence
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,125590,fitz_out,confidence
+eFST_group,ALL,accuracy,0.0,0.0,0.0,125590,fitz_out,confidence
+eFST_group,I-II,coverage,0.8031995757468623,0.7973786489062762,0.8093542191883224,56570,fitz_out,confidence
+eFST_group,I-II,abstention_rate,0.1968004242531377,0.19064578081167763,0.2026213510937238,56570,fitz_out,confidence
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,56570,fitz_out,confidence
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,56570,fitz_out,confidence
+eFST_group,I-II,accuracy,0.0,0.0,0.0,56570,fitz_out,confidence
+eFST_group,III-IV,coverage,0.8153063387746449,0.8086192832300096,0.8213021142310988,47170,fitz_out,confidence
+eFST_group,III-IV,abstention_rate,0.18469366122535513,0.17869788576890117,0.19138071676999038,47170,fitz_out,confidence
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,47170,fitz_out,confidence
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,47170,fitz_out,confidence
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,47170,fitz_out,confidence
+eFST_group,V-VI,coverage,0.8458742065781881,0.8362367638186773,0.8560689288476411,17330,fitz_out,confidence
+eFST_group,V-VI,abstention_rate,0.15412579342181187,0.14393107115235887,0.16376323618132274,17330,fitz_out,confidence
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,17330,fitz_out,confidence
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,17330,fitz_out,confidence
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,17330,fitz_out,confidence
+eFST_group,V-VI - I-II,coverage,0.04267463083132583,0.030804296645544606,0.054201784992614445,73900,fitz_out,confidence
+eFST_group,V-VI - I-II,abstention_rate,-0.04267463083132583,-0.054201784992614445,-0.030804296645544606,73900,fitz_out,confidence
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,73900,fitz_out,confidence
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,73900,fitz_out,confidence
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,73900,fitz_out,confidence
+eFST_group,III-IV - I-II,coverage,0.012106763027782574,0.0032339633370169706,0.02039091451660646,103740,fitz_out,confidence
+eFST_group,III-IV - I-II,abstention_rate,-0.012106763027782574,-0.02039091451660646,-0.0032339633370169715,103740,fitz_out,confidence
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,103740,fitz_out,confidence
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,103740,fitz_out,confidence
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,103740,fitz_out,confidence
+eFST_group,ALL,coverage,0.6611274783024126,0.6551104785412851,0.6676270005573692,125590,fitz_out,combined
+eFST_group,ALL,abstention_rate,0.3388725216975874,0.3323729994426308,0.3448895214587148,125590,fitz_out,combined
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,125590,fitz_out,combined
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,125590,fitz_out,combined
+eFST_group,ALL,accuracy,0.0,0.0,0.0,125590,fitz_out,combined
+eFST_group,I-II,coverage,0.6609863885451652,0.6520077097663207,0.6703496150850818,56570,fitz_out,combined
+eFST_group,I-II,abstention_rate,0.3390136114548348,0.32965038491491816,0.34799229023367934,56570,fitz_out,combined
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,56570,fitz_out,combined
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,56570,fitz_out,combined
+eFST_group,I-II,accuracy,0.0,0.0,0.0,56570,fitz_out,combined
+eFST_group,III-IV,coverage,0.6815136739453043,0.6710746370958357,0.691567410282714,47170,fitz_out,combined
+eFST_group,III-IV,abstention_rate,0.31848632605469573,0.308432589717286,0.3289253629041643,47170,fitz_out,combined
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,47170,fitz_out,combined
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,47170,fitz_out,combined
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,47170,fitz_out,combined
+eFST_group,V-VI,coverage,0.6735141373341027,0.6565316019977877,0.6912217915428152,17330,fitz_out,combined
+eFST_group,V-VI,abstention_rate,0.3264858626658973,0.30877820845718484,0.34346839800221235,17330,fitz_out,combined
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,17330,fitz_out,combined
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,17330,fitz_out,combined
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,17330,fitz_out,combined
+eFST_group,V-VI - I-II,coverage,0.012527748788937476,-0.006515137532626982,0.031654362989121755,73900,fitz_out,combined
+eFST_group,V-VI - I-II,abstention_rate,-0.012527748788937476,-0.03165436298912176,0.006515137532626974,73900,fitz_out,combined
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,73900,fitz_out,combined
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,73900,fitz_out,combined
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,73900,fitz_out,combined
+eFST_group,III-IV - I-II,coverage,0.02052728540013904,0.005948057548133651,0.03369324877653002,103740,fitz_out,combined
+eFST_group,III-IV - I-II,abstention_rate,-0.02052728540013904,-0.03369324877653002,-0.005948057548133651,103740,fitz_out,combined
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,103740,fitz_out,combined
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,103740,fitz_out,combined
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,103740,fitz_out,combined
+eFST_group,ALL,coverage,0.7161087866108786,0.6794926778242678,0.7525156903765691,4780,ddi_out,flag
+eFST_group,ALL,abstention_rate,0.2838912133891214,0.24748430962343093,0.3205073221757322,4780,ddi_out,flag
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,4780,ddi_out,flag
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,4780,ddi_out,flag
+eFST_group,ALL,accuracy,0.0,0.0,0.0,4780,ddi_out,flag
+eFST_group,I-II,coverage,0.7755555555555556,0.7055533854166667,0.8385201224846894,1350,ddi_out,flag
+eFST_group,I-II,abstention_rate,0.22444444444444445,0.16147987751531057,0.29444661458333327,1350,ddi_out,flag
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,1350,ddi_out,flag
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,1350,ddi_out,flag
+eFST_group,I-II,accuracy,0.0,0.0,0.0,1350,ddi_out,flag
+eFST_group,III-IV,coverage,0.716304347826087,0.6554687805422914,0.7737573934837092,1840,ddi_out,flag
+eFST_group,III-IV,abstention_rate,0.283695652173913,0.22624260651629075,0.34453121945770854,1840,ddi_out,flag
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,1840,ddi_out,flag
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,1840,ddi_out,flag
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,1840,ddi_out,flag
+eFST_group,V-VI,coverage,0.6654088050314465,0.5994272321428571,0.7380054140127389,1590,ddi_out,flag
+eFST_group,V-VI,abstention_rate,0.3345911949685535,0.26199458598726116,0.40057276785714285,1590,ddi_out,flag
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,1590,ddi_out,flag
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,1590,ddi_out,flag
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,1590,ddi_out,flag
+eFST_group,V-VI - I-II,coverage,-0.11014675052410905,-0.19617507260115521,-0.0098400823572574,2940,ddi_out,flag
+eFST_group,V-VI - I-II,abstention_rate,0.11014675052410905,0.009840082357257383,0.19617507260115521,2940,ddi_out,flag
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,2940,ddi_out,flag
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,2940,ddi_out,flag
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,2940,ddi_out,flag
+eFST_group,III-IV - I-II,coverage,-0.05925120772946857,-0.14679902501247882,0.03426743774413861,3190,ddi_out,flag
+eFST_group,III-IV - I-II,abstention_rate,0.05925120772946857,-0.03426743774413861,0.14679902501247882,3190,ddi_out,flag
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,3190,ddi_out,flag
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,3190,ddi_out,flag
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,3190,ddi_out,flag
+eFST_group,ALL,coverage,0.7857740585774059,0.7635826359832636,0.8071129707112971,4780,ddi_out,confidence
+eFST_group,ALL,abstention_rate,0.2142259414225941,0.19288702928870294,0.2364173640167364,4780,ddi_out,confidence
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,4780,ddi_out,confidence
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,4780,ddi_out,confidence
+eFST_group,ALL,accuracy,0.0,0.0,0.0,4780,ddi_out,confidence
+eFST_group,I-II,coverage,0.7481481481481481,0.699197318429602,0.7912433185815276,1350,ddi_out,confidence
+eFST_group,I-II,abstention_rate,0.2518518518518519,0.2087566814184723,0.300802681570398,1350,ddi_out,confidence
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,1350,ddi_out,confidence
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,1350,ddi_out,confidence
+eFST_group,I-II,accuracy,0.0,0.0,0.0,1350,ddi_out,confidence
+eFST_group,III-IV,coverage,0.7717391304347826,0.732413463364349,0.8072400793650794,1840,ddi_out,confidence
+eFST_group,III-IV,abstention_rate,0.2282608695652174,0.19275992063492067,0.2675865366356509,1840,ddi_out,confidence
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,1840,ddi_out,confidence
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,1840,ddi_out,confidence
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,1840,ddi_out,confidence
+eFST_group,V-VI,coverage,0.8339622641509434,0.7993702361614395,0.86748504601227,1590,ddi_out,confidence
+eFST_group,V-VI,abstention_rate,0.16603773584905657,0.13251495398773008,0.2006297638385605,1590,ddi_out,confidence
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,1590,ddi_out,confidence
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,1590,ddi_out,confidence
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,1590,ddi_out,confidence
+eFST_group,V-VI - I-II,coverage,0.08581411600279532,0.031478354696424383,0.14322924030474005,2940,ddi_out,confidence
+eFST_group,V-VI - I-II,abstention_rate,-0.08581411600279532,-0.14322924030474005,-0.0314783546964244,2940,ddi_out,confidence
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,2940,ddi_out,confidence
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,2940,ddi_out,confidence
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,2940,ddi_out,confidence
+eFST_group,III-IV - I-II,coverage,0.023590982286634476,-0.03684271870593133,0.08305873650332227,3190,ddi_out,confidence
+eFST_group,III-IV - I-II,abstention_rate,-0.023590982286634476,-0.08305873650332227,0.03684271870593131,3190,ddi_out,confidence
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,3190,ddi_out,confidence
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,3190,ddi_out,confidence
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,3190,ddi_out,confidence
+eFST_group,ALL,coverage,0.5600418410041841,0.5269822175732217,0.5935146443514644,4780,ddi_out,combined
+eFST_group,ALL,abstention_rate,0.4399581589958159,0.4064853556485356,0.4730177824267783,4780,ddi_out,combined
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,4780,ddi_out,combined
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,4780,ddi_out,combined
+eFST_group,ALL,accuracy,0.0,0.0,0.0,4780,ddi_out,combined
+eFST_group,I-II,coverage,0.577037037037037,0.5150951793309877,0.6371111356606275,1350,ddi_out,combined
+eFST_group,I-II,abstention_rate,0.422962962962963,0.3628888643393725,0.48490482066901225,1350,ddi_out,combined
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,1350,ddi_out,combined
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,1350,ddi_out,combined
+eFST_group,I-II,accuracy,0.0,0.0,0.0,1350,ddi_out,combined
+eFST_group,III-IV,coverage,0.5456521739130434,0.49026783523225237,0.5989363881974379,1840,ddi_out,combined
+eFST_group,III-IV,abstention_rate,0.45434782608695656,0.4010636118025621,0.5097321647677476,1840,ddi_out,combined
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,1840,ddi_out,combined
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,1840,ddi_out,combined
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,1840,ddi_out,combined
+eFST_group,V-VI,coverage,0.5622641509433962,0.5,0.6309054760281754,1590,ddi_out,combined
+eFST_group,V-VI,abstention_rate,0.4377358490566038,0.3690945239718246,0.5,1590,ddi_out,combined
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,1590,ddi_out,combined
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,1590,ddi_out,combined
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,1590,ddi_out,combined
+eFST_group,V-VI - I-II,coverage,-0.014772886093640802,-0.10012340647857886,0.07940247824116452,2940,ddi_out,combined
+eFST_group,V-VI - I-II,abstention_rate,0.014772886093640802,-0.07940247824116456,0.10012340647857884,2940,ddi_out,combined
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,2940,ddi_out,combined
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,2940,ddi_out,combined
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,2940,ddi_out,combined
+eFST_group,III-IV - I-II,coverage,-0.03138486312399358,-0.11832546307061201,0.049398751981733345,3190,ddi_out,combined
+eFST_group,III-IV - I-II,abstention_rate,0.03138486312399358,-0.04939875198173337,0.11832546307061198,3190,ddi_out,combined
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,3190,ddi_out,combined
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,3190,ddi_out,combined
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,3190,ddi_out,combined
+eFST_group,ALL,coverage,0.764327485380117,0.7110818713450293,0.8233918128654971,1710,ddi_malignant,flag
+eFST_group,ALL,abstention_rate,0.23567251461988303,0.17660818713450288,0.2889181286549707,1710,ddi_malignant,flag
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,1710,ddi_malignant,flag
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,1710,ddi_malignant,flag
+eFST_group,ALL,accuracy,0.0,0.0,0.0,1710,ddi_malignant,flag
+eFST_group,I-II,coverage,0.7816326530612245,0.685175120772947,0.8854241071428571,490,ddi_malignant,flag
+eFST_group,I-II,abstention_rate,0.21836734693877546,0.1145758928571429,0.3148248792270531,490,ddi_malignant,flag
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,490,ddi_malignant,flag
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,490,ddi_malignant,flag
+eFST_group,I-II,accuracy,0.0,0.0,0.0,490,ddi_malignant,flag
+eFST_group,III-IV,coverage,0.722972972972973,0.642656338028169,0.8125135869565218,740,ddi_malignant,flag
+eFST_group,III-IV,abstention_rate,0.277027027027027,0.18748641304347827,0.35734366197183093,740,ddi_malignant,flag
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,740,ddi_malignant,flag
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,740,ddi_malignant,flag
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,740,ddi_malignant,flag
+eFST_group,V-VI,coverage,0.8104166666666667,0.6999568965517241,0.9109478260869565,480,ddi_malignant,flag
+eFST_group,V-VI,abstention_rate,0.18958333333333333,0.08905217391304353,0.30004310344827584,480,ddi_malignant,flag
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,480,ddi_malignant,flag
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,480,ddi_malignant,flag
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,480,ddi_malignant,flag
+eFST_group,V-VI - I-II,coverage,0.028784013605442138,-0.12167289402173921,0.16870128122308356,970,ddi_malignant,flag
+eFST_group,V-VI - I-II,abstention_rate,-0.028784013605442138,-0.1687012812230836,0.12167289402173921,970,ddi_malignant,flag
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,970,ddi_malignant,flag
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,970,ddi_malignant,flag
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,970,ddi_malignant,flag
+eFST_group,III-IV - I-II,coverage,-0.05865968008825151,-0.18996070607659687,0.07492105481969283,1230,ddi_malignant,flag
+eFST_group,III-IV - I-II,abstention_rate,0.05865968008825151,-0.07492105481969288,0.18996070607659687,1230,ddi_malignant,flag
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,1230,ddi_malignant,flag
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,1230,ddi_malignant,flag
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,1230,ddi_malignant,flag
+eFST_group,ALL,coverage,0.7953216374269005,0.7567105263157894,0.8292543859649123,1710,ddi_malignant,confidence
+eFST_group,ALL,abstention_rate,0.20467836257309946,0.17074561403508773,0.24328947368421056,1710,ddi_malignant,confidence
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,1710,ddi_malignant,confidence
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,1710,ddi_malignant,confidence
+eFST_group,ALL,accuracy,0.0,0.0,0.0,1710,ddi_malignant,confidence
+eFST_group,I-II,coverage,0.789795918367347,0.7255801583374567,0.8512820512820513,490,ddi_malignant,confidence
+eFST_group,I-II,abstention_rate,0.21020408163265303,0.14871794871794874,0.27441984166254324,490,ddi_malignant,confidence
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,490,ddi_malignant,confidence
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,490,ddi_malignant,confidence
+eFST_group,I-II,accuracy,0.0,0.0,0.0,490,ddi_malignant,confidence
+eFST_group,III-IV,coverage,0.7486486486486487,0.6875,0.8066948051948052,740,ddi_malignant,confidence
+eFST_group,III-IV,abstention_rate,0.25135135135135134,0.19330519480519484,0.3125,740,ddi_malignant,confidence
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,740,ddi_malignant,confidence
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,740,ddi_malignant,confidence
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,740,ddi_malignant,confidence
+eFST_group,V-VI,coverage,0.8729166666666667,0.8076886792452831,0.9272727272727272,480,ddi_malignant,confidence
+eFST_group,V-VI,abstention_rate,0.12708333333333333,0.07272727272727275,0.19231132075471696,480,ddi_malignant,confidence
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,480,ddi_malignant,confidence
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,480,ddi_malignant,confidence
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,480,ddi_malignant,confidence
+eFST_group,V-VI - I-II,coverage,0.0831207482993197,-0.0043294139604329275,0.1705253358549627,970,ddi_malignant,confidence
+eFST_group,V-VI - I-II,abstention_rate,-0.0831207482993197,-0.17052533585496277,0.004329413960432905,970,ddi_malignant,confidence
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,970,ddi_malignant,confidence
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,970,ddi_malignant,confidence
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,970,ddi_malignant,confidence
+eFST_group,III-IV - I-II,coverage,-0.04114726971869831,-0.12808910701301357,0.04538439430566742,1230,ddi_malignant,confidence
+eFST_group,III-IV - I-II,abstention_rate,0.04114726971869831,-0.045384394305667444,0.12808910701301354,1230,ddi_malignant,confidence
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,1230,ddi_malignant,confidence
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,1230,ddi_malignant,confidence
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,1230,ddi_malignant,confidence
+eFST_group,ALL,coverage,0.6076023391812866,0.5555555555555556,0.6649122807017543,1710,ddi_malignant,combined
+eFST_group,ALL,abstention_rate,0.3923976608187134,0.33508771929824566,0.4444444444444444,1710,ddi_malignant,combined
+eFST_group,ALL,selective_accuracy,0.0,0.0,0.0,1710,ddi_malignant,combined
+eFST_group,ALL,abstention_precision,1.0,1.0,1.0,1710,ddi_malignant,combined
+eFST_group,ALL,accuracy,0.0,0.0,0.0,1710,ddi_malignant,combined
+eFST_group,I-II,coverage,0.6326530612244898,0.5369377811094452,0.7280236842105263,490,ddi_malignant,combined
+eFST_group,I-II,abstention_rate,0.36734693877551017,0.2719763157894737,0.4630622188905547,490,ddi_malignant,combined
+eFST_group,I-II,selective_accuracy,0.0,0.0,0.0,490,ddi_malignant,combined
+eFST_group,I-II,abstention_precision,1.0,1.0,1.0,490,ddi_malignant,combined
+eFST_group,I-II,accuracy,0.0,0.0,0.0,490,ddi_malignant,combined
+eFST_group,III-IV,coverage,0.5283783783783784,0.4430576923076923,0.6127000640204865,740,ddi_malignant,combined
+eFST_group,III-IV,abstention_rate,0.4716216216216216,0.3872999359795135,0.5569423076923076,740,ddi_malignant,combined
+eFST_group,III-IV,selective_accuracy,0.0,0.0,0.0,740,ddi_malignant,combined
+eFST_group,III-IV,abstention_precision,1.0,1.0,1.0,740,ddi_malignant,combined
+eFST_group,III-IV,accuracy,0.0,0.0,0.0,740,ddi_malignant,combined
+eFST_group,V-VI,coverage,0.7041666666666667,0.5815816326530612,0.8038586956521739,480,ddi_malignant,combined
+eFST_group,V-VI,abstention_rate,0.2958333333333333,0.19614130434782606,0.41841836734693877,480,ddi_malignant,combined
+eFST_group,V-VI,selective_accuracy,0.0,0.0,0.0,480,ddi_malignant,combined
+eFST_group,V-VI,abstention_precision,1.0,1.0,1.0,480,ddi_malignant,combined
+eFST_group,V-VI,accuracy,0.0,0.0,0.0,480,ddi_malignant,combined
+eFST_group,V-VI - I-II,coverage,0.07151360544217689,-0.0803908972125436,0.2036417362119012,970,ddi_malignant,combined
+eFST_group,V-VI - I-II,abstention_rate,-0.07151360544217689,-0.20364173621190132,0.08039089721254357,970,ddi_malignant,combined
+eFST_group,V-VI - I-II,selective_accuracy,0.0,0.0,0.0,970,ddi_malignant,combined
+eFST_group,V-VI - I-II,abstention_precision,0.0,0.0,0.0,970,ddi_malignant,combined
+eFST_group,V-VI - I-II,accuracy,0.0,0.0,0.0,970,ddi_malignant,combined
+eFST_group,III-IV - I-II,coverage,-0.10427468284611141,-0.22739009816474606,0.013798576059349059,1230,ddi_malignant,combined
+eFST_group,III-IV - I-II,abstention_rate,0.10427468284611141,-0.013798576059349083,0.22739009816474598,1230,ddi_malignant,combined
+eFST_group,III-IV - I-II,selective_accuracy,0.0,0.0,0.0,1230,ddi_malignant,combined
+eFST_group,III-IV - I-II,abstention_precision,0.0,0.0,0.0,1230,ddi_malignant,combined
+eFST_group,III-IV - I-II,accuracy,0.0,0.0,0.0,1230,ddi_malignant,combined

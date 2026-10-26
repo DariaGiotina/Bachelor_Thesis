@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-26: Out-of-scope detector for the app model (Task 4.2b)
+
+- **Why:** E4 showed that calibrated confidence does not stop the DINOv2 model from answering on conditions it never saw (79.5% of DDI malignant lesions got a confident benign label). Task 4.2b tests whether a distance in the encoder's feature space can flag such photos before the classifier answers.
+- **Method (`ml/ood_detect.py`):** three scores on the frozen DINOv2 features, fitted per seed on the SCIN train cases: maximum calibrated probability (baseline, Hendrycks & Gimpel 2017), Mahalanobis distance to the nearest class mean with a shared Ledoit-Wolf covariance (Lee et al. 2018), and cosine distance to the 10th nearest training case (kNN, Sun et al. 2022). kNN with k = 10 was fixed as the primary detector before the run, so nothing is selected on test data. Threshold per seed: 95th percentile on validation (5% of normal cases flagged). App rule: show a category only if not flagged AND confidence >= tau.
+- **New control set:** 464 SCIN cases whose dermatologist differentials all lie outside the four categories (impetigo, herpes zoster, tinea, purpura, ...), listed in `ml/labels/scin_near_ood.csv` (`build_labels.in_scope_weight`); primary images downloaded with the new `--case-ids` option of `download_scin_images.py` (463 available, one file returns 404 on the SCIN bucket). Same phones and contributors, so it separates "unknown condition" from "unknown kind of photo".
+- **Results (10 seeds, `ml/results/e4/e4_ood.md`):** on the SCIN control set no score works (AUROC 0.50-0.53; kNN flags 4.6%, the same as its 5.1% false alarms). On external sets Mahalanobis separates best (AUROC 0.77-0.89), kNN 0.72-0.83, confidence not at all (0.46-0.51); but Fitzpatrick17k in-scope images are flagged almost as often as out-of-scope ones (17.4% vs 18.9%): the detector sees the atlas domain, not the disease. Combined rule: DDI malignant answered confidently 79.5% -> 60.8% (FST V-VI 87.3% -> 70.4%); SCIN coverage 79.8% -> 75.9% with equal selective accuracy (67.7% / 68.4%). Fairness cost: kNN flags 8.8% of normal SCIN eFST V-VI cases vs 3.6% of I-II (-5.3 [-9.3, -1.4] points).
+- **Decision:** keep kNN in the app as a filter for unusual photos, but it is not a safety filter. Safety rests on explicit red-flag questions (new or changing lesion, bleeding, pain), the permanent notice of what the app does not assess, and the declared four-category scope. Mahalanobis looked better, but only on the test sets; it needs a fresh set before it can replace kNN.
+- **Code changes:** `run_e4.external_features` now caches the frozen-encoder features of the external sets (used by `external_predictions` and the detector). Tests: `tests/test_ood_detect.py` (5); the recomputed probe must match the stored predictions for every seed (checked at run time).
+- **Thesis:** section 8.6 gets three paragraphs and Table 8.9 (Grad-CAM table becomes 8.10); 8.8 updated; four new references after Darcet et al., project-management sources renumbered to keep first-citation order. Fields refreshed in Word, 52 pages.
+
 ## 2026-10-26: Normalization of the relational schema to BCNF
 
 - **Why:** the faculty guide asks for a document that explains, for every table of the relational model, its normalization up to Boyce-Codd normal form (FNBC).
