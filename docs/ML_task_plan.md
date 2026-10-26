@@ -87,7 +87,7 @@ Status of every task of the original four-week program, and the changes made to 
 
 ## Week 4: Fairness, calibration, explainability & freeze
 
-Recommended order (changed): 4.2 (done), 4.3 (done), then 4.2b, 4.1, 4.4, 4.5. 4.2 and 4.3 go first because the app needs the "uncertain, see a professional" output and the explanation screen for the photo-only model, and E4 is the only research question without results.
+Recommended order (changed): 4.2 (done), 4.3 (done), 4.2b (done), then 4.1, 4.4, 4.5. 4.2 and 4.3 go first because the app needs the "uncertain, see a professional" output and the explanation screen for the photo-only model, and E4 is the only research question without results.
 
 **Task 4.1: Skin-Tone Stratified Analysis (E3) - PARTIAL, revised to a consolidation**
 - **Done:** per-tone (eFST, eMST) and per-category results with Holm correction are in `results/e1/e1_table.md`: no fusion variant helps any group; gated fusion hurts eFST III-IV; the photo model is weakest on eMST 4-6 (0.457) and eFST V-VI (0.496, 23 cases).
@@ -106,10 +106,12 @@ Recommended order (changed): 4.2 (done), 4.3 (done), then 4.2b, 4.1, 4.4, 4.5. 4
 - **External (all Fitzpatrick17k and DDI images, `--keep_all` loader, cached in `runs/external_eval/e4/`):** in scope DINOv2 is far better on Fitzpatrick17k (accuracy 53.8% vs 42.9%, no tone gap). **But confidence does not catch out-of-scope conditions:** DINOv2 abstains on only 18.6% (Fitzpatrick17k) / 21.4% (DDI) of them, less on dark skin; it answers confidently with a benign category for **79.5% of the 171 DDI malignant lesions (87.3% on FST V-VI)**; EfficientNet-B0 55.0% (70.0%). Thesis 8.11 Table 8.12 / paper Table 13.
 - `e4_reliability.png` (reliability diagram) is saved but not in the documents.
 
-**Task 4.2b: Out-of-scope detector - NEW, priority before the app is released**
+**Task 4.2b: Out-of-scope detector - DONE (2026-10-26)**
 - **Why:** E4 shows that confidence-based abstention misses most out-of-scope and malignant lesions, and more so on dark skin.
-- **Objective:** a detector that flags images unlike the SCIN training data (e.g. Mahalanobis or k-nearest-neighbour distance of the DINOv2 features to the training features, threshold set on SCIN validation), evaluated on Fitzpatrick17k / DDI out-of-scope and malignant images, by skin tone; combined rule "out of scope OR low confidence -> see a professional".
-- **Deliverable:** `ood_detect.py`, `results/e4/e4_ood.md`; thesis / paper subsection.
+- **Code:** `ood_detect.py` (scores on frozen DINOv2 features fitted per seed on SCIN train: max calibrated probability, Mahalanobis with Ledoit-Wolf covariance, kNN cosine distance with k = 10 = primary, fixed in advance; threshold = 95th percentile on validation), `labels/scin_near_ood.csv` (464 SCIN cases with every differential outside the categories; 463 images available), `download_scin_images.py --case-ids`, cached external features in `run_e4.external_features`; tests `tests/test_ood_detect.py`.
+- **Results (`results/e4/e4_ood.md`, 10 seeds):** SCIN other conditions are not separated by any score (AUROC 0.50-0.53, kNN flags 4.6% vs 5.1% false alarms). External sets: Mahalanobis AUROC 0.77-0.89, kNN 0.72-0.83, confidence 0.46-0.51, but Fitzpatrick17k in-scope images are flagged as often as out-of-scope ones (17.4% vs 18.9%): the detector recognises the photo domain, not the condition. Combined rule (not flagged AND confidence >= tau): DDI malignant answered confidently 79.5% -> 60.8% (FST V-VI 87.3% -> 70.4%); SCIN coverage 79.8% -> 75.9%, selective accuracy unchanged. kNN false alarms higher on eFST V-VI (8.8% vs 3.6%).
+- **Decision:** kNN stays as a filter for unusual photos; safety comes from red-flag questions, a permanent notice and the declared scope (requirements for Task 5.1). Mahalanobis needs a fresh set before it can replace kNN.
+- **Thesis:** 8.6 (Table 8.9), 8.8.
 
 
 

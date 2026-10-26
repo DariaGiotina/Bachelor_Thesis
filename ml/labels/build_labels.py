@@ -74,6 +74,14 @@ def assign_label(weights: dict, cfg: dict) -> tuple[str, float, list[str]]:
     return winners[0], round(best, 4), unmapped
 
 
+def in_scope_weight(weights: dict, cfg: dict) -> float:
+    """Summed weight of the differentials that map to a target category (not ``unmapped_class``).
+    0 for a labelled case means every differential lies outside the assistant's categories."""
+    out = cfg["unmapped_class"]
+    return float(sum(float(w) for name, w in weights.items()
+                     if cfg["lookup"].get(str(name).strip().casefold(), out) != out))
+
+
 def derive_labels(df: pd.DataFrame, cfg: dict, mst_pool: str) -> tuple[pd.DataFrame, pd.Series]:
     parsed = df[audit.WEIGHTED_LABEL_COL].map(audit._parse_dict)
     results = parsed.map(lambda d: assign_label(d, cfg))

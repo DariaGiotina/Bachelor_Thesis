@@ -117,13 +117,10 @@ EXT_SETS = ["fitzpatrick17k", "ddi"]
 def external_predictions(arm: str, dataset: str, seeds: list[int]) -> pd.DataFrame:
     """Class probabilities of every seed's model on every image of an external set, including the
     images whose diagnosis is outside our categories (true_label ``out_of_scope``). Cached."""
-    import copy
-
     import yaml
     from torch.utils.data import DataLoader
 
     import external_datasets as ext
-    import foundation_probe as fp
     from models.image_model import SkinImageBaseline
 
     cache = ROOT / "runs" / "external_eval" / "e4" / f"{arm}_{dataset}.csv"
@@ -163,21 +160,8 @@ def external_predictions(arm: str, dataset: str, seeds: list[int]) -> pd.DataFra
                 df[f"prob_{c}"] = p[:, j]
             frames.append(df)
     elif arm in ("probe_dinov2", "probe_panderm_large", "probe_dermlip"):
-        from run_e1 import PROBES
-        backbone, weights = PROBES[arm]
-        enc = fp.load_encoder(backbone, weights, device)
-        ecfg = copy.deepcopy(cfg)
-        ecfg["data"]["image_size"] = enc.image_size
-        ecfg["normalize"] = {"mean": list(enc.mean), "std": list(enc.std)}
-        ds = ext.DATASET_CLASSES[dataset](ecfg, keep_all=True)
-        feats, labels, efst, ids = [], [], [], []
-        for b in DataLoader(ds, batch_size=64, shuffle=False, num_workers=4):
-            with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
-                feats.append(enc.forward(b["image"].to(device)).float().cpu())
-            labels.append(b["label"].numpy())
-            efst.append(b["eFST"].numpy())
-            ids += list(b["case_id"])
-        f, labels, efst = torch.cat(feats), np.concatenate(labels), np.concatenate(efst)
+        ef = external_features(arm, dataset)
+        f, labels, efst, ids = ef["features"], ef["label"].numpy(), ef["eFST"].numpy(), ef["case_id"]
         for s in seeds:
             pr = torch.load(spec["dir"] / f"probe_seed{s}.pt", map_location="cpu", weights_only=True)
             lin = torch.nn.Linear(f.shape[1], len(pr["classes"]))
@@ -194,6 +178,45 @@ def external_predictions(arm: str, dataset: str, seeds: list[int]) -> pd.DataFra
     out = pd.concat(frames, ignore_index=True)
     cache.parent.mkdir(parents=True, exist_ok=True)
     out.to_csv(cache, index=False)
+    return out
+
+
+@torch.no_grad()
+def external_features(arm: str, dataset: str) -> dict:
+    """Frozen-encoder features of every image of an external set (``keep_all``: out-of-scope images
+    get label -1), with the same preprocessing as the SCIN features of the probe. Cached."""
+    import copy
+
+    import yaml
+    from torch.utils.data import DataLoader
+
+    import external_datasets as ext
+    import foundation_probe as fp
+    from run_e1 import PROBES
+
+    cache = ROOT / "runs" / "external_eval" / "e4" / f"features_{arm}_{dataset}.pt"
+    if cache.exists():
+        return torch.load(cache, weights_only=True)
+    cfg = yaml.safe_load((ROOT / "runs" / "e1_image_only" / "efficientnet_b0_weighted_loss" / "config_used.yaml")
+                         .read_text(encoding="utf-8"))
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    backbone, weights = PROBES[arm]
+    enc = fp.load_encoder(backbone, weights, device)
+    ecfg = copy.deepcopy(cfg)
+    ecfg["data"]["image_size"] = enc.image_size
+    ecfg["normalize"] = {"mean": list(enc.mean), "std": list(enc.std)}
+    ds = ext.DATASET_CLASSES[dataset](ecfg, keep_all=True)
+    feats, labels, efst, ids = [], [], [], []
+    for b in DataLoader(ds, batch_size=64, shuffle=False, num_workers=4):
+        with torch.autocast(device_type=device.type, enabled=device.type == "cuda"):
+            feats.append(enc.forward(b["image"].to(device)).float().cpu())
+        labels.append(b["label"])
+        efst.append(b["eFST"])
+        ids += list(b["case_id"])
+    out = {"features": torch.cat(feats), "label": torch.cat(labels), "eFST": torch.cat(efst), "case_id": ids,
+           "classes": ds.classes}
+    cache.parent.mkdir(parents=True, exist_ok=True)
+    torch.save(out, cache)
     return out
 
 
