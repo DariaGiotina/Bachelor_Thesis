@@ -2,6 +2,31 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-26: Normalization of the relational schema to BCNF
+
+- **Why:** the faculty guide asks for a document that explains, for every table of the relational model, its normalization up to Boyce-Codd normal form (FNBC).
+- **Done:** `docs/Normalizare_bazei_de_date_Giotina.docx` (+ PDF, 13 pages, Romanian; table and column names in English). For each table: schema, candidate keys, functional dependencies, and the FN1 / FN2 / FN3 / FNBC check with the assumptions written out. Summary table of all tables. References: Codd 1970, Kent 1983, Elmasri & Navathe 2016 (ISBN 978-0-13-397077-7).
+- **Problems found and fixed (schema 24 -> 26 tables):**
+  - `ANSWER` was not in FN1 (multi-select answers would be a list in `answer_value`), and `answer_value -> is_missing`. Now one row per selected option, `ANSWER(analysis_id, question_id, option_value)` with FK to `QUESTION_OPTION`; a skipped question has no row (is_missing is computed).
+  - `REFRESH_TOKEN`: `family_id -> user_id` (transitive, FN3). New table `TOKEN_FAMILY(family_id, user_id, created_at)`.
+  - `ROUTINE`: `analysis_id -> user_id` (transitive, FN3) and a nullable FK. New table `ROUTINE_SOURCE(routine_id, analysis_id)` for generated routines only.
+  - `SKIN_ANALYSIS.overall_confidence` (= max probability) and `PREDICTION.rank` (= order of probabilities) removed as derived values.
+  - All decompositions are lossless (the shared column is a key of one side) and dependency preserving.
+- **Assumptions stated in the document:** policy versions are numbered per policy type; one AM and one PM reminder per user (`UQ(user_id, period)`); a product can fill different step roles (moisturiser with SPF), so `product_id -/-> category` in `ROUTINE_STEP`; `period` in `PRODUCT_USE` is the routine the user ticks, not the clock time; `is_uncertain` is the decision recorded at analysis time, not recomputed.
+- **Diagrams updated:** EER (new entity `TOKEN_FAMILY` with ISSUES, multivalued `selected_options` on ANSWERS, `overall_confidence` and `rank` drawn as derived; now 17 entities) and relational page (26 tables, title "normalized to BCNF", mapping rule 10 for ROUTINE_SOURCE). PNGs re-exported.
+- **Tooling:** the diagram and document generators live outside the repo in `D:\facultate\BD_instrumente` (`build_er_diagram.py`, `build_normalizare.py`).
+- **Thesis:** 4.1 updated (17 entities, ANSWERS description, new Figures 4.1-4.2, one paragraph on normalization pointing to the attached document, Kent 1983 added as [4]; later references renumbered in order of first citation). Still 50 pages.
+
+## 2026-10-26: Thesis condensed and restructured (72 -> 50 pages)
+
+- **Why:** the complete thesis must fit in 60-80 pages, and the ML part alone already took about 40. Chapters 2, 3, 6, 7 and 9 still need room (about 30 pages).
+- **Done:** chapters 4, 5 and 8 and Annex A rewritten in a tighter form (about 18,000 -> 8,300 words). Each term is defined once, in chapter 5; chapter 8 reports only the final ten-seed results and refers back to the method.
+- **Chapter 5 (9 sections, was 11 with sub-sections):** SCIN and skin-tone scales merged; audit in one section; splits and preprocessing merged; models (image, questionnaire, fusion, dropout regimes) in one section; one evaluation protocol including calibration and abstention; external data and frozen encoders together; Grad-CAM method filled in (was a placeholder). The four research questions are now stated at the start of the chapter.
+- **Chapter 8 (8 sections, was 12):** preliminary five-seed tables (old 8.1-8.3) dropped, only the replication note kept; diagnostics and method checks merged into "Why the questionnaire does not help"; the two E2 sections merged; the abstention-by-tone figure dropped (same numbers as the table); new 8.8 summarises RQ1-RQ4 and the model chosen for the app.
+- **Section 4.2:** only the final interface is described; earlier Figma versions and the redesign history removed.
+- **Front matter:** list of figures added; all captions now use Word sequence fields, so the lists of tables and figures update automatically; abbreviation list extended (AURC, DDI, ECE, EER, MLP, RQ, WBS). References renumbered in order of first citation; three no longer cited were removed.
+- **Scope:** the research paper is a separate project and is no longer updated or mentioned here.
+
 ## 2026-10-25: Layered, more intricate UI details
 
 - **Why:** the user wanted the depth of their references (the ice-cream app, the analysis overlay in `download (1).jpg`, the medicube look in `download (2).jpg`) instead of flat square photos.
