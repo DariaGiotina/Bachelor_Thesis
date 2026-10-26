@@ -1,0 +1,7 @@
+# E7: extra Fitzpatrick17k training data
+
+| model | macro_f1 | balanced_acc | fitzpatrick17k_macro_f1 |
+|---|---|---|---|
+| Photo, EfficientNet-B0 fine-tuned | 0.519 ± 0.040 | 0.610 ± 0.038 | 0.410 ± 0.022 |
+| Pooled SCIN + Fitzpatrick17k | 0.484 ± 0.071 | 0.499 ± 0.070 | 0.626 ± 0.062 |
+| Fitzpatrick17k, then SCIN | 0.496 ± 0.051 | 0.576 ± 0.065 | 0.464 ± 0.049 |
