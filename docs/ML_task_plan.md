@@ -87,7 +87,7 @@ Status of every task of the original four-week program, and the changes made to 
 
 ## Week 4: Fairness, calibration, explainability & freeze
 
-Recommended order (changed): 4.2, 4.3, 4.2b, 4.1, 4.4 (all done), then 4.5. 4.2 and 4.3 go first because the app needs the "uncertain, see a professional" output and the explanation screen for the photo-only model, and E4 is the only research question without results.
+Recommended order (changed): 4.2, 4.3, 4.2b, 4.1, 4.4, 4.5 (all done). 4.2 and 4.3 go first because the app needs the "uncertain, see a professional" output and the explanation screen for the photo-only model, and E4 is the only research question without results.
 
 **Task 4.1: Skin-Tone Stratified Analysis (E3) - DONE (2026-10-26)**
 - **Code:** `analyze_fairness.py` reads the stored test predictions (nothing retrained) of the E1 arms, the E5 probes (DINOv2, DermLIP, PanDerm-Large), the E7 pooled model and the E2 hidden-answer runs (r = 1 vs 0), plus the Fitzpatrick17k zero-shot predictions of the two app candidates. Per eFST / eMST group: macro-F1 and balanced accuracy, paired difference vs the photo model (Holm within each model), missingness drop, best-minus-worst gap (groups with >= 20 cases; mean +- sd, no bootstrap interval because the range of noisy groups is biased upwards), groups with < 30 test cases per seed flagged as descriptive. Tests `tests/test_fairness_and_stats.py`.
@@ -126,11 +126,13 @@ Recommended order (changed): 4.2, 4.3, 4.2b, 4.1, 4.4 (all done), then 4.5. 4.2 
 - **Results (`results/stats/contrasts.md`):** all 20 stored contrasts reproduced. 12 of 31 stay significant after Holm over all: questionnaire-only and ImageNet-probe losses, DermLIP +0.084, AURC reduction of the three probes, detector differences. PanDerm-Large +0.047 (Holm all 0.381) and E7 pooled -0.035 (0.289) no longer pass; DINOv2 +0.032 has t interval over seeds [-0.018, +0.082] (case bootstrap [+0.005, +0.061]), so its macro-F1 advantage is likely but not certain; the app choice rests on calibration, selective accuracy and licence.
 - **Thesis:** 8.8 (statistics paragraph).
 
-**Task 4.5: Reproducibility Freeze & Model Export - TODO (model chosen 2026-10-24: DINOv2 + linear probe)**
-- **Revised objective:** lock the environment (`requirements.txt`), the config for every reported number, and the split files; add a one-command rerun script. Export the **photo-only** model (trained on SCIN only; recommended after E4: DINOv2 ViT-B/14 + linear probe with its temperature and tau (Apache 2.0, selective accuracy 0.676 vs 0.607, lowest ECE after scaling 0.061); DermLIP / PanDerm are more accurate but CC BY-NC-ND, so research only; ViT-B has 86 M parameters vs 5.3 M, so server inference only) with its calibration temperature and abstention tau to ONNX (or TorchScript) for the FastAPI service. Fusion is not exported: it gives no benefit.
-- **Model card:** intended use (informational, not a medical device, no diagnosis), training data (SCIN only), per-tone results, abstention behaviour, limits; Fitzpatrick17k is not used in the shipped model.
-- **Deliverable:** `requirements.txt`, `run_all.sh`, `results_registry.csv`, `export_model.py`, `final_image_only.onnx`, `model_card.md`.
-- **Prompt Blueprint:** "Write `export_model.py` that loads the final photo-only checkpoint, bundles the temperature and tau in a JSON, and exports ONNX. Also write `run_all.sh` and `results_registry.csv` mapping each reported number to config, seed and checkpoint. Include Git commit commands."
+**Task 4.5: Reproducibility Freeze & Model Export - DONE (2026-10-27)**
+- **Export:** `export_model.py` puts the DINOv2 ViT-B/14 encoder, the linear probe of split seed 0 (fixed by rule), the temperature and the kNN out-of-scope score in one ONNX file (`export/skin_concern_dinov2.onnx`, opset 18, 335 MB, git-ignored) with a JSON of classes, T = 0.857, tau = 0.488, kNN threshold 0.455, preprocessing and SHA-256. Thresholds are refitted on fp32 validation features (the service runs in fp32) and agree with E4.
+- **Checks (`results/export/export_check.md`):** ONNX vs PyTorch max probability difference 6.7e-6, same class 100%; same class as stored E5 predictions 99.6% (269/270); seed-0 test selective accuracy 70.4% vs 70.5% in E4.
+- **Serving:** `serving.py` (preprocessing without PyTorch, tested equal to the evaluation transform; decision unusual photo -> uncertain -> answered).
+- **Reproducibility:** `requirements-lock.txt`, `run_all.sh` (stages data / e1 / e2 / e5 / e7 / e4 / report / export / test), `results_registry.py` -> `results/results_registry.csv` (337 numbers; rebuilds all 8 thesis tables and stops on a difference). `run_e1.py --name` added because the E5 files had been renamed by hand; the rebuild reproduces them exactly.
+- **Model card:** `model_card.md`.
+- **Thesis:** section 6.1, Table 6.1.
 
 ## Added tasks (NEW)
 
@@ -144,4 +146,4 @@ Recommended order (changed): 4.2, 4.3, 4.2b, 4.1, 4.4 (all done), then 4.5. 4.2 
 
 **Task 5.1: App backend and mobile MVP - NEW (outside the ML program, thesis milestone O3, 31.03.2027)**
 - **Objective:** FastAPI skeleton (auth, `/analyze` serving the exported ONNX model with temperature and tau, MongoDB models from the EER design), then the Expo screens from the Figma designs.
-- **Status:** `api/main.py` empty, `app/SkincareApp` is the Expo template only.
+- **Status:** `api/main.py` empty, `app/SkincareApp` is the Expo template only. The ML service can import `ml/serving.py` and load `ml/export/skin_concern_dinov2.onnx` (Task 4.5).

@@ -21,3 +21,7 @@ fairlearn>=0.10
 pytest
 python-docx
 pyarrow
+open_clip_torch>=3.0
+onnx>=1.17
+onnxruntime>=1.20
+onnxscript>=0.2

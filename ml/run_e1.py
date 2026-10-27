@@ -350,11 +350,15 @@ def markdown_subgroups(sub: pd.DataFrame, arms: list[str], reference: str = "ima
     return "\n".join(lines) + "\n"
 
 # ------------------------------------------------------------------------------------------ table
+TITLES = {"e1": "E1: photo only vs questionnaire only vs fusion",
+          "e5": "E5: fine-tuned EfficientNet-B0 (image_only) vs frozen encoders with a linear probe"}
+
+
 def markdown(arm_table: pd.DataFrame, pair_table: pd.DataFrame, meta: dict) -> str:
     def cell(r):
         return f"{r['mean']:.3f} ± {r['sd']:.3f} [{r['ci_low']:.3f}, {r['ci_high']:.3f}]"
 
-    lines = [f"# E1: photo only vs questionnaire only vs fusion (test, seeds {meta['seeds']})", "",
+    lines = [f"# {TITLES.get(meta['name'], meta['name'].upper())} (test, seeds {meta['seeds']})", "",
              f"Backbone {meta['backbone']}, imbalance correction {meta['balance']}. Each cell: mean ± sd over seeds "
              "[95% seed-stratified case-bootstrap CI].", "",
              "| Arm | Macro-F1 | Balanced accuracy | ECE | Macro-F1, all answers hidden |", "|---|---|---|---|---|"]
@@ -391,6 +395,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--bins", type=int, default=15, help="ECE bins (as evaluate.py)")
     ap.add_argument("--boot-seed", type=int, default=0)
     ap.add_argument("--out-dir", type=Path, default=ROOT / "results" / "e1")
+    ap.add_argument("--name", default="e1", help="output prefix and table title: e1, or e5 for the probe arms")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 
@@ -404,15 +409,15 @@ def main(argv: list[str] | None = None) -> int:
     arm_table, pair_table = summarise(preds, args.arms, args.seeds, classes, args.n_boot, args.bins, args.boot_seed)
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
-    meta = {"arms": args.arms, "seeds": args.seeds, "backbone": args.backbone, "balance": args.balance}
+    meta = {"name": args.name, "arms": args.arms, "seeds": args.seeds, "backbone": args.backbone, "balance": args.balance}
     sub = subgroups(preds, args.arms, args.seeds, classes, args.n_boot, args.boot_seed)
     summary = pd.concat([arm_table, pair_table, sub], ignore_index=True)
     summary.insert(0, "backbone", args.backbone)
     summary.insert(1, "balance", args.balance)
-    summary.to_csv(args.out_dir / "e1_summary.csv", index=False, float_format="%.5f")
+    summary.to_csv(args.out_dir / f"{args.name}_summary.csv", index=False, float_format="%.5f")
     text = markdown(arm_table, pair_table, meta) + markdown_subgroups(sub, args.arms)
-    (args.out_dir / "e1_table.md").write_text(text, encoding="utf-8")
-    log.info("wrote %s and e1_table.md", args.out_dir / "e1_summary.csv")
+    (args.out_dir / f"{args.name}_table.md").write_text(text, encoding="utf-8")
+    log.info("wrote %s and %s_table.md", args.out_dir / f"{args.name}_summary.csv", args.name)
     print(text)
     return 0
 
