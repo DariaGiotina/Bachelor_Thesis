@@ -35,6 +35,18 @@ Datasets go in `ml/data/` (git-ignored). SCIN images must not be redistributed
 | 10f. Method checks for the null result | `python analysis/fusion_positive_control.py`; `python run_stacking.py --seeds 0 1 2 3 4 5 6 7 8 9`; `python analysis/stacking_synthetic_ceiling.py`; `python run_e1.py --no-train --seeds 0 1 2 3 4 5 6 7 8 9 --arms image_only questionnaire_only fusion_concat stack_photo stack_photo_q stack_photo_qmlp stack_q --out-dir results/e1/stacking` | positive control (synthetic informative question), cross-fitted stacking (out-of-fold photo predictions in `runs/e1_stacking/`, ignored) and the gain ceiling; `results/e1/diagnostics/positive_control.*`, `stacking_ceiling.*`, `results/e1/stacking/` (committed) |
 | 11. E5 linear probe | `python foundation_probe.py --backbone timm:<name>` (or `open_clip:` / `hf:`) | `runs/foundation_probe/<tag>/` (ignored) |
 | 12. External test (DDI, Fitzpatrick17k) | `python external_datasets.py --checkpoints "runs/e1_image_only/<exp>/seed_checkpoints/*.pt"` | `runs/external_eval/<exp>/external_eval.csv` + metrics (ignored) |
+| 13. E2 missing answers | `python run_e2_dropout.py`, then `python eval_missingness.py` | `results/e2/` |
+| 14. E5 table | `python run_e1.py --seeds 0 1 2 3 4 5 6 7 8 9 --arms image_only probe_effb0 probe_vit_in21k probe_dinov2 probe_panderm_base probe_panderm_large probe_dermlip --out-dir results/e5 --name e5` | `results/e5/e5_summary.csv`, `e5_table.md` |
+| 15. E7 extra Fitzpatrick17k data | `python run_fitz_pooling.py --arms fitz_pooled fitz_pretrain --seeds 0 1 2 3 4 5 6 7 8 9` | `results/e7/` (checkpoints deleted with the images) |
+| 16. E4 calibration, abstention, out-of-scope detector | `python calibrate.py --export image_only fusion_film`; `python run_e4.py`; `python ood_detect.py` | `results/e4/` |
+| 17. Grad-CAM, results by tone | `python run_gradcam.py`; `python analyze_fairness.py` | `results/gradcam/`, `results/e3/` |
+| 18. Statistics and thesis tables | `python stats_tests.py`; `python make_report_assets.py` | `results/stats/`, `reports/assets/` |
+| 19. App model export | `python export_model.py` | `export/skin_concern_dinov2.onnx` (ignored, 335 MB) + `.json`, `results/export/export_check.md` |
+| 20. Registry of reported numbers | `python results_registry.py` (stops if a table no longer follows from the results) | `results/results_registry.csv` |
+
+All steps in order: `bash run_all.sh` (or one stage: `bash run_all.sh e4`). Exact package versions of the
+reported results: `requirements-lock.txt`. App inference: `serving.py` (numpy + onnxruntime, no PyTorch);
+model card: `model_card.md`.
 
 `train.py --model` is `dummy` (pipeline check), `image_only` (photo-only baseline, staged fine-tuning,
 `--backbone efficientnet_b0|mobilenetv3_large_100`, `--stages 1,2,3`) or `fusion` (`LateFusionNet`, photo + questionnaire, `--fusion concat|gated|film`, same stages as `image_only`). Each run writes `best_model.pt`, `log.csv`, `config_used.yaml`,

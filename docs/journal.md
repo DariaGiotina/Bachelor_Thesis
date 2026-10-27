@@ -2,6 +2,19 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-27: Reproducibility freeze and export of the app model (Task 4.5)
+
+- **Why:** the FastAPI service needs one file it can run without PyTorch, and every reported number must be traceable to the run that produced it before the app work starts.
+- **Export (`ml/export_model.py`):** the DINOv2 ViT-B/14 + linear probe of split seed 0 (the development seed, fixed by rule, not picked for its test score), with pixel normalisation, the probe, the temperature T and the kNN score against the 1,266 training cases of that seed in one ONNX graph (opset 18, 335 MB, dynamic batch, git-ignored). The JSON beside it holds the classes, T, tau, the kNN threshold, the preprocessing and the SHA-256 of the file.
+- **Thresholds recomputed in full precision:** the experiments ran with mixed precision; the service computes in fp32. Features agree with the cache (cosine >= 0.99998); on validation T = 0.857 (E4 0.857), tau = 0.488 (E4 0.487), kNN threshold 0.455 (5% false alarms).
+- **Checks (`results/export/export_check.md`):** ONNX Runtime vs PyTorch: largest probability difference 6.7e-6, same class 100%; same class as the stored E5 predictions for 269 of 270 test cases. Seed-0 test: accuracy 64.8% (E4 65.2%), macro-F1 0.614 (0.616), coverage 80.0% (80.4%), selective accuracy 70.4% (70.5%); with the kNN filter coverage 78.1%, selective accuracy 70.1%. About 1.2 s per photo on CPU including reading the file.
+- **Serving (`ml/serving.py`):** preprocessing (448 px cache step, 518 px letterbox) without albumentations or PyTorch, tested to give the same pixels as the evaluation transform; decision order unusual photo -> uncertain -> answered.
+- **Reproducibility:** `ml/requirements-lock.txt` (163 exact packages, Python 3.13.5, CUDA 12.6), `ml/run_all.sh` (every step in order, by stage), `ml/results_registry.py` -> `ml/results/results_registry.csv` (337 reported numbers with results file, command, seeds, config and checkpoint path); the registry first rebuilds all 8 thesis tables from the stored results and stops if one differs. All 8 rebuild identically.
+- **Process gap found and fixed:** the E5 tables in `results/e5/` had been renamed by hand from `run_e1.py` output. `run_e1.py` now has `--name` (file prefix and table title); the rebuild with `--name e5` reproduces the committed E5 files exactly.
+- **Model card:** `ml/model_card.md` (intended use, data, results by tone, limits: the kNN filter does not catch unknown conditions and flags dark skin more often).
+- **Thesis:** new section 6.1 with Table 6.1; three references (ONNX, ONNX Runtime, Mitchell et al. 2019). All citations renumbered in order of first appearance, which also fixed Darcet et al., listed before the out-of-scope references although cited after them. 54 pages after the field refresh.
+- **Tests:** `tests/test_serving.py`, `tests/test_export_model.py`, `tests/test_results_registry.py`; full suite 182 passed.
+
 ## 2026-10-26: One statistics procedure for every contrast and generated result assets (Task 4.4)
 
 - **Why:** each experiment runner tested its own contrasts; the thesis needs one rule for all of them and a way to rebuild every table from the stored results.

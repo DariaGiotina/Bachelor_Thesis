@@ -1,0 +1,113 @@
+{
+  "model": "DINOv2 ViT-B/14 (frozen) + linear probe, SCIN only",
+  "intended_use": "informational skin-concern category for the app; not a medical device, no diagnosis",
+  "created": "2026-10-27",
+  "encoder": {
+    "name": "vit_base_patch14_dinov2.lvd142m",
+    "licence": "Apache-2.0",
+    "dim": 768
+  },
+  "probe": {
+    "seed": 0,
+    "l2": 0.1,
+    "file": "probe_seed0.pt"
+  },
+  "classes": [
+    "acne",
+    "eczema_dermatitis",
+    "redness_rosacea",
+    "normal_other"
+  ],
+  "temperature": 0.8568918863699065,
+  "tau": 0.48816233277320864,
+  "target_coverage": 0.8,
+  "knn": {
+    "k": 10,
+    "threshold": 0.45478477478027324,
+    "keep": 0.95,
+    "bank_size": 1266
+  },
+  "decision_order": [
+    "unusual_photo if knn_score > knn.threshold",
+    "uncertain if max probability < tau",
+    "answered otherwise"
+  ],
+  "preprocessing": {
+    "input_size": 518,
+    "cache_longest_side": 448,
+    "layout": "NCHW RGB float32",
+    "pixel_range": "0-255 (normalised inside the graph)",
+    "mean": [
+      0.485,
+      0.456,
+      0.406
+    ],
+    "std": [
+      0.229,
+      0.224,
+      0.225
+    ],
+    "resize": "Lanczos to 448 if larger, bilinear longest side to 518, centred black padding (serving.preprocess)"
+  },
+  "inputs": {
+    "image": [
+      "batch",
+      3,
+      518,
+      518
+    ]
+  },
+  "outputs": {
+    "probabilities": [
+      "batch",
+      4
+    ],
+    "knn_score": [
+      "batch"
+    ]
+  },
+  "opset": 18,
+  "versions": {
+    "torch": "2.14.1+cu126",
+    "timm": "1.0.30",
+    "onnxruntime": "1.31.1"
+  },
+  "onnx_sha256": "6ed60809e644c604c0431f0fb9a6bc4dc3409273e5d9723a52abd32f836c649f",
+  "check": {
+    "feature_cosine_fp32_vs_cached": {
+      "min": 0.9999837875366211,
+      "mean": 0.9999980926513672
+    },
+    "onnx_vs_torch_max_abs_diff": {
+      "probabilities": 6.705522537231445e-06,
+      "knn_score": 3.516674041748047e-06
+    },
+    "onnx_vs_torch_class_agreement": 1.0,
+    "onnx_vs_stored_e5_class_agreement": 0.9962962962962963,
+    "test_n": 270,
+    "test_exported": {
+      "accuracy": 0.6481481481481481,
+      "macro_f1": 0.6136607598414381,
+      "coverage": 0.8,
+      "selective_accuracy": 0.7037037037037037
+    },
+    "test_exported_with_knn_filter": {
+      "accuracy": 0.6481481481481481,
+      "macro_f1": 0.6136607598414381,
+      "coverage": 0.7814814814814814,
+      "selective_accuracy": 0.7014218009478673
+    },
+    "test_knn_flagged": 0.025925925925925925,
+    "test_stored_e4": {
+      "accuracy": 0.6518518518518519,
+      "macro_f1": 0.6163505207109858,
+      "coverage": 0.8037037037037037,
+      "selective_accuracy": 0.7050691244239631
+    },
+    "stored_e4_T_tau": {
+      "T": 0.8569926532257319,
+      "tau": 0.4873305385871959
+    },
+    "onnxruntime_cpu_ms_per_image": 1172.8
+  }
+}
