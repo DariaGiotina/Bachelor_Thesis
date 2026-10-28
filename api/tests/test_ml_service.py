@@ -48,7 +48,7 @@ def client(monkeypatch):
 
 
 def test_analyze_returns_decision_and_notice(client):
-    r = client.post("/v1/analyze", files={"photo": ("p.png", _png(), "image/png")})
+    r = client.post("/v1/analyze", content=_png(), headers={"Content-Type": "image/png"})
     assert r.status_code == 200
     body = r.json()
     assert (body["status"], body["category"]) == ("answered", "eczema_dermatitis")
@@ -56,34 +56,34 @@ def test_analyze_returns_decision_and_notice(client):
 
 
 def test_exif_orientation_is_applied(client):
-    client.post("/v1/analyze", files={"photo": ("p.jpg", _png(64, 48, exif_rotate=True), "image/jpeg")})
+    client.post("/v1/analyze", content=_png(64, 48, exif_rotate=True), headers={"Content-Type": "image/jpeg"})
     assert client.model.seen[-1] == (48, 64)  # upright: width and height swapped
 
 
 @pytest.mark.parametrize("payload,code", [(b"", 400), (b"not an image", 400)])
 def test_bad_uploads_are_refused(client, payload, code):
-    assert client.post("/v1/analyze", files={"photo": ("x.png", payload, "image/png")}).status_code == code
+    assert client.post("/v1/analyze", content=payload, headers={"Content-Type": "image/png"}).status_code == code
 
 
 def test_unsupported_format_and_size_limits(client, monkeypatch):
-    assert client.post("/v1/analyze", files={"photo": ("x.gif", _png(fmt="GIF"), "image/gif")}).status_code == 415
+    assert client.post("/v1/analyze", content=_png(fmt="GIF"), headers={"Content-Type": "image/gif"}).status_code == 415
     monkeypatch.setenv("MAX_UPLOAD_MB", "0.001")
-    assert client.post("/v1/analyze", files={"photo": ("p.png", _png(200, 200), "image/png")}).status_code == 413
+    assert client.post("/v1/analyze", content=_png(200, 200), headers={"Content-Type": "image/png"}).status_code == 413
 
 
 def test_service_key_is_required_when_set(client, monkeypatch):
     monkeypatch.setenv("ML_SERVICE_KEY", "secret")
-    files = {"photo": ("p.png", _png(), "image/png")}
-    assert client.post("/v1/analyze", files=files).status_code == 401
-    assert client.post("/v1/analyze", files=files, headers={"X-Service-Key": "wrong"}).status_code == 401
-    assert client.post("/v1/analyze", files=files, headers={"X-Service-Key": "secret"}).status_code == 200
+    body = _png()
+    assert client.post("/v1/analyze", content=body).status_code == 401
+    assert client.post("/v1/analyze", content=body, headers={"X-Service-Key": "wrong"}).status_code == 401
+    assert client.post("/v1/analyze", content=body, headers={"X-Service-Key": "secret"}).status_code == 200
 
 
 def test_no_model_gives_503(monkeypatch):
     svc.app.state.model = None
     with TestClient(svc.app) as c:
         assert c.get("/health").status_code == 503
-        assert c.post("/v1/analyze", files={"photo": ("p.png", _png(), "image/png")}).status_code == 503
+        assert c.post("/v1/analyze", content=_png(), headers={"Content-Type": "image/png"}).status_code == 503
     del svc.app.state.model
 
 
@@ -93,7 +93,14 @@ def test_real_model_end_to_end(monkeypatch):
     svc.app.state.model = svc.load_model()
     with TestClient(svc.app) as c:
         assert c.get("/health").json()["classes"] == CLASSES
-        body = c.post("/v1/analyze", files={"photo": ("p.png", _png(300, 200), "image/png")}).json()
+        body = c.post("/v1/analyze", content=_png(300, 200), headers={"Content-Type": "image/png"}).json()
     del svc.app.state.model
     assert body["status"] in {"answered", "uncertain", "unusual_photo"}
     assert abs(sum(body["probabilities"].values()) - 1) < 1e-3
+
+
+def test_streamed_body_without_length_is_capped(client, monkeypatch):
+    monkeypatch.setenv("MAX_UPLOAD_MB", "0.01")
+    chunks = (b"x" * 4096 for _ in range(10))  # 40 kB, sent chunked: no Content-Length header
+    assert client.post("/v1/analyze", content=chunks).status_code == 413
+    assert client.model.seen == []

@@ -146,4 +146,4 @@ Recommended order (changed): 4.2, 4.3, 4.2b, 4.1, 4.4, 4.5 (all done). 4.2 and 4
 
 **Task 5.1: App backend and mobile MVP - NEW (outside the ML program, thesis milestone O3, 31.03.2027)**
 - **Objective:** FastAPI skeleton (auth, `/analyze` serving the exported ONNX model with temperature and tau, MongoDB models from the EER design), then the Expo screens from the Figma designs.
-- **Status (2026-10-28):** ML inference service done: `api/ml_service/app.py` (`GET /health`, `POST /v1/analyze` with the exported ONNX model, size / format / pixel limits, optional service key, 8 tests). Still to do: main backend (auth, MongoDB), `api/main.py` empty, `app/SkincareApp` is the Expo template only.
+- **Status (2026-10-28):** ML inference service done: `api/ml_service/app.py` (`GET /health`, `POST /v1/analyze` with the exported ONNX model, size / format / pixel limits, optional service key, raw-body upload read in memory with a cap, 9 tests). Still to do: main backend (auth, MongoDB), `api/main.py` empty, `app/SkincareApp` is the Expo template only.

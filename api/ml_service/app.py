@@ -6,10 +6,16 @@ written by ``ml/export_model.py``) and answers ``POST /v1/analyze`` with the dec
 ``unusual_photo`` (the photo is unlike the training photos). It is an internal service: the main
 backend calls it after authenticating the user, so it holds no user data.
 
+The request body is the image file itself (``Content-Type: image/jpeg``, ``image/png`` or
+``image/webp``), not a multipart form: a multipart parser spools large files to a temporary file on
+disk before any size check, while the raw body is read here in chunks, in memory only, and refused as
+soon as it passes the size limit. The service key is checked before the body is read.
+
 Privacy: the photo is decoded in memory, never written to disk and never logged; the response holds
 no image data. Uploads are limited in size and pixel count; only JPEG, PNG and WebP are accepted.
-No file is kept. If ``ML_SERVICE_KEY`` is set, every request must send it in
-the ``X-Service-Key`` header (shared secret between the backend and this service).
+If ``ML_SERVICE_KEY`` is set, every request must send it in the ``X-Service-Key`` header (shared
+secret between the backend and this service). In production a reverse proxy in front of the service
+should also cap the body size.
 
 Configuration (environment variables):
   SKINCONCERN_MODEL   path of the .onnx file (default: ml/export/skin_concern_dinov2.onnx)
@@ -30,7 +36,8 @@ import sys
 from contextlib import asynccontextmanager
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.concurrency import run_in_threadpool
 from PIL import Image, ImageOps, UnidentifiedImageError
 
 REPO = Path(__file__).resolve().parents[2]
@@ -104,13 +111,28 @@ def health() -> dict:
             "onnx_sha256": m["onnx_sha256"][:16]}
 
 
-@app.post("/v1/analyze", dependencies=[Depends(require_key)])
-def analyze(photo: UploadFile = File(...)) -> dict:
-    model = model_or_503()
-    data = photo.file.read(max_upload_bytes() + 1)
-    if len(data) > max_upload_bytes():
+async def read_body(request: Request, cap: int) -> bytes:
+    """Raw request body, in memory, refused as soon as it is larger than ``cap`` bytes."""
+    declared = request.headers.get("content-length", "")
+    if declared.isdigit() and int(declared) > cap:
         raise HTTPException(status_code=413, detail="file too large")
+    buf = bytearray()
+    async for chunk in request.stream():
+        buf += chunk
+        if len(buf) > cap:
+            raise HTTPException(status_code=413, detail="file too large")
+    return bytes(buf)
+
+
+def _analyze(model: serving.SkinConcernModel, data: bytes) -> serving.Decision:
+    return model.analyze(read_photo(data))
+
+
+@app.post("/v1/analyze", dependencies=[Depends(require_key)])
+async def analyze(request: Request) -> dict:
+    model = model_or_503()
+    data = await read_body(request, max_upload_bytes())
     if not data:
         raise HTTPException(status_code=400, detail="empty file")
-    decision = model.analyze(read_photo(data))
+    decision = await run_in_threadpool(_analyze, model, data)  # decoding and inference are CPU-bound
     return {**decision.to_dict(), "notice": NOTICE, "model_sha256": model.meta["onnx_sha256"][:16]}
