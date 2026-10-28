@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-28: ML inference service (Task 5.1, first part)
+
+- **Why:** the app needs the exported model behind an HTTP endpoint before the backend and the screens can use it; it is the smallest part of Task 5.1 that can be finished and tested on its own.
+- **Done:** `api/ml_service/app.py` (FastAPI): `GET /health` (model name, classes, short SHA-256 of the ONNX file) and `POST /v1/analyze` (one photo -> decision `answered` / `uncertain` / `unusual_photo`, probabilities, kNN score, model fingerprint and the permanent notice). The model is loaded once at start; without it both routes answer 503. `api/requirements.txt` lists only the serving packages (no PyTorch).
+- **Decisions:** internal service, called by the main backend after authentication, so it never sees user data; optional shared secret `ML_SERVICE_KEY` checked in constant time (`hmac.compare_digest`); no public OpenAPI pages. Photos are decoded in memory, never written or logged; EXIF orientation is applied (phone photos are often stored rotated); uploads over 10 MB, images over 40 million pixels (decompression bombs) and formats other than JPEG, PNG and WebP are refused. HEIC photos from iPhones must be sent as JPEG by the app.
+- **Checked:** 8 tests in `api/tests/test_ml_service.py` (decision and notice, EXIF rotation, empty and broken files, wrong format, size limit, service key, missing model, and one end-to-end run of the real ONNX model); a manual run with uvicorn answered a real SCIN photo with the same result as `ml/serving.py`.
+- **Fixed:** the root README still named Node.js as the backend; the stack is FastAPI.
+- **Thesis:** paragraph at the end of 6.1 and the FastAPI reference; citations renumbered by first appearance (54 pages).
+- **Next (Task 5.1):** main backend (accounts with Argon2id + JWT and rotating refresh tokens, MongoDB collections from the data model), then the Expo screens.
+
 ## 2026-10-27: Reproducibility freeze and export of the app model (Task 4.5)
 
 - **Why:** the FastAPI service needs one file it can run without PyTorch, and every reported number must be traceable to the run that produced it before the app work starts.
