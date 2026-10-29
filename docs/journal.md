@@ -2,6 +2,15 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-10-29: EER-to-relational mapping sheet
+
+- **Why:** the faculty guide asks to attach the relational schema together with the ER model, so that one can see how one was obtained from the other, made in a specialised tool (no hand drawing).
+- **Done:** third page "EER to relational" in `docs/diagrams/skincare_eer.drawio`: the EER model (top) and the BCNF relational schema (bottom) on one sheet. Every EER element that becomes a table has a coloured badge T1-T26, repeated on the header of the table it produced; every relationship that becomes a foreign key has a dashed badge FK->Tn pointing to the table that holds the key. A mapping table lists badge, EER element, construct, rule (R1-R10, same numbering as the mapping note) and the resulting table or column. Colours follow the four groups (account and security, skin analysis, photos, products/routines/log).
+- **Exports:** `docs/Schema_ER_relational_Giotina.pdf` (one large page, for zooming) and `docs/diagrams/eer_to_relational.png`.
+- **Counts:** 26 EER elements become tables (17 entities, 5 M:N relationships, 3 multivalued attributes, 1 optional 1:N relationship); 11 relationships become foreign keys.
+- **Tooling:** generator `D:\facultate\BD_instrumente\build_er_diagram.py` now draws into a shared page with x/y offsets, so pages 1-2 and the combined page 3 come from the same code and cannot drift apart.
+- **Thesis:** one sentence in 4.1 points to the attachment (no new figure: the sheet is too dense for an A4 page).
+
 ## 2026-10-28: ML inference service (Task 5.1, first part)
 
 - **Why:** the app needs the exported model behind an HTTP endpoint before the backend and the screens can use it; it is the smallest part of Task 5.1 that can be finished and tested on its own.
