@@ -8,14 +8,21 @@ Transformer, the input norm of the last block, with the patch tokens reshaped ba
 For every test case of every seed the script stores, for the predicted class:
   outcome          correct / wrong / abstained (calibrated confidence below the E4 tau of the seed)
   top10_share      share of the heatmap mass in its 10% hottest pixels (how focused the map is)
-  pad_ratio        heatmap mass per pixel on the black letterbox padding, relative to the mean per
-                   pixel (1 = no preference; well above 1 = the model looks at the padding, a shortcut)
+  pad_ratio        heatmap mass per pixel on the letterbox padding, relative to the mean per pixel
+                   (1 = no preference; well above 1 = the model looks at the padding, a shortcut). The
+                   padding is found from the letterbox geometry (the same image padded with black), so
+                   it is also measured when the padding is the mirrored image
   rho_head         Spearman correlation between the map of the trained model and the map after the
                    classifier weights are replaced by random ones
   rho_top          the same after also randomizing the top of the encoder (last 4 ViT blocks or the
                    last 2 EfficientNet stages and conv_head)
 The two correlations are the model-randomization sanity check of Adebayo et al. (NeurIPS 2018): a
 map that stays the same when the weights it should explain are destroyed explains nothing.
+
+Task 4.7 adds the models that should remove the border artefact of DINOv2: the probe on mirrored
+padding (``probe_dinov2_reflect``), the probe on DINOv2 with registers (``probe_dinov2_reg``) and
+the fine-tuned DINOv2 (``finetune_dinov2``, ``finetune_dinov2_reflect``). Arms without an E4
+calibration get their temperature and tau from ``run_e4.calibrate_seed`` (same rule).
 
 Outputs: ``results/gradcam/gradcam_cases.csv`` (no images, only ids and numbers),
 ``results/gradcam/gradcam_summary.md``; overlay grids of sampled correct / wrong / abstained cases
@@ -25,6 +32,7 @@ Usage::
 
     python run_gradcam.py                     # both models, seeds 0-9
     python run_gradcam.py --models probe_dinov2 --seeds 0
+    python run_gradcam.py --models probe_dinov2_reflect probe_dinov2_reg finetune_dinov2 --out-dir results/e8/gradcam
 """
 from __future__ import annotations
 
@@ -45,12 +53,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "src"))
 from data_loading import ROOT, SCINDataset  # noqa: E402
 from foundation_probe import load_encoder, primary_view  # noqa: E402
 from models.image_model import SkinImageBaseline  # noqa: E402
-from run_e1 import PROBES, arm_spec  # noqa: E402
+from run_e1 import FINETUNES, PROBE_PAD, PROBES, arm_spec  # noqa: E402
 from skinconcern.metrics import efst_group  # noqa: E402
 
 log = logging.getLogger("run_gradcam")
 MODELS = ["probe_dinov2", "image_only"]
-LABEL = {"probe_dinov2": "DINOv2 + linear probe", "image_only": "EfficientNet-B0 fine-tuned"}
+EXTRA = ["probe_dinov2_reflect", "probe_dinov2_reg", "finetune_dinov2", "finetune_dinov2_reflect"]  # Task 4.7
+LABEL = {"probe_dinov2": "DINOv2 + linear probe", "image_only": "EfficientNet-B0 fine-tuned",
+         "probe_dinov2_reflect": "DINOv2 + probe, mirrored padding", "probe_dinov2_reg": "DINOv2 with registers + probe",
+         "finetune_dinov2": "DINOv2 fine-tuned", "finetune_dinov2_reflect": "DINOv2 fine-tuned, mirrored padding"}
 CFG = ROOT / "runs" / "e1_image_only" / "efficientnet_b0_weighted_loss" / "config_used.yaml"
 
 
@@ -67,6 +78,18 @@ class ProbeModel(nn.Module):
 
     def forward(self, x):
         return self.head((self.encoder(x) - self.mu) / self.sd)
+
+
+class FTModel(nn.Module):
+    """A fine-tuned timm ViT with ``encoder`` / ``head`` names, like ``ProbeModel`` (the code below reads them)."""
+
+    def __init__(self, vit: nn.Module):
+        super().__init__()
+        self.encoder = vit
+        self.head = vit.head
+
+    def forward(self, x):
+        return self.encoder(x)
 
 
 def vit_reshape(grid: int, prefix: int):
@@ -86,6 +109,20 @@ def build(model_name: str, seed: int, cfg: dict, device):
         m.requires_grad_(True)  # Grad-CAM needs a graph; nothing is trained here
         return (m.to(device).eval(), [m.net.conv_head], None, cfg,
                 {"head": [m.net.get_classifier()], "top": [m.net.get_classifier(), m.net.conv_head, *m.net.blocks[-2:]]})
+    if model_name in FINETUNES:
+        import timm
+        from run_finetune_dinov2 import MODEL
+        vit = timm.create_model(MODEL, pretrained=False, num_classes=len(cfg["data"]["classes"]))
+        ckpt = arm_spec(model_name, "efficientnet_b0", "weighted_loss")["dir"] / "seed_checkpoints" / f"ft_seed{seed}.pt"
+        vit.load_state_dict(torch.load(ckpt, map_location="cpu", weights_only=True))
+        m = FTModel(vit).to(device).eval().requires_grad_(True)
+        dc = timm.data.resolve_model_data_config(vit)
+        ecfg = copy.deepcopy(cfg)
+        ecfg["data"]["image_size"] = dc["input_size"][-1]
+        ecfg["data"]["pad_mode"] = FINETUNES[model_name]
+        ecfg["normalize"] = {"mean": list(dc["mean"]), "std": list(dc["std"])}
+        return (m, [vit.blocks[-1].norm1], vit_reshape(vit.patch_embed.grid_size[0], vit.num_prefix_tokens), ecfg,
+                {"head": [m.head], "top": [m.head, *vit.blocks[-4:]]})
     spec, weights = PROBES[model_name]
     enc = load_encoder(spec, weights, device)
     probe = torch.load(arm_spec(model_name, "efficientnet_b0", "weighted_loss")["dir"] / f"probe_seed{seed}.pt",
@@ -94,6 +131,7 @@ def build(model_name: str, seed: int, cfg: dict, device):
     ecfg = copy.deepcopy(cfg)
     ecfg["data"]["image_size"] = enc.image_size
     ecfg["normalize"] = {"mean": list(enc.mean), "std": list(enc.std)}
+    ecfg["data"]["pad_mode"] = PROBE_PAD.get(model_name, "constant")
     vit = enc.model
     return (m, [vit.blocks[-1].norm1], vit_reshape(vit.patch_embed.grid_size[0], vit.num_prefix_tokens), ecfg,
             {"head": [m.head], "top": [m.head, *vit.blocks[-4:]]})
@@ -137,13 +175,17 @@ def run_model(model_name: str, seeds: list[int], cal: pd.DataFrame, device, out_
         rand = {k: randomised(model, v, 1000 + seed) for k, v in parts.items()}
         ds = primary_view(SCINDataset(dcfg, "test", seed), dcfg)
         loader = torch.utils.data.DataLoader(ds, batch_size=batch_size, shuffle=False, num_workers=2)
-        c = cal[(cal["arm"] == arm) & (cal["seed"] == str(seed))].iloc[0]
-        t, tau = float(c["T"]), float(c["tau"])
+        # the same images padded with black: their padding pixels mark where the letterbox padding is
+        bcfg = copy.deepcopy(dcfg)
+        bcfg["data"]["pad_mode"] = "constant"
+        black = torch.utils.data.DataLoader(primary_view(SCINDataset(bcfg, "test", seed), bcfg), batch_size=batch_size,
+                                            shuffle=False, num_workers=2)
+        t, tau = calibration(cal, arm, seed)
         mean = torch.tensor(dcfg["normalize"]["mean"]).view(1, 3, 1, 1)
         std = torch.tensor(dcfg["normalize"]["std"]).view(1, 3, 1, 1)
         pad_val = (-mean / std)  # normalised value of a black padding pixel
         grid_items = []
-        for b in loader:
+        for b, bb in zip(loader, black):
             x = b["image"].to(device)
             with torch.no_grad():
                 p = (model(x).float() / t).softmax(1).cpu()
@@ -153,7 +195,7 @@ def run_model(model_name: str, seeds: list[int], cal: pd.DataFrame, device, out_
                           else [rand["head"].encoder.blocks[-1].norm1], reshape, x, pred)
             heat_t = cams(rand["top"], [rand["top"].net.conv_head] if model_name == "image_only"
                           else [rand["top"].encoder.blocks[-1].norm1], reshape, x, pred)
-            pad = torch.isclose(b["image"], pad_val.expand_as(b["image"]), atol=1e-3).all(1).numpy()
+            pad = torch.isclose(bb["image"], pad_val.expand_as(bb["image"]), atol=1e-3).all(1).numpy()
             for i in range(len(x)):
                 h = heat[i]
                 mass = h.sum()
@@ -181,6 +223,17 @@ def run_model(model_name: str, seeds: list[int], cal: pd.DataFrame, device, out_
         if device.type == "cuda":
             torch.cuda.empty_cache()
     return pd.DataFrame(rows)
+
+
+def calibration(cal: pd.DataFrame, arm: str, seed: int) -> tuple[float, float]:
+    """Temperature and tau of one arm and seed: from E4, else fitted now with the E4 rule."""
+    c = cal[(cal["arm"] == arm) & (cal["seed"] == str(seed))]
+    if len(c):
+        return float(c.iloc[0]["T"]), float(c.iloc[0]["tau"])
+    from run_e4 import calibrate_seed, classes_of, load_arm
+    df = load_arm(arm, [seed])
+    _, info = calibrate_seed(df, classes_of(df), 0.8)
+    return info["T"], info["tau"]
 
 
 def save_grid(model_name: str, items, out: Path, n: int) -> None:
@@ -217,11 +270,14 @@ def summary(df: pd.DataFrame, seeds) -> str:
            f"Seeds {seeds}, SCIN test split, heatmap of the predicted class. Mean ± sd over cases.", "",
            "## Model-randomization check (Spearman correlation with the trained model's map; near 0 = the map "
            "depends on the learned weights, as it should)", "",
-           "| Model | classifier randomised | classifier + top of encoder randomised | top-10% mass share | padding ratio |",
-           "|---|---|---|---|---|"]
+           "| Model | classifier randomised | classifier + top of encoder randomised | top-10% mass share | padding ratio "
+           "| padding ratio, median | cases with padding ratio > 2 |",
+           "|---|---|---|---|---|---|---|"]
     for m in df["model"].unique():
         d = df[df.model == m]
-        out.append(f"| {LABEL[m]} | {f(d.rho_head)} | {f(d.rho_top)} | {f(d.top10_share)} | {f(d.pad_ratio)} |")
+        pr = d.pad_ratio.dropna()
+        out.append(f"| {LABEL[m]} | {f(d.rho_head)} | {f(d.rho_top)} | {f(d.top10_share)} | {f(d.pad_ratio)} "
+                   f"| {pr.median():.2f} | {100 * (pr > 2).mean():.1f}% |")
     out += ["", "Padding ratio: heatmap mass per padding pixel relative to the image average (1 = no preference); "
             "computed on cases with letterbox padding only.", "",
             "## Map statistics by outcome and eFST group (top-10% mass share)", "",
@@ -237,7 +293,7 @@ def summary(df: pd.DataFrame, seeds) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--models", nargs="+", default=MODELS, choices=MODELS)
+    ap.add_argument("--models", nargs="+", default=MODELS, choices=MODELS + EXTRA)
     ap.add_argument("--seeds", type=int, nargs="+", default=list(range(10)))
     ap.add_argument("--n-grid", type=int, default=5, help="examples per row in the overlay grids")
     ap.add_argument("--batch-size", type=int, default=4, help="small: the ViT at 518 px keeps large attention maps")

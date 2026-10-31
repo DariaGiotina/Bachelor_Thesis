@@ -2,7 +2,7 @@
 # Rerun every step behind the reported results, in order (Task 4.5).
 #
 #   bash run_all.sh            # everything (days on one RTX 3060: about 150 training runs)
-#   bash run_all.sh data       # one stage: data | e1 | e2 | e5 | e7 | e4 | report | export | test
+#   bash run_all.sh data       # one stage: data | e1 | e2 | e5 | e7 | e4 | e8 | report | export | test
 #
 # Run from ml/ with the virtual environment active (README). Training steps skip arms whose
 # checkpoints already exist, so an interrupted run can be restarted with the same command.
@@ -64,6 +64,14 @@ if want e4; then  # RQ4: calibration, abstention, out-of-scope detector, Grad-CA
   run ood_detect.py
   run run_gradcam.py
   run analyze_fairness.py
+fi
+
+if want e8; then  # Task 4.7: fine-tuned DINOv2, mirrored padding and registers (Grad-CAM border artefact)
+  run foundation_probe.py --backbone timm:vit_base_patch14_dinov2.lvd142m --pad-mode reflect --seeds $SEEDS
+  run foundation_probe.py --backbone timm:vit_base_patch14_reg4_dinov2.lvd142m --seeds $SEEDS
+  run run_finetune_dinov2.py --seeds $SEEDS --skip-existing
+  run run_e8.py
+  run run_gradcam.py --models probe_dinov2_reflect probe_dinov2_reg finetune_dinov2 --out-dir results/e8/gradcam
 fi
 
 if want report; then

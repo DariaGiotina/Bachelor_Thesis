@@ -37,6 +37,8 @@ NAMES = {"image_only": "Photo, EfficientNet-B0 fine-tuned", "questionnaire_only"
          "probe_effb0": "EfficientNet-B0 ImageNet + probe", "probe_vit_in21k": "ViT-B/16 ImageNet-21k + probe",
          "probe_dinov2": "DINOv2 + probe", "probe_panderm_base": "PanDerm-Base + probe",
          "probe_panderm_large": "PanDerm-Large + probe", "probe_dermlip": "DermLIP + probe",
+         "probe_dinov2_reflect": "DINOv2 + probe, mirrored padding", "probe_dinov2_reg": "DINOv2 with registers + probe",
+         "finetune_dinov2": "DINOv2 fine-tuned",
          "fitz_pooled": "Pooled SCIN + Fitzpatrick17k", "fitz_pretrain": "Fitzpatrick17k, then SCIN",
          "nodrop": "Concat, no dropout", "fixed": "Concat, fixed dropout", "randdrop": "Concat, random dropout"}
 
@@ -114,6 +116,16 @@ def t_e7() -> pd.DataFrame:
     return a.assign(fitzpatrick17k_macro_f1=b["macro_f1"])
 
 
+def t_e8() -> pd.DataFrame:
+    arms = ["image_only", "probe_dinov2", "probe_dinov2_reflect", "probe_dinov2_reg", "finetune_dinov2"]
+    a = arm_table(RES / "e8" / "e8_summary.csv", arms, ["macro_f1", "balanced_acc"])
+    d = pd.read_csv(RES / "e8" / "e8_calibration.csv")
+    cols = ["ece_after", "aurc", "selective_accuracy"]
+    g = d.groupby("arm")[cols]
+    m, s = g.mean().loc[arms], g.std().loc[arms]
+    return a.assign(**{c: [ms(x, y) for x, y in zip(m[c], s[c])] for c in cols})
+
+
 def t_stats() -> pd.DataFrame:
     d = pd.read_csv(RES / "stats" / "contrasts.csv")
     return pd.DataFrame({"family": d["family"], "contrast": d["contrast"], "metric": d["metric"],
@@ -130,6 +142,7 @@ TABLES = {"e1_questionnaire": (t_e1, "results/e1/e1_summary.csv", "RQ1: photo, q
           "e4_ood_detector": (t_e4_ood, "results/e4/e4_ood_auroc.csv", "Task 4.2b: out-of-scope detector AUROC"),
           "e5_encoders": (t_e5, "results/e5/e5_summary.csv", "E5: frozen encoders + linear probe"),
           "e7_extra_data": (t_e7, "results/e7/e7_summary.csv", "E7: extra Fitzpatrick17k training data"),
+          "e8_dinov2_variants": (t_e8, "results/e8/e8_summary.csv", "Task 4.7: fine-tuned DINOv2 and the border-artefact fixes"),
           "stats_contrasts": (t_stats, "results/stats/contrasts.csv", "Task 4.4: every main contrast, one procedure")}
 FIGURES = {"e2_missing_answers.png": "results/e2/e2_curve.png",
            "e3_benefit_by_tone.png": "results/e3/e3_benefit_by_tone.png",

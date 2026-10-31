@@ -86,6 +86,10 @@ I-II / III-IV / V-VI: darker skin stays the weakest group outside SCIN.
 - **redness_rosacea** has 44 training cases; its results are unstable.
 - **Questionnaire:** not used. It gave no measurable gain over the photo (E1, E2), so the app asks questions
   for safety and context only.
+- **Grad-CAM maps** of this model sit mostly on the black padding in 3.7% of test cases (padding ratio > 2), so the
+  map is shown only as a rough hint. Mirrored padding lowers this to 0.4% (Task 4.7).
+- **Next version:** a fine-tuned DINOv2 (Task 4.7) reaches macro-F1 0.589 vs 0.551 and selective accuracy 0.706 vs 0.676;
+  it is not shipped yet because the export, the kNN filter and the external checks must be redone for it.
 - One seed is shipped; its own test result (macro-F1 0.614) is above the 10-seed mean by chance of the split.
   The expected performance is the 10-seed mean.
 

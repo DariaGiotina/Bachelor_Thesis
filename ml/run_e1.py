@@ -63,7 +63,12 @@ PROBES = {"probe_effb0": ("timm:efficientnet_b0", None),
           "probe_dinov2": ("timm:vit_base_patch14_dinov2.lvd142m", None),
           "probe_dermlip": ("open_clip:hf-hub:redlessone/DermLIP_ViT-B-16", None),
           "probe_panderm_base": ("panderm:base", PANDERM / "panderm_bb_data6_checkpoint-499.pth"),
-          "probe_panderm_large": ("panderm:large", PANDERM / "panderm_ll_data6_checkpoint-499.pth")}
+          "probe_panderm_large": ("panderm:large", PANDERM / "panderm_ll_data6_checkpoint-499.pth"),
+          # Task 4.7: the border artefact of the DINOv2 Grad-CAM maps
+          "probe_dinov2_reflect": ("timm:vit_base_patch14_dinov2.lvd142m", None),
+          "probe_dinov2_reg": ("timm:vit_base_patch14_reg4_dinov2.lvd142m", None)}
+PROBE_PAD = {"probe_dinov2_reflect": "reflect"}  # letterbox padding of a probe arm (default: black)
+FINETUNES = {"finetune_dinov2": "constant", "finetune_dinov2_reflect": "reflect"}  # arm -> padding
 REFERENCE_PAIRS = [("fusion", "image_only"), ("fusion", "questionnaire_only"), ("image_only", "questionnaire_only")]
 
 
@@ -84,10 +89,16 @@ def arm_spec(arm: str, backbone: str, balance: str) -> dict:
                 "train": lambda o: __import__("run_stacking").run({**o, "backbone": backbone})}
     if arm in PROBES:  # E5: frozen encoder + linear probe (foundation_probe.py)
         spec, weights = PROBES[arm]
+        pad = PROBE_PAD.get(arm, "constant")
         fp = __import__("foundation_probe")
-        extra = ["--weights", str(weights)] if weights else []
-        return {"dir": ROOT / "runs" / "foundation_probe" / fp.backbone_tag(spec, weights), "questionnaire": False,
+        extra = (["--weights", str(weights)] if weights else []) + ["--pad-mode", pad]
+        return {"dir": ROOT / "runs" / "foundation_probe" / fp.backbone_tag(spec, weights, pad), "questionnaire": False,
                 "train": lambda o: fp.main(["--backbone", spec, *extra, "--seeds", *map(str, o["seeds"])])}
+    if arm in FINETUNES:  # Task 4.7: DINOv2 fine-tuned end to end (run_finetune_dinov2.py)
+        pad = FINETUNES[arm]
+        return {"dir": ROOT / "runs" / "finetune_dinov2" / pad, "questionnaire": False,
+                "train": lambda o: __import__("run_finetune_dinov2").main(
+                    ["--pad-mode", pad, "--seeds", *map(str, o["seeds"])])}
     if arm.startswith("fusion_"):
         variant, mode = arm.removeprefix("fusion_"), "fixed"
         for suffix, m in (("_nodrop", "none"), ("_randdrop", "random")):
@@ -202,13 +213,15 @@ def pairs(arms: list[str]) -> list[tuple[str, str]]:
     """Every fusion arm against image-only and questionnaire-only, image vs questionnaire, and fusion
     variants against fusion_concat."""
     out = []
-    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo", "fitz_", "probe_"))]
+    fusion = [a for a in arms if a.startswith(("fusion_", "ensemble_", "stack_photo", "fitz_", "probe_", "finetune_"))]
     for f in fusion:
         out += [(f, b) for b in ("image_only", "questionnaire_only") if b in arms]
     if {"image_only", "questionnaire_only"} <= set(arms):
         out.append(("image_only", "questionnaire_only"))
     if "fusion_concat" in arms:
         out += [(f, "fusion_concat") for f in fusion if f != "fusion_concat"]
+    if "probe_dinov2" in arms:  # Task 4.7: padding, registers and fine-tuning against the app model
+        out += [(a, "probe_dinov2") for a in arms if a.startswith(("probe_dinov2_", "finetune_dinov2"))]
     for a in ("stack_photo_q", "stack_photo_qmlp"):  # same photo predictions: isolates the questionnaire
         if {a, "stack_photo"} <= set(arms):
             out.append((a, "stack_photo"))
@@ -351,7 +364,8 @@ def markdown_subgroups(sub: pd.DataFrame, arms: list[str], reference: str = "ima
 
 # ------------------------------------------------------------------------------------------ table
 TITLES = {"e1": "E1: photo only vs questionnaire only vs fusion",
-          "e5": "E5: fine-tuned EfficientNet-B0 (image_only) vs frozen encoders with a linear probe"}
+          "e5": "E5: fine-tuned EfficientNet-B0 (image_only) vs frozen encoders with a linear probe",
+          "e8": "Task 4.7: DINOv2 fine-tuned, with mirrored padding and with registers, vs the app model"}
 
 
 def markdown(arm_table: pd.DataFrame, pair_table: pd.DataFrame, meta: dict) -> str:

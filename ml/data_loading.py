@@ -7,9 +7,12 @@ One item is one ``case_id``. Image choice:
 * val / test: always the primary image (``image_1_path``, the close-up shot in the SCIN app);
   letterbox + ImageNet normalisation only, so evaluation is exactly reproducible.
 
-Letterbox: the longer side is scaled to ``image_size`` and the shorter side is padded with black,
-so lesions keep their shape (most SCIN photos are portrait 3:4; stretching them to a square would
-distort them).
+Letterbox: the longer side is scaled to ``image_size`` and the shorter side is padded, so lesions
+keep their shape (most SCIN photos are portrait 3:4; stretching them to a square would distort
+them). ``data.pad_mode`` chooses the padding: ``constant`` (black, the default and the setting of
+every experiment up to Task 4.5) or ``reflect`` (the image mirrored at its edge, also used for the
+empty corners left by the training affine). Reflection removes the uniform black band that a
+Vision Transformer can attend to (Task 4.7).
 
 A missing or unreadable image falls back to another image of the same case; if none can be
 read the item gets a black image and ``image_ok = 0`` (never an exception mid-epoch).
@@ -40,6 +43,7 @@ from utils.seed import seed_everything
 log = logging.getLogger("data_loading")
 ROOT = Path(__file__).resolve().parent
 IMAGE_COLS = ["image_1_path", "image_2_path", "image_3_path"]
+PAD_MODES = {"constant": cv2.BORDER_CONSTANT, "reflect": cv2.BORDER_REFLECT_101}
 
 
 def load_config(config: str | Path | dict) -> dict:
@@ -52,16 +56,17 @@ def load_config(config: str | Path | dict) -> dict:
 def build_transform(cfg: dict, train: bool) -> A.Compose:
     size = cfg["data"]["image_size"]
     norm = A.Normalize(mean=cfg["normalize"]["mean"], std=cfg["normalize"]["std"])
+    border = PAD_MODES[cfg["data"].get("pad_mode", "constant")]
     # Resize first so all later steps run on small images; keep the aspect ratio and pad.
     steps: list = [A.LongestMaxSize(max_size=size),
-                   A.PadIfNeeded(min_height=size, min_width=size, border_mode=cv2.BORDER_CONSTANT, fill=0)]
+                   A.PadIfNeeded(min_height=size, min_width=size, border_mode=border, fill=0)]
     if train:
         aug = cfg["augment"]
         steps += [
             A.HorizontalFlip(p=aug["horizontal_flip"]["p"]),
             A.Affine(scale=tuple(aug["affine"]["scale"]),
                      translate_percent=aug["affine"]["translate_percent"],
-                     rotate=aug["affine"]["rotate"], p=aug["affine"]["p"]),
+                     rotate=aug["affine"]["rotate"], border_mode=border, p=aug["affine"]["p"]),
             A.ColorJitter(brightness=aug["color_jitter"]["brightness"],
                           contrast=aug["color_jitter"]["contrast"],
                           saturation=aug["color_jitter"]["saturation"],

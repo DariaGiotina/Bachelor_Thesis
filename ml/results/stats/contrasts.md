@@ -29,28 +29,37 @@ Difference a - b per split seed (10 seeds). Interval: 95% t interval over seeds;
 
 | Contrast | metric | mean diff | 95% t interval | case bootstrap | better seeds | t p | Wilcoxon p | Holm (family) | Holm (all) | checked |
 |---|---|---|---|---|---|---|---|---|---|---|
-| EfficientNet-B0 ImageNet probe - fine-tuned photo | macro-F1 | -0.072 | [-0.098, -0.045] | [-0.099, -0.044] | 0/10 | 0.000 | 0.002 | 0.001 | 0.003 | yes |
-| ViT-B/16 ImageNet-21k probe - fine-tuned photo | macro-F1 | -0.069 | [-0.099, -0.040] | [-0.097, -0.039] | 0/10 | 0.000 | 0.002 | 0.002 | 0.010 | yes |
+| EfficientNet-B0 ImageNet probe - fine-tuned photo | macro-F1 | -0.072 | [-0.098, -0.045] | [-0.099, -0.044] | 0/10 | 0.000 | 0.002 | 0.001 | 0.004 | yes |
+| ViT-B/16 ImageNet-21k probe - fine-tuned photo | macro-F1 | -0.069 | [-0.099, -0.040] | [-0.097, -0.039] | 0/10 | 0.000 | 0.002 | 0.002 | 0.012 | yes |
 | DINOv2 probe - fine-tuned photo | macro-F1 | +0.032 | [-0.018, +0.082] | [+0.005, +0.061] | 7/10 | 0.185 | 0.131 | 0.185 | 1.000 | yes |
 | PanDerm-Base probe - fine-tuned photo | macro-F1 | +0.034 | [-0.003, +0.071] | [+0.003, +0.066] | 8/10 | 0.069 | 0.064 | 0.138 | 1.000 | yes |
-| PanDerm-Large probe - fine-tuned photo | macro-F1 | +0.047 | [+0.008, +0.086] | [+0.017, +0.078] | 7/10 | 0.022 | 0.037 | 0.067 | 0.381 | yes |
+| PanDerm-Large probe - fine-tuned photo | macro-F1 | +0.047 | [+0.008, +0.086] | [+0.017, +0.078] | 7/10 | 0.022 | 0.037 | 0.067 | 0.448 | yes |
 | DermLIP probe - fine-tuned photo | macro-F1 | +0.084 | [+0.055, +0.113] | [+0.052, +0.114] | 10/10 | 0.000 | 0.002 | 0.001 | 0.003 | yes |
 
 ## E7 extra training data
 
 | Contrast | metric | mean diff | 95% t interval | case bootstrap | better seeds | t p | Wilcoxon p | Holm (family) | Holm (all) | checked |
 |---|---|---|---|---|---|---|---|---|---|---|
-| pooled SCIN + Fitzpatrick17k - photo, SCIN test | macro-F1 | -0.035 | [-0.061, -0.008] | [-0.071, -0.002] | 2/10 | 0.016 | 0.020 | 0.032 | 0.289 | yes |
+| pooled SCIN + Fitzpatrick17k - photo, SCIN test | macro-F1 | -0.035 | [-0.061, -0.008] | [-0.071, -0.002] | 2/10 | 0.016 | 0.020 | 0.032 | 0.337 | yes |
 | Fitzpatrick17k then SCIN - photo, SCIN test | macro-F1 | -0.024 | [-0.050, +0.003] | [-0.049, +0.001] | 3/10 | 0.073 | 0.064 | 0.073 | 1.000 | yes |
 
 ## RQ4 confidence ranking (E4)
 
 | Contrast | metric | mean diff | 95% t interval | case bootstrap | better seeds | t p | Wilcoxon p | Holm (family) | Holm (all) | checked |
 |---|---|---|---|---|---|---|---|---|---|---|
-| FiLM fusion - photo | AURC reduction | +0.023 | [+0.007, +0.039] | - | 8/10 | 0.011 | 0.020 | 0.011 | 0.205 | - |
+| FiLM fusion - photo | AURC reduction | +0.023 | [+0.007, +0.039] | - | 8/10 | 0.011 | 0.020 | 0.011 | 0.238 | - |
 | DINOv2 probe - photo | AURC reduction | +0.089 | [+0.063, +0.116] | - | 10/10 | 0.000 | 0.002 | 0.000 | 0.001 | - |
 | PanDerm-Large probe - photo | AURC reduction | +0.119 | [+0.094, +0.144] | - | 10/10 | 0.000 | 0.002 | 0.000 | 0.000 | - |
 | DermLIP probe - photo | AURC reduction | +0.116 | [+0.088, +0.144] | - | 10/10 | 0.000 | 0.002 | 0.000 | 0.000 | - |
+
+## DINOv2 variants (4.7)
+
+| Contrast | metric | mean diff | 95% t interval | case bootstrap | better seeds | t p | Wilcoxon p | Holm (family) | Holm (all) | checked |
+|---|---|---|---|---|---|---|---|---|---|---|
+| DINOv2 fine-tuned - DINOv2 probe | macro-F1 | +0.038 | [+0.004, +0.071] | [+0.015, +0.056] | 6/10 | 0.032 | 0.039 | 0.095 | 0.603 | yes |
+| DINOv2 probe, mirrored padding - DINOv2 probe | macro-F1 | -0.014 | [-0.058, +0.030] | [-0.041, +0.012] | 5/10 | 0.489 | 0.557 | 0.489 | 1.000 | yes |
+| DINOv2 with registers probe - DINOv2 probe | macro-F1 | -0.023 | [-0.051, +0.005] | [-0.048, +0.003] | 2/10 | 0.094 | 0.084 | 0.188 | 1.000 | yes |
+| DINOv2 fine-tuned - DINOv2 probe | AURC reduction | +0.055 | [+0.023, +0.088] | - | 9/10 | 0.004 | 0.004 | 0.016 | 0.093 | - |
 
 ## Out-of-scope detector (4.2b)
 

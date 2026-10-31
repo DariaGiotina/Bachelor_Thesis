@@ -18,6 +18,9 @@ Backbones (``--backbone``), all loaded through one interface (``load_encoder``):
                           ``open_clip:hf-hub:redlessone/DermLIP_ViT-B-16`` (DermLIP; ``pip install open_clip_torch``)
   hf:<model id>           Hugging Face ``transformers`` vision model (pooled output, else the CLS token)
 
+``--pad-mode reflect`` letterboxes with the mirrored image instead of black (Task 4.7); the run
+folder then gets the suffix ``__reflect``.
+
 Outputs in ``runs/foundation_probe/<backbone tag>/`` (git-ignored): features.pt (cache),
 seed{k}/predictions.csv + evaluate.py metrics, probe_seed{k}.pt (linear layer, feature mean/std,
 classes, backbone), probe_runs.csv, foundation_probe_test.csv.
@@ -27,6 +30,7 @@ Usage::
     python foundation_probe.py --backbone timm:vit_base_patch16_224.augreg2_in21k_ft_in1k
     python foundation_probe.py --backbone open_clip:hf-hub:redlessone/DermLIP_ViT-B-16
     python foundation_probe.py --backbone panderm:base --weights data/models/panderm/panderm_bb_data6_checkpoint-499.pth
+    python foundation_probe.py --backbone timm:vit_base_patch14_dinov2.lvd142m --pad-mode reflect
 """
 from __future__ import annotations
 
@@ -167,9 +171,10 @@ def load_encoder(spec: str, weights: Path | None = None, device: torch.device = 
     return Encoder(model, fwd, int(size), mean, std, int(dim))
 
 
-def backbone_tag(spec: str, weights: Path | None) -> str:
+def backbone_tag(spec: str, weights: Path | None, pad_mode: str = "constant") -> str:
     tag = re.sub(r"[^A-Za-z0-9._-]+", "_", spec).strip("_")
-    return f"{tag}__{Path(weights).stem}" if weights else tag
+    tag = f"{tag}__{Path(weights).stem}" if weights else tag
+    return tag if pad_mode == "constant" else f"{tag}__{pad_mode}"
 
 
 # ------------------------------------------------------------------------------------ features
@@ -182,11 +187,12 @@ def primary_view(ds: SCINDataset, cfg: dict) -> SCINDataset:
 
 @torch.no_grad()
 def extract_features(enc: Encoder, cfg: dict, device: torch.device, batch_size: int, num_workers: int,
-                     only_available: bool) -> dict:
+                     only_available: bool, pad_mode: str = "constant") -> dict:
     """Features of every used SCIN case (the three splits of seed 0 hold all of them)."""
     ecfg = copy.deepcopy(cfg)
     ecfg["data"]["image_size"] = enc.image_size
     ecfg["normalize"] = {"mean": list(enc.mean), "std": list(enc.std)}
+    ecfg["data"]["pad_mode"] = pad_mode
     parts = [primary_view(SCINDataset(ecfg, s, 0, only_available), ecfg) for s in ("train", "val", "test")]
     loader = DataLoader(ConcatDataset(parts), batch_size=batch_size, shuffle=False, num_workers=num_workers,
                         pin_memory=device.type == "cuda")
@@ -259,7 +265,7 @@ def predictions(probe: nn.Linear, x, idx: np.ndarray, feats: dict, split: str, s
 def run(args) -> pd.DataFrame:
     cfg = load_config(args.config)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    root = args.out_root / backbone_tag(args.backbone, args.weights)
+    root = args.out_root / backbone_tag(args.backbone, args.weights, args.pad_mode)
     root.mkdir(parents=True, exist_ok=True)
     cache = root / "features.pt"
     if cache.exists() and not args.refresh_features:
@@ -271,7 +277,8 @@ def run(args) -> pd.DataFrame:
         enc = load_encoder(args.backbone, args.weights, device)
         log.info("encoder %s: dim %d, input %d px, mean %s std %s", args.backbone, enc.dim, enc.image_size,
                  enc.mean, enc.std)
-        feats = extract_features(enc, cfg, device, args.batch_size, args.num_workers, args.only_available)
+        feats = extract_features(enc, cfg, device, args.batch_size, args.num_workers, args.only_available,
+                                 args.pad_mode)
         torch.save(feats, cache)
         del enc
     pos = {c: i for i, c in enumerate(feats["case_id"])}
@@ -300,7 +307,7 @@ def run(args) -> pd.DataFrame:
         out.mkdir(exist_ok=True)
         torch.save({"state_dict": probe.state_dict(), "mean": mu, "std": sd, "classes": feats["classes"],
                     "backbone": args.backbone, "weights": str(args.weights) if args.weights else None,
-                    "l2": wd}, root / f"probe_seed{seed}.pt")
+                    "l2": wd, "pad_mode": args.pad_mode}, root / f"probe_seed{seed}.pt")
         pd.concat([predictions(probe, x[s], idx[s], feats, s, seed) for s in ("val", "test")],
                   ignore_index=True).to_csv(out / "predictions.csv", index=False)
         harness.main([str(out / "predictions.csv"), "--split", "test", "--n-boot", str(args.n_boot)])
@@ -336,6 +343,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--num-workers", type=int, default=0)
     ap.add_argument("--n-boot", type=int, default=1000)
     ap.add_argument("--only-available", action="store_true", help="skip cases whose images are missing")
+    ap.add_argument("--pad-mode", choices=["constant", "reflect"], default="constant",
+                    help="letterbox padding: black (default) or the mirrored image")
     ap.add_argument("--refresh-features", action="store_true", help="re-extract features instead of the cache")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")

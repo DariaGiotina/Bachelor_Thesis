@@ -15,18 +15,22 @@
 | RQ2 missing answers (E2) | concat nodrop: 100% - 0% hidden | macro-F1 | -0.001 | [-0.014, +0.013] | 3/10 | 1.000 | 1.000 |
 | RQ2 missing answers (E2) | concat fixed: 100% - 0% hidden | macro-F1 | -0.010 | [-0.022, +0.003] | 3/10 | 0.790 | 1.000 |
 | RQ2 missing answers (E2) | concat randdrop: 100% - 0% hidden | macro-F1 | -0.003 | [-0.012, +0.005] | 4/10 | 1.000 | 1.000 |
-| E5 frozen encoders | EfficientNet-B0 ImageNet probe - fine-tuned photo | macro-F1 | -0.072 | [-0.098, -0.045] | 0/10 | 0.001 | 0.003 |
-| E5 frozen encoders | ViT-B/16 ImageNet-21k probe - fine-tuned photo | macro-F1 | -0.069 | [-0.099, -0.040] | 0/10 | 0.002 | 0.010 |
+| E5 frozen encoders | EfficientNet-B0 ImageNet probe - fine-tuned photo | macro-F1 | -0.072 | [-0.098, -0.045] | 0/10 | 0.001 | 0.004 |
+| E5 frozen encoders | ViT-B/16 ImageNet-21k probe - fine-tuned photo | macro-F1 | -0.069 | [-0.099, -0.040] | 0/10 | 0.002 | 0.012 |
 | E5 frozen encoders | DINOv2 probe - fine-tuned photo | macro-F1 | +0.032 | [-0.018, +0.082] | 7/10 | 0.185 | 1.000 |
 | E5 frozen encoders | PanDerm-Base probe - fine-tuned photo | macro-F1 | +0.034 | [-0.003, +0.071] | 8/10 | 0.138 | 1.000 |
-| E5 frozen encoders | PanDerm-Large probe - fine-tuned photo | macro-F1 | +0.047 | [+0.008, +0.086] | 7/10 | 0.067 | 0.381 |
+| E5 frozen encoders | PanDerm-Large probe - fine-tuned photo | macro-F1 | +0.047 | [+0.008, +0.086] | 7/10 | 0.067 | 0.448 |
 | E5 frozen encoders | DermLIP probe - fine-tuned photo | macro-F1 | +0.084 | [+0.055, +0.113] | 10/10 | 0.001 | 0.003 |
-| E7 extra training data | pooled SCIN + Fitzpatrick17k - photo, SCIN test | macro-F1 | -0.035 | [-0.061, -0.008] | 2/10 | 0.032 | 0.289 |
+| E7 extra training data | pooled SCIN + Fitzpatrick17k - photo, SCIN test | macro-F1 | -0.035 | [-0.061, -0.008] | 2/10 | 0.032 | 0.337 |
 | E7 extra training data | Fitzpatrick17k then SCIN - photo, SCIN test | macro-F1 | -0.024 | [-0.050, +0.003] | 3/10 | 0.073 | 1.000 |
-| RQ4 confidence ranking (E4) | FiLM fusion - photo | AURC reduction | +0.023 | [+0.007, +0.039] | 8/10 | 0.011 | 0.205 |
+| RQ4 confidence ranking (E4) | FiLM fusion - photo | AURC reduction | +0.023 | [+0.007, +0.039] | 8/10 | 0.011 | 0.238 |
 | RQ4 confidence ranking (E4) | DINOv2 probe - photo | AURC reduction | +0.089 | [+0.063, +0.116] | 10/10 | 0.000 | 0.001 |
 | RQ4 confidence ranking (E4) | PanDerm-Large probe - photo | AURC reduction | +0.119 | [+0.094, +0.144] | 10/10 | 0.000 | 0.000 |
 | RQ4 confidence ranking (E4) | DermLIP probe - photo | AURC reduction | +0.116 | [+0.088, +0.144] | 10/10 | 0.000 | 0.000 |
+| DINOv2 variants (4.7) | DINOv2 fine-tuned - DINOv2 probe | macro-F1 | +0.038 | [+0.004, +0.071] | 6/10 | 0.095 | 0.603 |
+| DINOv2 variants (4.7) | DINOv2 probe, mirrored padding - DINOv2 probe | macro-F1 | -0.014 | [-0.058, +0.030] | 5/10 | 0.489 | 1.000 |
+| DINOv2 variants (4.7) | DINOv2 with registers probe - DINOv2 probe | macro-F1 | -0.023 | [-0.051, +0.005] | 2/10 | 0.188 | 1.000 |
+| DINOv2 variants (4.7) | DINOv2 fine-tuned - DINOv2 probe | AURC reduction | +0.055 | [+0.023, +0.088] | 9/10 | 0.016 | 0.093 |
 | Out-of-scope detector (4.2b) | kNN - max probability, SCIN other conditions | AUROC | +0.006 | [-0.016, +0.029] | 6/10 | 0.535 | 1.000 |
 | Out-of-scope detector (4.2b) | Mahalanobis - kNN, SCIN other conditions | AUROC | +0.021 | [+0.017, +0.025] | 10/10 | 0.000 | 0.000 |
 | Out-of-scope detector (4.2b) | kNN - max probability, DDI malignant | AUROC | +0.295 | [+0.252, +0.338] | 10/10 | 0.000 | 0.000 |

@@ -13,7 +13,8 @@ per-seed results, so every reported comparison uses one definition and one multi
 
 Families: RQ1 questionnaire (E1), RQ2 missing answers (E2), E5 frozen encoders, E7 extra training
 data, RQ4 confidence ranking (E4, AURC; lower is better, so the sign is flipped: positive = better),
-and the out-of-scope detector (Task 4.2b, AUROC).
+the out-of-scope detector (Task 4.2b, AUROC) and the DINOv2 variants against the app model
+(Task 4.7: fine-tuning, mirrored padding, registers; macro-F1 and AURC).
 
 Outputs in ``results/stats/``: contrasts.csv, contrasts.md.
 
@@ -73,6 +74,11 @@ def e4_aurc(arm: str) -> pd.Series:
     return -d.sort_index()  # negative AURC: higher = better, like every other metric here
 
 
+def e8_aurc(arm: str) -> pd.Series:
+    d = pd.read_csv(RES / "e8" / "e8_calibration.csv")
+    return -d[d["arm"] == arm].set_index("seed")["aurc"].sort_index()
+
+
 def ood_auroc(method: str, set_name: str) -> pd.Series:
     d = pd.read_csv(RES / "e4" / "e4_ood_auroc.csv")
     return d[(d["method"] == method) & (d["set"] == set_name)].set_index("seed")["auroc"].sort_index()
@@ -114,6 +120,14 @@ def registry() -> list[dict]:
     for arm, label in (("fusion_film", "FiLM fusion"), ("probe_dinov2", "DINOv2 probe"),
                        ("probe_panderm_large", "PanDerm-Large probe"), ("probe_dermlip", "DermLIP probe")):
         add("RQ4 confidence ranking (E4)", f"{label} - photo", e4_aurc(arm), base, metric="AURC reduction")
+    e8 = RES / "e8" / "e8_summary.csv"
+    probe = seed_values(e8, "probe_dinov2")
+    for arm, label in (("finetune_dinov2", "DINOv2 fine-tuned"), ("probe_dinov2_reflect", "DINOv2 probe, mirrored padding"),
+                       ("probe_dinov2_reg", "DINOv2 with registers probe")):
+        add("DINOv2 variants (4.7)", f"{label} - DINOv2 probe", seed_values(e8, arm), probe,
+            stored_pair(e8, arm, "probe_dinov2"))
+    add("DINOv2 variants (4.7)", "DINOv2 fine-tuned - DINOv2 probe", e8_aurc("finetune_dinov2"), e8_aurc("probe_dinov2"),
+        metric="AURC reduction")
     for set_name, label in (("scin_ood", "SCIN other conditions"), ("ddi_malignant", "DDI malignant"),
                             ("fitz_out", "Fitzpatrick17k out of scope")):
         add("Out-of-scope detector (4.2b)", f"kNN - max probability, {label}", ood_auroc("knn", set_name),

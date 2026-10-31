@@ -39,12 +39,13 @@ COMMANDS = {
     "e1_questionnaire": ("python run_e1.py --seeds 0 1 2 3 4 5 6 7 8 9 --arms image_only questionnaire_only "
                          "fusion_concat fusion_gated fusion_film fusion_concat_nodrop ensemble_image_q", "8.1, Table 8.1"),
     "e2_missing_answers": ("python run_e2_dropout.py --seeds 0 1 2 3 4 5 6 7 8 9", "8.3, Table 8.3, Figure 8.1"),
-    "e3_by_tone": ("python analyze_fairness.py", "8.8, Table 8.11"),
+    "e3_by_tone": ("python analyze_fairness.py", "8.8, Table 8.12"),
     "e4_calibration": ("python calibrate.py --export image_only fusion_film; python run_e4.py", "8.6, Table 8.6"),
     "e4_ood_detector": ("python ood_detect.py", "8.6, Table 8.9"),
     "e5_encoders": ("python run_e1.py --seeds 0 1 2 3 4 5 6 7 8 9 --arms image_only probe_effb0 probe_vit_in21k "
                     "probe_dinov2 probe_panderm_base probe_panderm_large probe_dermlip --out-dir results/e5 --name e5", "8.5, Table 8.5"),
     "e7_extra_data": ("python run_fitz_pooling.py --arms fitz_pooled fitz_pretrain --seeds 0 1 2 3 4 5 6 7 8 9", "8.4, Table 8.4"),
+    "e8_dinov2_variants": ("python run_finetune_dinov2.py --seeds 0 1 2 3 4 5 6 7 8 9; python run_e8.py", "8.7, Table 8.11"),
     "stats_contrasts": ("python stats_tests.py", "8.8 (statistics)"),
 }
 ARM_OF = {v: k for k, v in mra.NAMES.items()}
