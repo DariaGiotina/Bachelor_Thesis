@@ -1,0 +1,581 @@
+# Shared seed data (schema v1). The single source for both databases: a generator outside the
+# repository turns it into the INSERT statements of db/postgres/seed.sql and into db/mongo/seed.js,
+# so PostgreSQL and MongoDB hold identical data. Keys written here as short names (ana, ana_a1)
+# become deterministic UUIDs (uuid5), so every run produces the same identifiers.
+# Allowed values: db/data_dictionary.md. Sources and licences: db/data_sources.md.
+# All people are fictitious; no real photo exists for any photo key.
+
+version: 1
+reference_time: "2026-11-01T09:00:00Z"   # "now" of the seed; every date below is before it
+
+skin_concerns:   # the four categories of the exported model, in model order
+  - {code: acne, name: Acne, description: "Spots such as blackheads, whiteheads or red bumps, often on the face, chest or back. The app only describes what the photo resembles; it does not diagnose."}
+  - {code: eczema_dermatitis, name: "Eczema or dermatitis", description: "Dry, itchy or flaky patches of irritated skin. The app only describes what the photo resembles; it does not diagnose."}
+  - {code: redness_rosacea, name: "Redness or rosacea", description: "Lasting redness, flushing or small visible vessels, often on the cheeks and nose. The app only describes what the photo resembles; it does not diagnose."}
+  - {code: normal_other, name: "Normal or other", description: "No sign of the three categories above. Other skin conditions are outside what the app can recognise."}
+
+face_zones:
+  - {code: forehead, name: Forehead}
+  - {code: nose, name: Nose}
+  - {code: left_cheek, name: "Left cheek"}
+  - {code: right_cheek, name: "Right cheek"}
+  - {code: chin, name: Chin}
+  - {code: jawline, name: Jawline}
+
+# Questions follow ml/features/field_mapping.md (SCIN wording and codes) plus the red-flag question
+# of Task 4.2b. Options: [value, label] or [value, label, red_flag]; position = order in the list.
+questions:
+  - id: 1
+    field_key: age_group
+    text: "What is your age?"
+    answer_type: single
+    options:
+      - [AGE_18_TO_29, "18-29"]
+      - [AGE_30_TO_39, "30-39"]
+      - [AGE_40_TO_49, "40-49"]
+      - [AGE_50_TO_59, "50-59"]
+      - [AGE_60_TO_69, "60-69"]
+      - [AGE_70_TO_79, "70-79"]
+      - [AGE_UNKNOWN, "I prefer not to say"]
+  - id: 2
+    field_key: body_area
+    text: "Where on your body is the issue? (select all)"
+    answer_type: multi
+    options:
+      - [head_or_neck, "Head or neck"]
+      - [arm, Arm]
+      - [palm, Palm]
+      - [back_of_hand, "Back of hand"]
+      - [torso_front, "Torso, front"]
+      - [torso_back, "Torso, back"]
+      - [genitalia_or_groin, "Genitalia or groin"]
+      - [buttocks, Buttocks]
+      - [leg, Leg]
+      - [foot_top_or_side, "Top or side of foot"]
+      - [foot_sole, "Sole of foot"]
+      - [other, Other]
+  - id: 3
+    field_key: symptoms
+    text: "Are you experiencing any of the following with your skin issue? (select all)"
+    answer_type: multi
+    options:
+      - [bothersome_appearance, "Concerning in appearance"]
+      - [bleeding, Bleeding, true]
+      - [increasing_size, "Increasing in size", true]
+      - [darkening, Darkening, true]
+      - [itching, Itching]
+      - [burning, Burning]
+      - [pain, Pain, true]
+      - [no_relevant_experience, "None of the above"]
+  - id: 4
+    field_key: texture
+    text: "Describe how the affected skin area feels (select all)"
+    answer_type: multi
+    options:
+      - [raised_or_bumpy, "Raised or bumpy"]
+      - [flat, Flat]
+      - [rough_or_flaky, "Rough or flaky"]
+      - [fluid_filled, "Filled with fluid"]
+  - id: 5
+    field_key: duration
+    text: "For how long have you had this skin issue?"
+    answer_type: ordinal          # position = rank 1-8; UNKNOWN is last and is not a rank
+    options:
+      - [ONE_DAY, "1 day"]
+      - [LESS_THAN_ONE_WEEK, "Less than 1 week"]
+      - [ONE_TO_FOUR_WEEKS, "1-4 weeks"]
+      - [ONE_TO_THREE_MONTHS, "1-3 months"]
+      - [THREE_TO_TWELVE_MONTHS, "3-12 months"]
+      - [MORE_THAN_ONE_YEAR, "More than 1 year"]
+      - [MORE_THAN_FIVE_YEARS, "More than 5 years"]
+      - [SINCE_CHILDHOOD, "Since childhood"]
+      - [UNKNOWN, "I don't know"]
+  - id: 6
+    field_key: skin_type
+    text: "How does your skin react to sun exposure?"
+    answer_type: single
+    options:
+      - [FST1, "Always burns, never tans"]
+      - [FST2, "Usually burns, lightly tans"]
+      - [FST3, "Sometimes burns, evenly tans"]
+      - [FST4, "Rarely burns, tans well"]
+      - [FST5, "Very rarely burns, easily tans"]
+      - [FST6, "Never burns, always tans"]
+      - [NONE_IDENTIFIED, "None of the above"]
+  - id: 7
+    field_key: lesion_change
+    text: "Has the spot appeared recently or changed in size, shape or colour?"
+    answer_type: single
+    options:
+      - ["yes", "Yes", true]
+      - ["no", "No"]
+      - [not_sure, "Not sure"]
+
+# Curated ingredient list: the union of the INCI lists of the products below plus RETINOL (used by
+# no product, on purpose). score 0-100: higher = fewer reasons for caution (band: safe >= 70,
+# caution 40-69, irritant < 40). Functions use CosIng names; flags use the value set of the data
+# dictionary. Meanings are the author's own plain-language wording.
+ingredients:
+  - {inci: "1,2-HEXANEDIOL", meaning: "Moisture-binding solvent that also helps keep the formula fresh.", score: 85, functions: [solvent, skin_conditioning]}
+  - {inci: ALBIZIA JULIBRISSIN FLOWER EXTRACT, meaning: "Plant extract from silk tree flowers, used as a skin conditioner.", score: 80, functions: [skin_conditioning]}
+  - {inci: ALCOHOL DENAT., meaning: "Denatured alcohol: dissolves other ingredients and dries quickly; can dry out sensitive skin.", score: 45, functions: [antimicrobial, solvent, astringent], flags: [drying_alcohol]}
+  - {inci: ALLANTOIN, meaning: "Soothing ingredient that helps calm and protect the skin.", score: 95, functions: [skin_conditioning, soothing]}
+  - {inci: ALOE BARBADENSIS EXTRACT, meaning: "Aloe vera extract, soothing and moisturising.", score: 88, functions: [skin_conditioning]}
+  - {inci: ALOE BARBADENSIS LEAF JUICE POWDER, meaning: "Dried aloe vera juice, soothing and moisturising.", score: 88, functions: [skin_conditioning]}
+  - {inci: ALTHAEA OFFICINALIS ROOT EXTRACT, meaning: "Marshmallow root extract, soothing.", score: 85, functions: [skin_conditioning, soothing]}
+  - {inci: AMINOMETHYL PROPANOL, meaning: "Adjusts the acidity (pH) of the formula.", score: 75, functions: [buffering]}
+  - {inci: AQUA, meaning: "Water, the base of most skincare.", score: 95, functions: [solvent]}
+  - {inci: ASCORBIC ACID, meaning: "Vitamin C, an antioxidant; can sting on sensitive skin at high levels.", score: 70, functions: [antioxidant, buffering]}
+  - {inci: AVENA SATIVA KERNEL OIL, meaning: "Oat kernel oil, softens and soothes dry skin.", score: 85, functions: [emollient, skin_conditioning]}
+  - {inci: BAMBOO CHARCOAL, meaning: "Charcoal powder that absorbs oil; name as printed on the label.", score: 80, functions: [absorbent]}
+  - {inci: BENZYL ALCOHOL, meaning: "Preservative and solvent; one of the fragrance allergens that EU labels must name.", score: 55, functions: [preservative, solvent, perfuming], flags: [fragrance_allergen]}
+  - {inci: BIS-ETHYLHEXYLOXYPHENOL METHOXYPHENYL TRIAZINE, meaning: "Broad-spectrum UV filter (UVA and UVB), well tolerated.", score: 85, functions: [uv_absorber, uv_filter]}
+  - {inci: BUTYL METHOXYDIBENZOYLMETHANE, meaning: "Avobenzone, a UVA filter; can irritate sensitive skin.", score: 60, functions: [uv_absorber, uv_filter]}
+  - {inci: C12-15 ALKYL BENZOATE, meaning: "Light emollient that gives a silky feel and dissolves UV filters.", score: 80, functions: [emollient, skin_conditioning]}
+  - {inci: CAPRYLIC/CAPRIC TRIGLYCERIDE, meaning: "Light oil from coconut fatty acids that softens the skin.", score: 88, functions: [emollient, masking, solvent]}
+  - {inci: CAPRYLYL GLYCOL, meaning: "Moisturising ingredient that also supports the preservatives.", score: 82, functions: [emollient, skin_conditioning]}
+  - {inci: CAPRYLYL/CAPRYL GLUCOSIDE, meaning: "Mild sugar-based cleansing agent.", score: 85, functions: [cleansing, surfactant]}
+  - {inci: CARBOMER, meaning: "Thickener that turns liquids into gels or creams.", score: 88, functions: [emulsion_stabilising, gel_forming, viscosity_controlling]}
+  - {inci: CENTELLA ASIATICA EXTRACT, meaning: "Gotu kola extract, soothing.", score: 88, functions: [skin_conditioning, soothing]}
+  - {inci: CETRIMONIUM BROMIDE, meaning: "Cationic cleansing agent and preservative; can irritate if left on the skin.", score: 55, functions: [antimicrobial, cleansing, preservative, surfactant]}
+  - {inci: CETYL ALCOHOL, meaning: "Fatty alcohol that thickens and softens; not a drying alcohol.", score: 85, functions: [emollient, emulsifying, opacifying, viscosity_controlling]}
+  - {inci: CITRIC ACID, meaning: "Adjusts the acidity (pH) of the formula.", score: 88, functions: [buffering, chelating]}
+  - {inci: CITRONELLOL, meaning: "Fragrance ingredient; one of the fragrance allergens that EU labels must name.", score: 35, functions: [perfuming], flags: [fragrance_allergen]}
+  - {inci: COCOGLYCERIDES, meaning: "Coconut-derived oil that softens the skin.", score: 80, functions: [emollient, skin_conditioning]}
+  - {inci: COCOS NUCIFERA (COCONUT) OIL, meaning: "Coconut oil, a rich emollient; may clog pores on acne-prone skin.", score: 55, functions: [emollient, skin_conditioning], flags: [comedogenic]}
+  - {inci: COPPER SULFATE, meaning: "Copper salt used to limit microbial growth.", score: 75, functions: [antimicrobial]}
+  - {inci: COUMARIN, meaning: "Fragrance ingredient; one of the fragrance allergens that EU labels must name.", score: 35, functions: [perfuming], flags: [fragrance_allergen]}
+  - {inci: CUCUMIS SATIVUS (CUCUMBER) FRUIT EXTRACT, meaning: "Cucumber extract, refreshing and soothing.", score: 88, functions: [skin_conditioning, tonic]}
+  - {inci: DISODIUM COCOAMPHODIACETATE, meaning: "Mild cleansing agent.", score: 82, functions: [cleansing, foam_boosting, surfactant]}
+  - {inci: DISODIUM EDTA, meaning: "Binds metal ions so the formula stays stable.", score: 85, functions: [chelating]}
+  - {inci: ETHYLHEXYL SALICYLATE, meaning: "Octisalate, a UVB filter.", score: 65, functions: [uv_absorber, uv_filter]}
+  - {inci: ETHYLHEXYL STEARATE, meaning: "Emollient ester that softens the skin.", score: 75, functions: [emollient, skin_conditioning]}
+  - {inci: ETHYLHEXYL TRIAZONE, meaning: "UVB filter, well tolerated.", score: 85, functions: [uv_absorber, uv_filter]}
+  - {inci: FRUCTOOLIGOSACCHARIDES, meaning: "Plant sugars that help keep the skin moisturised.", score: 90, functions: [humectant, skin_conditioning]}
+  - {inci: FULLERENES, meaning: "Carbon molecules used as antioxidants.", score: 75, functions: [skin_conditioning]}
+  - {inci: GLYCERETH-26, meaning: "Moisturising ingredient derived from glycerin.", score: 85, functions: [humectant, skin_conditioning]}
+  - {inci: GLYCERIN, meaning: "Draws water into the skin and keeps it moisturised.", score: 95, functions: [humectant, skin_protecting, solvent]}
+  - {inci: HEXYLENE GLYCOL, meaning: "Solvent that keeps the formula clear and even.", score: 75, functions: [emulsifying, solvent, viscosity_controlling]}
+  - {inci: HYALURONIC ACID, meaning: "Holds water in the upper skin layers.", score: 95, functions: [humectant, skin_conditioning]}
+  - {inci: HYDROXYACETOPHENONE, meaning: "Antioxidant that helps keep the formula fresh.", score: 82, functions: [antioxidant, soothing]}
+  - {inci: IMIDAZOLIDINYL UREA, meaning: "Preservative that releases small amounts of formaldehyde; a known sensitiser.", score: 25, functions: [preservative], flags: [formaldehyde_releaser]}
+  - {inci: ISOPROPYL PALMITATE, meaning: "Emollient ester that softens; may clog pores on acne-prone skin.", score: 55, functions: [emollient, skin_conditioning], flags: [comedogenic]}
+  - {inci: LACTIC ACID, meaning: "Alpha hydroxy acid (AHA) that exfoliates gently; can sting and increase sun sensitivity.", score: 60, functions: [buffering, humectant, skin_conditioning], flags: [exfoliating_acid]}
+  - {inci: LIMONENE, meaning: "Citrus fragrance ingredient; one of the fragrance allergens that EU labels must name.", score: 35, functions: [perfuming, solvent], flags: [fragrance_allergen]}
+  - {inci: LINALOOL, meaning: "Floral fragrance ingredient; one of the fragrance allergens that EU labels must name.", score: 35, functions: [perfuming], flags: [fragrance_allergen]}
+  - {inci: MALACHITE EXTRACT, meaning: "Mineral extract used as a skin conditioner.", score: 78, functions: [skin_conditioning]}
+  - {inci: MALIC ACID, meaning: "Alpha hydroxy acid (AHA) from fruit; exfoliates and adjusts pH.", score: 60, functions: [buffering, skin_conditioning], flags: [exfoliating_acid]}
+  - {inci: MALTODEXTRIN, meaning: "Sugar-based film former and binder.", score: 88, functions: [absorbent, binding, film_forming]}
+  - {inci: MANNITOL, meaning: "Sugar alcohol that helps keep the skin moisturised.", score: 90, functions: [humectant, skin_conditioning]}
+  - {inci: METHYLPARABEN, meaning: "Common preservative; rarely causes reactions on healthy skin.", score: 60, functions: [preservative]}
+  - {inci: MYRTRIMONIUM BROMIDE, meaning: "Cationic cleansing agent and preservative; can irritate if left on the skin.", score: 55, functions: [antimicrobial, cleansing, preservative]}
+  - {inci: NIACINAMIDE, meaning: "Vitamin B3: supports the skin barrier and evens the tone.", score: 92, functions: [skin_conditioning, smoothing]}
+  - {inci: PAEONIA LACTIFLORA ROOT EXTRACT, meaning: "White peony root extract, a skin conditioner.", score: 80, functions: [skin_conditioning]}
+  - {inci: PAEONIA OFFICINALIS FLOWER EXTRACT, meaning: "Peony flower extract, a skin conditioner.", score: 80, functions: [skin_conditioning]}
+  - {inci: PARAFFINUM LIQUIDUM, meaning: "Mineral oil that forms a protective layer and stops water loss.", score: 75, functions: [antistatic, emollient, skin_protecting, solvent]}
+  - {inci: PARFUM, meaning: "Fragrance: a mix of scent ingredients; a common cause of reactions on sensitive skin.", score: 30, functions: [perfuming, masking], flags: [fragrance]}
+  - {inci: PEG-6 CAPRYLIC/CAPRIC GLYCERIDES, meaning: "Mild cleansing agent used in micellar waters.", score: 78, functions: [cleansing, emulsifying, surfactant]}
+  - {inci: PENTYLENE GLYCOL, meaning: "Moisturising solvent that also supports the preservatives.", score: 85, functions: [skin_conditioning, solvent]}
+  - {inci: PHENOXYETHANOL, meaning: "Widely used preservative, tolerated at the allowed level of up to 1%.", score: 70, functions: [preservative]}
+  - {inci: PHENYLBENZIMIDAZOLE SULFONIC ACID, meaning: "Ensulizole, a water-soluble UVB filter.", score: 70, functions: [uv_absorber, uv_filter]}
+  - {inci: POLOXAMER 184, meaning: "Very mild cleansing agent used in micellar waters.", score: 85, functions: [cleansing, emulsifying, surfactant]}
+  - {inci: POLYAMINOPROPYL BIGUANIDE, meaning: "Preservative used at low levels.", score: 65, functions: [preservative]}
+  - {inci: POLYSORBATE 20, meaning: "Helps oil and water mix; mild cleansing agent.", score: 82, functions: [emulsifying, surfactant]}
+  - {inci: POTASSIUM CETYL PHOSPHATE, meaning: "Emulsifier that keeps creams smooth and stable.", score: 85, functions: [cleansing, emulsifying, surfactant]}
+  - {inci: POTASSIUM SORBATE, meaning: "Mild preservative, also used in food.", score: 85, functions: [preservative]}
+  - {inci: PROPYLENE GLYCOL, meaning: "Moisturising solvent; can irritate very sensitive skin.", score: 70, functions: [humectant, skin_conditioning, solvent, viscosity_controlling]}
+  - {inci: PRUNUS ARMENIACA (APRICOT) FRUIT EXTRACT, meaning: "Apricot extract, a skin conditioner.", score: 80, functions: [skin_conditioning]}
+  - {inci: RETINOL, meaning: "Vitamin A: smooths and renews the skin; can irritate and increase sun sensitivity.", score: 55, functions: [skin_conditioning], flags: [retinoid]}
+  - {inci: RHAMNOSE, meaning: "Plant sugar that soothes and moisturises.", score: 90, functions: [humectant, skin_conditioning]}
+  - {inci: SALICYLIC ACID, meaning: "Beta hydroxy acid (BHA) that unclogs pores; can dry and irritate.", score: 55, functions: [antimicrobial, keratolytic, preservative], flags: [exfoliating_acid]}
+  - {inci: SODIUM BENZOATE, meaning: "Mild preservative, also used in food.", score: 85, functions: [preservative]}
+  - {inci: SODIUM CITRATE, meaning: "Adjusts the acidity (pH) of the formula.", score: 90, functions: [buffering, chelating]}
+  - {inci: SODIUM HYALURONATE, meaning: "Salt of hyaluronic acid; holds water in the skin.", score: 95, functions: [humectant, skin_conditioning]}
+  - {inci: SODIUM HYDROXIDE, meaning: "Adjusts the acidity (pH); harmless at the small amounts used.", score: 85, functions: [buffering, denaturant]}
+  - {inci: SODIUM PCA, meaning: "Part of the skin's own natural moisturising factor.", score: 92, functions: [humectant, skin_conditioning]}
+  - {inci: SODIUM PHYTATE, meaning: "Binds metal ions so the formula stays stable.", score: 88, functions: [chelating]}
+  - {inci: SPIRULINA PLATENSIS EXTRACT, meaning: "Algae extract, a skin conditioner.", score: 82, functions: [skin_conditioning]}
+  - {inci: SUCCINIC ACID, meaning: "Adjusts the acidity (pH) of the formula.", score: 85, functions: [buffering]}
+  - {inci: TOCOPHERYL ACETATE, meaning: "Form of vitamin E, an antioxidant.", score: 88, functions: [antioxidant, skin_conditioning]}
+  - {inci: TREHALOSE, meaning: "Sugar that helps keep the skin moisturised.", score: 92, functions: [humectant, skin_conditioning]}
+  - {inci: XANTHAN GUM, meaning: "Natural thickener.", score: 92, functions: [binding, emulsion_stabilising, gel_forming, viscosity_controlling]}
+  - {inci: XYLITOL, meaning: "Sugar alcohol that helps keep the skin moisturised.", score: 90, functions: [humectant, skin_conditioning]}
+  - {inci: ZINC GLUCONATE, meaning: "Zinc salt that helps control oil.", score: 82, functions: [antimicrobial, skin_conditioning]}
+
+# Products from Open Beauty Facts (https://world.openbeautyfacts.org, ODbL), fetched on 01.11.2026.
+# Name, brand, barcode and quantity as published; INCI names normalised to the CosIng spelling
+# (translations removed, "AQUA / WATER" -> AQUA, "FRAGRANCE" -> PARFUM). The last product is the
+# author's own demo entry without a barcode (edge case for the partial unique index).
+products:
+  - {key: bioderma_sebium_h2o, barcode: "3401575645851", name: "Solution micellaire nettoyante-purifiante", brand: Bioderma, category: cleanser, size: "500 ml", source: openbeautyfacts,
+     inci: [AQUA, PEG-6 CAPRYLIC/CAPRIC GLYCERIDES, SODIUM CITRATE, ZINC GLUCONATE, COPPER SULFATE, CITRIC ACID, DISODIUM EDTA, CETRIMONIUM BROMIDE, PARFUM]}
+  - {key: bioderma_sensibio_h2o, barcode: "3401396991779", name: "Sensibio H2O", brand: Bioderma, category: cleanser, size: "500 ml", source: openbeautyfacts,
+     inci: [AQUA, PEG-6 CAPRYLIC/CAPRIC GLYCERIDES, CUCUMIS SATIVUS (CUCUMBER) FRUIT EXTRACT, MANNITOL, XYLITOL, RHAMNOSE, FRUCTOOLIGOSACCHARIDES, PROPYLENE GLYCOL, DISODIUM EDTA, CETRIMONIUM BROMIDE]}
+  - {key: garnier_micellar_3in1, barcode: "3600542133425", name: "Micellar Cleansing Water 3-in-1", brand: Garnier, category: cleanser, size: "100 ml", source: openbeautyfacts,
+     inci: [AQUA, HEXYLENE GLYCOL, GLYCERIN, POLOXAMER 184, DISODIUM COCOAMPHODIACETATE, DISODIUM EDTA, MYRTRIMONIUM BROMIDE]}
+  - {key: loreal_micellar, barcode: "3600522365884", name: "Solution Micellaire", brand: "L'Oréal Paris", category: cleanser, size: "200 ml", source: openbeautyfacts,
+     inci: [AQUA, HEXYLENE GLYCOL, GLYCERIN, POLOXAMER 184, DISODIUM COCOAMPHODIACETATE, DISODIUM EDTA, POLYAMINOPROPYL BIGUANIDE]}
+  - {key: uriage_micellar, barcode: "3661434003639", name: "Eau micellaire thermale", brand: Uriage, category: cleanser, size: "250 ml", source: openbeautyfacts,
+     inci: [AQUA, POLYSORBATE 20, GLYCERIN, POLOXAMER 184, CAPRYLYL/CAPRYL GLUCOSIDE, CETRIMONIUM BROMIDE, POLYAMINOPROPYL BIGUANIDE, PARFUM, PRUNUS ARMENIACA (APRICOT) FRUIT EXTRACT, CITRIC ACID, ASCORBIC ACID]}
+  - {key: cora_micellar_sensitive, barcode: "3257984523521", name: "Les Soins Eau micellaire Peaux Sensibles", brand: Cora, category: cleanser, size: "500 ml", source: openbeautyfacts,
+     inci: [AQUA, POLOXAMER 184, GLYCERIN, SODIUM BENZOATE, POTASSIUM SORBATE, DISODIUM EDTA, CITRIC ACID, PAEONIA OFFICINALIS FLOWER EXTRACT, SODIUM HYDROXIDE]}
+  - {key: naturalia_micellar, barcode: "3700036902947", name: "Eau micellaire démaquillante", brand: Naturalia, category: cleanser, size: "250 ml", source: openbeautyfacts,
+     inci: [AQUA, GLYCERIN, ALOE BARBADENSIS LEAF JUICE POWDER, ALTHAEA OFFICINALIS ROOT EXTRACT, SODIUM PCA, CAPRYLYL/CAPRYL GLUCOSIDE, SODIUM BENZOATE, POTASSIUM SORBATE, CITRIC ACID, PARFUM, BENZYL ALCOHOL, CITRONELLOL, LIMONENE, LINALOOL]}
+  - {key: balea_sheet_mask, barcode: "4070765070989", name: "Tuchmaske Selfcare Moments", brand: Balea, category: mask, size: "1 St", source: openbeautyfacts,
+     inci: [AQUA, GLYCERIN, PENTYLENE GLYCOL, HYDROXYACETOPHENONE, XANTHAN GUM, CAPRYLIC/CAPRIC TRIGLYCERIDE, SODIUM CITRATE, CITRIC ACID, SODIUM PHYTATE, SODIUM HYALURONATE, PARFUM, ALBIZIA JULIBRISSIN FLOWER EXTRACT]}
+  - {key: karite_purifying_mask, barcode: "6132321304810", name: "10 Mins Purifying Mask", brand: "Karité", category: mask, size: null, source: openbeautyfacts,
+     inci: [AQUA, PROPYLENE GLYCOL, GLYCERIN, SODIUM HYALURONATE, POLYSORBATE 20, IMIDAZOLIDINYL UREA, METHYLPARABEN, PARFUM, MALIC ACID, LACTIC ACID, SALICYLIC ACID, BAMBOO CHARCOAL]}
+  - {key: seomou_aloe_mask, barcode: "6974998720971", name: "Aloe Vera Nicotinamide Moisturizing Mask", brand: Seomou, category: mask, size: "25 ml", source: openbeautyfacts,
+     inci: [AQUA, GLYCERIN, PROPYLENE GLYCOL, HYDROXYACETOPHENONE, FULLERENES, HYALURONIC ACID, CENTELLA ASIATICA EXTRACT, XANTHAN GUM, DISODIUM EDTA, ALLANTOIN, PAEONIA LACTIFLORA ROOT EXTRACT, ALOE BARBADENSIS EXTRACT, NIACINAMIDE, PARFUM]}
+  - {key: anko_coconut_mask, barcode: "9341106912899", name: "OXX Coconut Face Mask", brand: Anko, category: mask, size: null, source: openbeautyfacts,
+     inci: [AQUA, GLYCERIN, GLYCERETH-26, "1,2-HEXANEDIOL", HYDROXYACETOPHENONE, COCOS NUCIFERA (COCONUT) OIL, XANTHAN GUM, POLYSORBATE 20, ALLANTOIN, DISODIUM EDTA, PARFUM, COUMARIN]}
+  - {key: caremare_spirulina_mask, barcode: "4262351040302", name: "Spirulina Malachit Recharge Hydra Mask", brand: caremare, category: mask, size: "50 ml", source: openbeautyfacts,
+     inci: [AQUA, PENTYLENE GLYCOL, GLYCERIN, SODIUM HYALURONATE, MALTODEXTRIN, MALACHITE EXTRACT, SODIUM CITRATE, CITRIC ACID, SPIRULINA PLATENSIS EXTRACT, TREHALOSE, SUCCINIC ACID]}
+  - {key: lubriderm_daily, barcode: "7702031244509", name: "Lubriderm Humectación Diaria", brand: "Johnson & Johnson", category: moisturizer, size: "400 ml", source: openbeautyfacts,
+     inci: [AQUA, PARAFFINUM LIQUIDUM, GLYCERIN, ISOPROPYL PALMITATE, CARBOMER, PHENOXYETHANOL, CETYL ALCOHOL, POTASSIUM CETYL PHOSPHATE, COCOGLYCERIDES, CAPRYLYL GLYCOL, SODIUM HYDROXIDE, PARFUM, AVENA SATIVA KERNEL OIL]}
+  - {key: sunozon_spray, barcode: "4305615827452", name: "Sonnenspray", brand: "Sun Ozon", category: sunscreen, size: "200 ml", source: openbeautyfacts,
+     inci: [ALCOHOL DENAT., C12-15 ALKYL BENZOATE, ISOPROPYL PALMITATE, GLYCERIN, ETHYLHEXYL STEARATE, BUTYL METHOXYDIBENZOYLMETHANE, ETHYLHEXYL TRIAZONE, ETHYLHEXYL SALICYLATE, AQUA, BIS-ETHYLHEXYLOXYPHENOL METHOXYPHENYL TRIAZINE, PARFUM, TOCOPHERYL ACETATE, PHENYLBENZIMIDAZOLE SULFONIC ACID, AMINOMETHYL PROPANOL]}
+  - {key: demo_hydrating_serum, barcode: null, name: "Demo Hydrating Serum (test entry)", brand: "Lumière demo", category: serum, size: "30 ml", source: curated,
+     inci: [AQUA, GLYCERIN, NIACINAMIDE, SODIUM HYALURONATE, PENTYLENE GLYCOL, XANTHAN GUM, CITRIC ACID]}
+
+# ---------------------------------------------------------------------------------------------
+# Fictitious users. Passwords are throwaway values hashed by the generator (Argon2id); e-mails use
+# the reserved example.com domain. Times are UTC.
+users:
+  - key: ana
+    email: ana.popescu@example.com
+    password: "seed-Ana-2026!"
+    first_name: Ana
+    last_name: Popescu
+    date_of_birth: 2001-04-12
+    skin_type: combination
+    main_concern: acne
+    climate: temperate
+    language: ro
+    created_at: "2026-10-05T08:12:00Z"
+    email_verified_at: "2026-10-05T08:20:00Z"
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-05T08:13:00Z"}
+      - {type: photo_processing, version: "1.0", granted_at: "2026-10-05T08:13:00Z"}
+      - {type: health_data, version: "1.0", granted_at: "2026-10-05T08:13:00Z"}
+      - {type: reminders, version: "1.0", granted_at: "2026-10-05T08:14:00Z"}
+    reminders:
+      - {period: AM, time: "07:30", enabled: true}
+      - {period: PM, time: "21:30", enabled: true}
+    sessions:   # token families; each token: [issued_at, expires_at, revoked]
+      - key: ana_s1
+        created_at: "2026-10-05T08:20:00Z"
+        tokens:
+          - ["2026-10-05T08:20:00Z", "2026-11-04T08:20:00Z", true]
+          - ["2026-10-20T19:02:00Z", "2026-11-19T19:02:00Z", false]
+    analyses:
+      - key: ana_a1
+        created_at: "2026-10-06T18:40:00Z"
+        status: answered
+        ood_score: 0.3121
+        probabilities: {acne: 0.7214, eczema_dermatitis: 0.0712, redness_rosacea: 0.1033, normal_other: 0.1041}
+        answers: {age_group: [AGE_18_TO_29], body_area: [head_or_neck], symptoms: [bothersome_appearance], texture: [raised_or_bumpy], duration: [MORE_THAN_ONE_YEAR], skin_type: [FST3], lesion_change: ["no"]}
+        photos:
+          - {shot: front, heatmap: true}
+          - {shot: left, heatmap: true}
+        zones:
+          - {zone: forehead, finding: "Several small raised spots", severity: moderate}
+          - {zone: chin, finding: "A few red bumps", severity: mild}
+      - key: ana_a2
+        created_at: "2026-10-18T19:05:00Z"
+        status: uncertain
+        ood_score: 0.3874
+        probabilities: {acne: 0.4102, eczema_dermatitis: 0.1500, redness_rosacea: 0.3398, normal_other: 0.1000}
+        answers: {age_group: [AGE_18_TO_29], body_area: [head_or_neck], symptoms: [itching], texture: [raised_or_bumpy, rough_or_flaky], duration: [ONE_TO_FOUR_WEEKS], lesion_change: [not_sure]}
+        photos:
+          - {shot: front, heatmap: false}
+      - key: ana_a3
+        created_at: "2026-10-31T18:50:00Z"
+        status: answered
+        ood_score: 0.2987
+        probabilities: {acne: 0.2210, eczema_dermatitis: 0.0590, redness_rosacea: 0.0911, normal_other: 0.6289}
+        answers: {age_group: [AGE_18_TO_29], body_area: [head_or_neck], symptoms: [no_relevant_experience], texture: [flat], duration: [MORE_THAN_ONE_YEAR], skin_type: [FST3], lesion_change: ["no"]}
+        photos:
+          - {shot: front, heatmap: true}
+    routines:
+      - key: ana_r_am
+        period: AM
+        complexity: basic
+        created_at: "2026-10-06T18:45:00Z"
+        source_analysis: ana_a1
+        steps:
+          - {category: cleansing, product: bioderma_sebium_h2o, instruction: "Wipe the face with a cotton pad soaked in micellar water.", duration: 60}
+          - {category: hydration, product: demo_hydrating_serum, instruction: "Press a few drops into the skin.", duration: 45}
+          - {category: protection, product: sunozon_spray, instruction: "Apply sunscreen generously as the last step.", duration: 60}
+      - key: ana_r_pm
+        period: PM
+        complexity: intermediate
+        created_at: "2026-10-06T18:46:00Z"
+        source_analysis: ana_a1
+        steps:
+          - {category: cleansing, product: garnier_micellar_3in1, instruction: "Remove make-up and sunscreen with micellar water.", duration: 60}
+          - {category: prep, product: bioderma_sensibio_h2o, instruction: "Second cleanse to remove what is left.", duration: 30}
+          - {category: treatment, product: karite_purifying_mask, instruction: "Twice a week: leave the mask on for 10 minutes, then rinse.", duration: 600}
+          - {category: hydration, product: demo_hydrating_serum, instruction: "Press a few drops into the skin.", duration: 45}
+          - {category: hydration, product: lubriderm_daily, instruction: "Finish with a thin layer of moisturiser.", duration: 45}
+    logs:   # one log per day in the range, except the listed days; uses: products of the routine steps
+      from: 2026-10-11
+      to: 2026-10-31
+      skip: [2026-10-15, 2026-10-22, 2026-10-23]
+      am: [bioderma_sebium_h2o, demo_hydrating_serum, sunozon_spray]
+      pm: [garnier_micellar_3in1, bioderma_sensibio_h2o, demo_hydrating_serum, lubriderm_daily]
+      partial_days: {2026-10-17: [AM], 2026-10-26: [PM]}   # only that period ticked on these days
+      notes: {2026-10-12: "Skin a bit tight after the mask.", 2026-10-28: "Fewer new spots this week."}
+      progress_photos: {2026-10-11: "Start", 2026-10-25: "Two weeks in"}
+
+  - key: mihai
+    email: mihai.ionescu@example.com
+    password: "seed-Mihai-2026!"
+    first_name: Mihai
+    last_name: Ionescu
+    date_of_birth: 1995-09-30
+    skin_type: oily
+    main_concern: oiliness_pores
+    climate: humid
+    language: ro
+    created_at: "2026-10-09T17:00:00Z"
+    email_verified_at: "2026-10-09T17:03:00Z"
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-09T17:01:00Z"}
+      - {type: photo_processing, version: "1.0", granted_at: "2026-10-09T17:01:00Z"}
+      - {type: health_data, version: "1.0", granted_at: "2026-10-09T17:01:00Z"}
+    reminders:
+      - {period: AM, time: "08:00", enabled: false}
+    sessions:
+      - key: mihai_s1
+        created_at: "2026-10-09T17:03:00Z"
+        tokens:
+          - ["2026-10-09T17:03:00Z", "2026-11-08T17:03:00Z", false]
+    analyses:
+      - key: mihai_a1
+        created_at: "2026-10-10T20:10:00Z"
+        status: answered
+        ood_score: 0.3340
+        probabilities: {acne: 0.5531, eczema_dermatitis: 0.0520, redness_rosacea: 0.1415, normal_other: 0.2534}
+        answers: {age_group: [AGE_30_TO_39], body_area: [head_or_neck, torso_back], symptoms: [bothersome_appearance, itching], texture: [raised_or_bumpy], duration: [THREE_TO_TWELVE_MONTHS], skin_type: [FST4], lesion_change: ["no"]}
+        photos:
+          - {shot: front, heatmap: true}
+      - key: mihai_a2
+        created_at: "2026-10-27T21:00:00Z"
+        status: unusual_photo
+        ood_score: 0.5122
+        probabilities: {acne: 0.3011, eczema_dermatitis: 0.2104, redness_rosacea: 0.1802, normal_other: 0.3083}
+        answers: {age_group: [AGE_30_TO_39], symptoms: [no_relevant_experience]}
+        photos:
+          - {shot: front, heatmap: false}
+    routines:
+      - key: mihai_r_am
+        period: AM
+        complexity: basic
+        created_at: "2026-10-10T20:20:00Z"
+        steps:
+          - {category: cleansing, product: uriage_micellar, instruction: "Cleanse with micellar water.", duration: 60}
+          - {category: hydration, product: null, instruction: "Light moisturiser (not chosen yet).", duration: 45}
+          - {category: protection, product: sunozon_spray, instruction: "Apply sunscreen.", duration: 60}
+    logs:
+      from: 2026-10-20
+      to: 2026-10-29
+      skip: [2026-10-24]
+      am: [uriage_micellar, sunozon_spray]
+      pm: []
+
+  - key: elena
+    email: elena.radu@example.com
+    password: "seed-Elena-2026!"
+    first_name: Elena
+    last_name: Radu
+    date_of_birth: 1988-02-03
+    skin_type: sensitive
+    main_concern: redness
+    climate: cold
+    language: en
+    time_zone: Europe/London
+    created_at: "2026-10-12T10:00:00Z"
+    email_verified_at: "2026-10-12T10:05:00Z"
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-12T10:01:00Z"}
+      - {type: photo_processing, version: "1.0", granted_at: "2026-10-12T10:01:00Z"}
+      - {type: health_data, version: "1.0", granted_at: "2026-10-12T10:01:00Z"}
+      - {type: reminders, version: "1.0", granted_at: "2026-10-12T10:02:00Z"}
+    reminders:
+      - {period: PM, time: "22:00", enabled: true}
+    sessions:
+      - key: elena_s1
+        created_at: "2026-10-12T10:05:00Z"
+        tokens:
+          - ["2026-10-12T10:05:00Z", "2026-11-11T10:05:00Z", false]
+    analyses:
+      - key: elena_a1
+        created_at: "2026-10-12T10:30:00Z"
+        status: answered
+        ood_score: 0.2815
+        probabilities: {acne: 0.0801, eczema_dermatitis: 0.1622, redness_rosacea: 0.6514, normal_other: 0.1063}
+        answers: {body_area: [head_or_neck], symptoms: [burning], duration: [MORE_THAN_FIVE_YEARS]}   # several questions skipped
+        photos:
+          - {shot: front, heatmap: true}
+          - {shot: right, heatmap: true}
+          - {shot: left, heatmap: true}
+    routines:
+      - key: elena_r_pm
+        period: PM
+        complexity: basic
+        created_at: "2026-10-12T10:40:00Z"
+        source_analysis: elena_a1
+        steps:
+          - {category: cleansing, product: cora_micellar_sensitive, instruction: "Cleanse gently, do not rub.", duration: 60}
+          - {category: treatment, product: null, instruction: "Soothing serum (not chosen yet).", duration: 30}
+          - {category: hydration, product: caremare_spirulina_mask, instruction: "Once a week: hydrating mask for 15 minutes.", duration: 900}
+    logs:
+      from: 2026-10-13
+      to: 2026-10-19
+      skip: []
+      am: []
+      pm: [cora_micellar_sensitive]
+      progress_photos: {2026-10-19: "One week"}
+
+  - key: andrei
+    email: andrei.stan@example.com
+    password: "seed-Andrei-2026!"
+    first_name: Andrei
+    last_name: Stan
+    date_of_birth: 1999-11-21
+    skin_type: normal
+    main_concern: none
+    climate: temperate
+    language: ro
+    created_at: "2026-10-20T07:30:00Z"
+    email_verified_at: "2026-10-20T07:31:00Z"
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-20T07:30:30Z"}
+    sessions:
+      - key: andrei_s1
+        created_at: "2026-10-20T07:31:00Z"
+        tokens:
+          - ["2026-10-20T07:31:00Z", "2026-11-19T07:31:00Z", false]
+    analyses: []          # edge case: a user without any analysis
+    routines:
+      - key: andrei_r_am
+        period: AM
+        complexity: basic
+        created_at: "2026-10-20T07:40:00Z"
+        steps:
+          - {category: cleansing, product: loreal_micellar, instruction: "Cleanse with micellar water.", duration: 45}
+          - {category: protection, product: sunozon_spray, instruction: "Apply sunscreen.", duration: 60}
+    logs:
+      from: 2026-10-21
+      to: 2026-10-24
+      skip: []
+      am: [loreal_micellar, sunozon_spray]
+      pm: []
+
+  - key: ioana
+    email: ioana.dumitru@example.com
+    password: "seed-Ioana-2026!"
+    first_name: Ioana
+    last_name: Dumitru
+    date_of_birth: 1979-06-08
+    skin_type: dry
+    main_concern: dryness
+    climate: dry
+    language: en
+    created_at: "2026-10-02T09:00:00Z"
+    email_verified_at: "2026-10-02T09:02:00Z"
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-02T09:01:00Z"}
+      - {type: photo_processing, version: "1.0", granted_at: "2026-10-02T09:01:00Z", withdrawn_at: "2026-10-25T12:00:00Z"}
+      - {type: health_data, version: "1.0", granted_at: "2026-10-02T09:01:00Z"}
+    sessions:
+      - key: ioana_s1      # a revoked token was presented again: the whole family is revoked
+        created_at: "2026-10-02T09:02:00Z"
+        tokens:
+          - ["2026-10-02T09:02:00Z", "2026-11-01T09:02:00Z", true]
+          - ["2026-10-14T08:00:00Z", "2026-11-13T08:00:00Z", true]
+      - key: ioana_s2
+        created_at: "2026-10-14T08:05:00Z"
+        tokens:
+          - ["2026-10-14T08:05:00Z", "2026-11-13T08:05:00Z", false]
+    analyses:
+      - key: ioana_a1
+        created_at: "2026-10-03T19:00:00Z"
+        status: answered
+        ood_score: 0.3502
+        probabilities: {acne: 0.0420, eczema_dermatitis: 0.6866, redness_rosacea: 0.1491, normal_other: 0.1223}
+        answers: {age_group: [AGE_40_TO_49], body_area: [arm, back_of_hand], symptoms: [itching, burning], texture: [rough_or_flaky], duration: [ONE_TO_THREE_MONTHS], skin_type: [FST2], lesion_change: ["no"]}
+        photos:
+          - {shot: front, heatmap: true}
+    routines:
+      - key: ioana_r_pm
+        period: PM
+        complexity: basic
+        created_at: "2026-10-03T19:10:00Z"
+        source_analysis: ioana_a1
+        steps:
+          - {category: cleansing, product: bioderma_sensibio_h2o, instruction: "Cleanse gently.", duration: 45}
+          - {category: hydration, product: lubriderm_daily, instruction: "Apply a generous layer of moisturiser.", duration: 60}
+    logs:
+      from: 2026-10-04
+      to: 2026-10-10
+      skip: [2026-10-07]
+      am: []
+      pm: [bioderma_sensibio_h2o, lubriderm_daily]
+
+  - key: sofia      # e-mail not verified yet, three failed logins, pending verification token
+    email: sofia.marin@example.com
+    password: "seed-Sofia-2026!"
+    first_name: Sofia
+    last_name: Marin
+    date_of_birth: 2003-01-17
+    skin_type: combination
+    main_concern: hyperpigmentation
+    climate: humid
+    language: ro
+    created_at: "2026-10-31T21:00:00Z"
+    failed_logins: 3
+    one_time_tokens:
+      - {purpose: email_verification, created_at: "2026-10-31T21:00:00Z", expires_at: "2026-11-01T21:00:00Z"}
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-31T21:00:30Z"}
+    analyses: []
+    routines: []
+
+  - key: radu       # used a password reset; then an account lock after five failed logins
+    email: radu.georgescu@example.com
+    password: "seed-Radu-2026!"
+    first_name: Radu
+    last_name: Georgescu
+    date_of_birth: 1990-07-25
+    skin_type: oily
+    main_concern: acne
+    climate: temperate
+    language: en
+    created_at: "2026-10-15T12:00:00Z"
+    email_verified_at: "2026-10-15T12:02:00Z"
+    failed_logins: 5
+    locked_until: "2026-11-01T09:10:00Z"
+    one_time_tokens:
+      - {purpose: email_verification, created_at: "2026-10-15T12:00:00Z", expires_at: "2026-10-16T12:00:00Z", used_at: "2026-10-15T12:02:00Z"}
+      - {purpose: password_reset, created_at: "2026-10-28T08:00:00Z", expires_at: "2026-10-28T09:00:00Z", used_at: "2026-10-28T08:07:00Z"}
+    consents:
+      - {type: privacy_policy, version: "1.0", granted_at: "2026-10-15T12:01:00Z"}
+      - {type: photo_processing, version: "1.0", granted_at: "2026-10-15T12:01:00Z"}
+      - {type: health_data, version: "1.0", granted_at: "2026-10-15T12:01:00Z"}
+    sessions:
+      - key: radu_s1
+        created_at: "2026-10-28T08:08:00Z"
+        tokens:
+          - ["2026-10-28T08:08:00Z", "2026-11-27T08:08:00Z", false]
+    analyses:
+      - key: radu_a1
+        created_at: "2026-10-16T18:00:00Z"
+        status: uncertain
+        ood_score: 0.4011
+        probabilities: {acne: 0.4520, eczema_dermatitis: 0.0611, redness_rosacea: 0.0903, normal_other: 0.3966}
+        answers: {age_group: [AGE_30_TO_39], body_area: [head_or_neck], symptoms: [bleeding, pain], texture: [raised_or_bumpy], duration: [LESS_THAN_ONE_WEEK], lesion_change: ["yes"]}
+        photos:
+          - {shot: front, heatmap: false}
+    routines: []
