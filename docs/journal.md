@@ -2,6 +2,14 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-11-01: Database implementation plan (PostgreSQL reference and MongoDB)
+
+- **Why:** the main backend of Task 5.1 needs the database next. Before writing code, the finished design (EER, relational schema in BCNF, mapping sheet) was checked against what the services already produce, and the remaining work was split into tasks.
+- **Done:** `docs/DB_task_plan.md`: 20 tasks (one optional) in five phases (D0 settle the design, D1 PostgreSQL reference implementation, D2 MongoDB document model, D3 MongoDB implementation and backend data layer, D4 documentation), about 120 h plus 4 h optional.
+- **Gaps found in the design (to fix in Task D0.1):** `SKIN_ANALYSIS.is_uncertain` is boolean, but the ML service returns three outcomes (`answered`, `uncertain`, `unusual_photo`), so it becomes `status`; `USER` is a reserved word in PostgreSQL, so the table becomes `APP_USER`; timestamps become `TIMESTAMPTZ` in UTC; the plan's e-mail verification, password reset and lockout have no storage yet (scope decision); range of the ingredient score and the rule of the derived product safety score; how the PHOTO specialization stays disjoint and total in SQL.
+- **Decisions:** the relational schema is also implemented in PostgreSQL 18 as a reference: same seed data and UUID keys as MongoDB, views bring back the derived attributes removed during normalization, and a parity test compares the numbered queries of both databases. MongoDB 8.0 locally, because Atlas Free runs only 8.0 (current server release 9.0). PyMongo Async API, not Motor (bug-fix support ended 14.05.2026, final support 14.05.2027), and no ODM. `_id` = the same UUIDs as the relational keys; `schema_version` in every document. Queryable Encryption is left out of the MVP: it cannot encrypt fields inside arrays of documents automatically, and answers and predictions are such arrays.
+- **Next:** Task D0.1 (regenerate the diagrams, the mapping sheet and the normalization document for schema v1).
+
 ## 2026-10-31: Fine-tuned DINOv2 and the Grad-CAM border artefact (Task 4.7)
 
 - **Why:** the app model only trains a linear probe on frozen DINOv2; fine-tuning the encoder could do better. The DINOv2 Grad-CAM maps also look more at the black letterbox padding than EfficientNet-B0 (median padding ratio 0.67 vs 0.25), which the thesis had left as a proposed improvement.
