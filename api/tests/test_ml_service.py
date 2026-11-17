@@ -104,3 +104,22 @@ def test_streamed_body_without_length_is_capped(client, monkeypatch):
     chunks = (b"x" * 4096 for _ in range(10))  # 40 kB, sent chunked: no Content-Length header
     assert client.post("/v1/analyze", content=chunks).status_code == 413
     assert client.model.seen == []
+
+
+def test_cors_only_when_origins_are_configured(monkeypatch):
+    import importlib
+
+    monkeypatch.setenv("ML_CORS_ORIGINS", "http://localhost:8081, ")
+    assert svc.cors_origins() == ["http://localhost:8081"]
+    module = importlib.reload(svc)
+    try:
+        module.app.state.model = FakeModel()
+        with TestClient(module.app) as c:
+            r = c.options("/v1/analyze", headers={"Origin": "http://localhost:8081",
+                                                  "Access-Control-Request-Method": "POST"})
+            assert r.headers.get("access-control-allow-origin") == "http://localhost:8081"
+            r = c.get("/health", headers={"Origin": "http://evil.example"})
+            assert "access-control-allow-origin" not in r.headers
+    finally:
+        monkeypatch.delenv("ML_CORS_ORIGINS")
+        importlib.reload(svc)

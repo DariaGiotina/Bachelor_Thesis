@@ -21,6 +21,8 @@ Configuration (environment variables):
   SKINCONCERN_MODEL   path of the .onnx file (default: ml/export/skin_concern_dinov2.onnx)
   ML_SERVICE_KEY      shared secret; unset = no key required (local development only)
   MAX_UPLOAD_MB       largest accepted upload, default 10
+  ML_CORS_ORIGINS     comma-separated browser origins allowed to call the service directly, for testing
+                      the app in a web browser (e.g. http://localhost:8081); unset = no CORS headers
 
 Run::
 
@@ -37,6 +39,7 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.concurrency import run_in_threadpool
 from PIL import Image, ImageOps, UnidentifiedImageError
 
@@ -53,6 +56,10 @@ NOTICE = ("Informational result only, not a diagnosis. The app does not assess s
 
 def max_upload_bytes() -> int:
     return int(float(os.environ.get("MAX_UPLOAD_MB", "10")) * 2**20)
+
+
+def cors_origins() -> list[str]:
+    return [o.strip() for o in os.environ.get("ML_CORS_ORIGINS", "").split(",") if o.strip()]
 
 
 def load_model() -> serving.SkinConcernModel | None:
@@ -72,6 +79,9 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="Skin-concern ML service", version="1.0.0", lifespan=lifespan,
               docs_url=None, redoc_url=None, openapi_url=None)  # internal service: no public API docs
+if cors_origins():  # development only: lets the web build of the app call the service directly
+    app.add_middleware(CORSMiddleware, allow_origins=cors_origins(), allow_methods=["GET", "POST"],
+                       allow_headers=["Content-Type", "X-Service-Key"])
 
 
 def require_key(x_service_key: str | None = Header(default=None)) -> None:
