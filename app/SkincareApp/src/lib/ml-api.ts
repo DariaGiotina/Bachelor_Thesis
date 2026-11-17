@@ -60,9 +60,9 @@ export async function preparePhoto(uri: string): Promise<string> {
 
 export async function analyzePhoto(uri: string): Promise<AnalyzeResponse> {
   const url = `${mlServiceUrl()}/v1/analyze`;
+  // No service key here: EXPO_PUBLIC_* values are built into the app and readable by anyone. During
+  // development the service runs without ML_SERVICE_KEY; in production the backend calls the service.
   const headers: Record<string, string> = { 'Content-Type': 'image/jpeg' };
-  const key = process.env.EXPO_PUBLIC_ML_SERVICE_KEY; // development only; in production the backend calls the service
-  if (key) headers['X-Service-Key'] = key;
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
@@ -89,6 +89,6 @@ export async function analyzePhoto(uri: string): Promise<AnalyzeResponse> {
   }
   if ([400, 413, 415].includes(res.status)) throw new AnalyzeError(detail || 'The photo could not be read.', 'photo');
   if (res.status === 503) throw new AnalyzeError('The analysis model is not loaded on the service.', 'service');
-  if (res.status === 401) throw new AnalyzeError('The analysis service refused the request (service key).', 'service');
+  if (res.status === 401) throw new AnalyzeError('The analysis service requires a key. Start it without ML_SERVICE_KEY for testing.', 'service');
   throw new AnalyzeError(`The analysis service answered ${res.status}${detail ? `: ${detail}` : ''}.`, 'service');
 }

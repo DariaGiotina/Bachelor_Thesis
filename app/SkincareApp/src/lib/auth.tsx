@@ -3,8 +3,14 @@
 // The main backend (FastAPI auth with Argon2id + JWT) is not built yet, so this provider keeps
 // accounts on the device: a development stand-in with the same rules the backend will enforce
 // (passwords of at least 12 characters that are not common, sign-in paused for 15 minutes after
-// 5 failed attempts). Only a salted SHA-256 of the password is stored, never the password. When the
-// backend exists, `register`, `logIn` and `logOut` call its endpoints and the screens stay the same.
+// 5 failed attempts). The password is never stored: only a PBKDF2-HMAC-SHA256 hash (random 16-byte
+// salt, 310,000 iterations; pure JavaScript, so it runs in Expo Go) is kept, and it is kept in the
+// platform keychain/keystore, not in AsyncStorage with the profile. When the backend exists,
+// `register`, `logIn` and `logOut` call its endpoints (Argon2id on the server) and the screens stay
+// the same.
+import { pbkdf2Async } from '@noble/hashes/pbkdf2.js';
+import { sha256 } from '@noble/hashes/sha2.js';
+import { bytesToHex, hexToBytes } from '@noble/hashes/utils.js';
 import * as Crypto from 'expo-crypto';
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
@@ -20,10 +26,13 @@ export type User = {
   skinTone: string | null; // Fitzpatrick I-VI or null
 };
 
-type StoredAccount = User & { salt: string; passwordHash: string; failed: number; lockedUntil: number | null };
+type StoredAccount = User & { failed: number; lockedUntil: number | null };
+type Credential = { salt: string; hash: string; iterations: number };
 
 const ACCOUNTS_KEY = 'lumiere.accounts.v1';
 const SESSION_KEY = 'lumiere.session';
+const credKey = (id: string) => `lumiere.cred.${id}`;
+const ITERATIONS = 310_000;
 export const POLICY_VERSION = '1.2';
 export const MAX_ATTEMPTS = 5;
 export const LOCK_MINUTES = 15;
@@ -50,12 +59,28 @@ export function isEmail(s: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(s.trim());
 }
 
-async function hash(salt: string, password: string) {
-  return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, `${salt}:${password}`);
+async function derive(password: string, salt: Uint8Array, iterations: number): Promise<Uint8Array> {
+  return pbkdf2Async(sha256, password, salt, { c: iterations, dkLen: 32 });
+}
+
+async function newCredential(password: string): Promise<Credential> {
+  const salt = Crypto.getRandomBytes(16);
+  return { salt: bytesToHex(salt), hash: bytesToHex(await derive(password, salt, ITERATIONS)), iterations: ITERATIONS };
+}
+
+async function checkPassword(id: string, password: string): Promise<boolean> {
+  const raw = await secret.get(credKey(id));
+  if (!raw) return false;
+  const cred = JSON.parse(raw) as Credential;
+  const got = await derive(password, hexToBytes(cred.salt), cred.iterations);
+  const want = hexToBytes(cred.hash);
+  let diff = got.length ^ want.length; // constant-time comparison
+  for (let i = 0; i < Math.min(got.length, want.length); i++) diff |= got[i] ^ want[i];
+  return diff === 0;
 }
 
 function publicUser(a: StoredAccount): User {
-  const { salt: _s, passwordHash: _p, failed: _f, lockedUntil: _l, ...user } = a;
+  const { failed: _f, lockedUntil: _l, ...user } = a;
   return user;
 }
 
@@ -96,7 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (passwordStrength(password).score < 2) throw new AuthError(passwordStrength(password).message);
     const accounts = await readJson<StoredAccount[]>(ACCOUNTS_KEY, []);
     if (accounts.some((a) => a.email === mail)) throw new AuthError('An account with this email already exists.');
-    const salt = Crypto.randomUUID();
     const account: StoredAccount = {
       id: Crypto.randomUUID(),
       name: name.trim(),
@@ -105,11 +129,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       consentVersion: null,
       ageRange: null,
       skinTone: null,
-      salt,
-      passwordHash: await hash(salt, password),
       failed: 0,
       lockedUntil: null,
     };
+    await secret.set(credKey(account.id), JSON.stringify(await newCredential(password)));
     await writeJson(ACCOUNTS_KEY, [...accounts, account]);
     await secret.set(SESSION_KEY, account.id);
     setUser(publicUser(account));
@@ -128,7 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const min = Math.ceil((a.lockedUntil - now) / 60000);
       throw new AuthError(`Too many attempts. Try again in ${min} minute${min === 1 ? '' : 's'}.`);
     }
-    if ((await hash(a.salt, password)) !== a.passwordHash) {
+    if (!(await checkPassword(a.id, password))) {
       a.failed = (a.lockedUntil ? 0 : a.failed) + 1;
       a.lockedUntil = null;
       if (a.failed >= MAX_ATTEMPTS) {

@@ -6,6 +6,7 @@
     "@expo-google-fonts/hanken-grotesk": "^0.4.3",
     "@expo-google-fonts/young-serif": "^0.4.0",
     "@expo/ui": "~58.0.29",
+    "@noble/hashes": "^2.4.0",
     "@react-native-async-storage/async-storage": "2.2.0",
     "expo": "~58.0.26",
     "expo-camera": "~58.0.14",

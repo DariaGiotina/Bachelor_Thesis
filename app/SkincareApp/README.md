@@ -33,8 +33,9 @@ ml/.venv/Scripts/python -m uvicorn api.ml_service.app:app --host 0.0.0.0 --port 
   another address. The address in use is shown at the bottom of the Me tab.
 - Windows may ask to allow Python through the firewall on private networks; allow it.
 - For the browser version also set `ML_CORS_ORIGINS=http://localhost:8081` when starting the service.
-- If the service requires a key (`ML_SERVICE_KEY`), set the same value in `EXPO_PUBLIC_ML_SERVICE_KEY`
-  (development only; in production the backend calls the service).
+- Start the service without `ML_SERVICE_KEY` for testing. The app never carries the service key:
+  anything in an `EXPO_PUBLIC_*` variable is readable inside the app, so in production the backend
+  calls the service and adds the key on the server.
 
 The model was trained on close-up photos of skin (SCIN), so a close photo of one zone (cheek, chin,
 forehead) works best. A whole-face portrait is usually reported as "photo not usable", which is the
@@ -42,9 +43,11 @@ out-of-scope detector doing its job.
 
 ## Notes
 
-- Accounts are stored on the device until the backend exists (salted SHA-256, never the password;
-  12-character minimum; sign-in paused for 15 minutes after 5 failed attempts). The session id is kept
-  in the platform keychain/keystore (`expo-secure-store`).
+- Accounts are stored on the device until the backend exists. The password is never stored: only a
+  PBKDF2-HMAC-SHA256 hash (random 16-byte salt, 310,000 iterations), kept with the session id in the
+  platform keychain/keystore (`expo-secure-store`; AsyncStorage on web). 12-character minimum;
+  sign-in paused for 15 minutes after 5 failed attempts. Creating an account or logging in takes a
+  few seconds on a phone because of the hashing.
 - Photos are downscaled on the phone (longest side 1024 px, JPEG), sent once and never saved. Results
   can be saved to the history on the device.
 - With several zones each photo is analysed separately with the service's validated rule; the result
