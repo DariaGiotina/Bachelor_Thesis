@@ -2,6 +2,35 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-11-21: Oracle reference implementation, day 1: users, type mapping, schema script, seed (Tasks O1-O4)
+
+- **Written:** `db/oracle/00_users.sql` (users), `db/oracle/skincare.sql` (schema), `db/oracle/seed.sql` (917 rows), the Oracle column and mapping section of `db/data_dictionary.md`.
+- **Users (O1):** `SKINCARE` owns the schema with only the creation privileges the scripts use; `SKINCARE_APP` can only connect and gets object grants from the schema script. A logon trigger points the app user's session at the `SKINCARE` schema, so no synonyms are needed. The script ends by checking that `SKINCARE_APP` cannot create a table.
+- **Decisions (O2):**
+  - Keys stay UUID text, `CHAR(36 CHAR)`, so the SQL-MongoDB parity test compares strings directly.
+  - Oracle has no time-of-day type, so reminder times are `HH:MM` text with a format check, the same string MongoDB stores.
+  - Oracle's `DATE` holds a time too, so calendar-day columns get `CHECK (col = TRUNC(col))`.
+  - Every moment uses a domain that only accepts the UTC offset; new moments default to the current UTC time whatever the session time zone is.
+  - `SIZE` is an Oracle reserved word, so `PRODUCT.size` became `pack_size` in all diagrams, the normalization document (v1.2), the dictionary and both seeds. This was the only collision.
+- **Schema (O3):** six SQL domains (a type plus its rule, defined once and reused), 27 tables with named keys and checks, 18 indexes (Oracle does not index foreign keys by itself, and an unindexed foreign key locks the child table while a parent row is deleted), the schema-change examples, least-privilege grants (no direct insert on the photo tables, so the photo package of day 2 is the only way in) and table comments.
+- **Seed (O4):** the seed generator now writes the Oracle file from the same rows as the PostgreSQL one: ANSI date and timestamp literals, `TRUE/FALSE`, `q'[...]'` quoting for apostrophes, substitution turned off because a brand name contains `&`.
+- **Checks done:** a check script compares the schema script with the diagram's table list: 27 tables, 123 columns, 29 foreign keys, no difference. On a deliberately broken copy it reports all four planted errors. The Oracle seed has the same 917 rows per table as the PostgreSQL seed, and no seed row breaks any of the new checks.
+- **Not done yet:** nothing has run on a real Oracle server. Docker Desktop cannot start on the development PC because WSL is not installed, and installing it needs administrator rights and a restart. After that, one runner command starts the container, prints the exact release, runs the three scripts (the schema script twice) and compares the live schema and row counts. O1, O3 and O4 count as done only after that run.
+- **Thesis:** unchanged on purpose. Section 4.1 is rewritten for Oracle in Task O8, once the scripts have run; the diagram figures with `pack_size` are refreshed then too.
+
+## 2026-11-21: Relational reference implementation moves to Oracle (plan only)
+
+- **Decision:** the relational reference implementation of schema v1 is built in Oracle (Oracle AI Database 26ai Free) instead of PostgreSQL. Phase D1 had not started, so nothing is redone. MongoDB stays the application database.
+- **Plan:** Phase O in `docs/DB_task_plan.md`, eight tasks over two days (about 15 h).
+  - Day 1: environment with two users (owner and least-privilege app user), the PostgreSQL-to-Oracle decisions, the DDL script and the seed.
+  - Day 2: PL/SQL integrity rules, DML and transactions, the numbered queries and the views.
+- **What changes because of Oracle:**
+  - No deferred triggers, so the total specialization of PHOTO is enforced by a PL/SQL package that writes the PHOTO row and its subclass row together, and the app user gets no direct insert on PHOTO.
+  - Foreign keys are not indexed automatically, so every foreign key gets an index.
+  - Every name is checked against Oracle's reserved words.
+  - UUID keys are kept as text, so the SQL-MongoDB parity test can compare them directly.
+- **Nothing implemented yet;** the thesis is updated once the scripts exist (Task O8).
+
 ## 2026-11-17: Mobile app, first part: account screens and the AI skin check (Task 5.2)
 
 - **Why:** the ML service existed but nothing could call it from a phone. The first app screens are the ones that make the project testable end to end: create an account, log in, take a photo and get the model's answer.

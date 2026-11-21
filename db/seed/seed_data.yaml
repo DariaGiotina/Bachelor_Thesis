@@ -1,7 +1,8 @@
 # Shared seed data (schema v1). The single source for both databases: a generator outside the
-# repository turns it into the INSERT statements of db/postgres/seed.sql and into db/mongo/seed.js,
-# so PostgreSQL and MongoDB hold identical data. Keys written here as short names (ana, ana_a1)
-# become deterministic UUIDs (uuid5), so every run produces the same identifiers.
+# repository turns it into the INSERT statements of db/oracle/seed.sql (relational reference),
+# db/postgres/seed.sql and db/mongo/seed.js, so the relational databases and MongoDB hold identical
+# data. Keys written here as short names (ana, ana_a1) become deterministic UUIDs (uuid5), so every
+# run produces the same identifiers.
 # Allowed values: db/data_dictionary.md. Sources and licences: db/data_sources.md.
 # All people are fictitious; no real photo exists for any photo key.
 
@@ -207,35 +208,35 @@ ingredients:
 # (translations removed, "AQUA / WATER" -> AQUA, "FRAGRANCE" -> PARFUM). The last product is the
 # author's own demo entry without a barcode (edge case for the partial unique index).
 products:
-  - {key: bioderma_sebium_h2o, barcode: "3401575645851", name: "Solution micellaire nettoyante-purifiante", brand: Bioderma, category: cleanser, size: "500 ml", source: openbeautyfacts,
+  - {key: bioderma_sebium_h2o, barcode: "3401575645851", name: "Solution micellaire nettoyante-purifiante", brand: Bioderma, category: cleanser, pack_size: "500 ml", source: openbeautyfacts,
      inci: [AQUA, PEG-6 CAPRYLIC/CAPRIC GLYCERIDES, SODIUM CITRATE, ZINC GLUCONATE, COPPER SULFATE, CITRIC ACID, DISODIUM EDTA, CETRIMONIUM BROMIDE, PARFUM]}
-  - {key: bioderma_sensibio_h2o, barcode: "3401396991779", name: "Sensibio H2O", brand: Bioderma, category: cleanser, size: "500 ml", source: openbeautyfacts,
+  - {key: bioderma_sensibio_h2o, barcode: "3401396991779", name: "Sensibio H2O", brand: Bioderma, category: cleanser, pack_size: "500 ml", source: openbeautyfacts,
      inci: [AQUA, PEG-6 CAPRYLIC/CAPRIC GLYCERIDES, CUCUMIS SATIVUS (CUCUMBER) FRUIT EXTRACT, MANNITOL, XYLITOL, RHAMNOSE, FRUCTOOLIGOSACCHARIDES, PROPYLENE GLYCOL, DISODIUM EDTA, CETRIMONIUM BROMIDE]}
-  - {key: garnier_micellar_3in1, barcode: "3600542133425", name: "Micellar Cleansing Water 3-in-1", brand: Garnier, category: cleanser, size: "100 ml", source: openbeautyfacts,
+  - {key: garnier_micellar_3in1, barcode: "3600542133425", name: "Micellar Cleansing Water 3-in-1", brand: Garnier, category: cleanser, pack_size: "100 ml", source: openbeautyfacts,
      inci: [AQUA, HEXYLENE GLYCOL, GLYCERIN, POLOXAMER 184, DISODIUM COCOAMPHODIACETATE, DISODIUM EDTA, MYRTRIMONIUM BROMIDE]}
-  - {key: loreal_micellar, barcode: "3600522365884", name: "Solution Micellaire", brand: "L'Oréal Paris", category: cleanser, size: "200 ml", source: openbeautyfacts,
+  - {key: loreal_micellar, barcode: "3600522365884", name: "Solution Micellaire", brand: "L'Oréal Paris", category: cleanser, pack_size: "200 ml", source: openbeautyfacts,
      inci: [AQUA, HEXYLENE GLYCOL, GLYCERIN, POLOXAMER 184, DISODIUM COCOAMPHODIACETATE, DISODIUM EDTA, POLYAMINOPROPYL BIGUANIDE]}
-  - {key: uriage_micellar, barcode: "3661434003639", name: "Eau micellaire thermale", brand: Uriage, category: cleanser, size: "250 ml", source: openbeautyfacts,
+  - {key: uriage_micellar, barcode: "3661434003639", name: "Eau micellaire thermale", brand: Uriage, category: cleanser, pack_size: "250 ml", source: openbeautyfacts,
      inci: [AQUA, POLYSORBATE 20, GLYCERIN, POLOXAMER 184, CAPRYLYL/CAPRYL GLUCOSIDE, CETRIMONIUM BROMIDE, POLYAMINOPROPYL BIGUANIDE, PARFUM, PRUNUS ARMENIACA (APRICOT) FRUIT EXTRACT, CITRIC ACID, ASCORBIC ACID]}
-  - {key: cora_micellar_sensitive, barcode: "3257984523521", name: "Les Soins Eau micellaire Peaux Sensibles", brand: Cora, category: cleanser, size: "500 ml", source: openbeautyfacts,
+  - {key: cora_micellar_sensitive, barcode: "3257984523521", name: "Les Soins Eau micellaire Peaux Sensibles", brand: Cora, category: cleanser, pack_size: "500 ml", source: openbeautyfacts,
      inci: [AQUA, POLOXAMER 184, GLYCERIN, SODIUM BENZOATE, POTASSIUM SORBATE, DISODIUM EDTA, CITRIC ACID, PAEONIA OFFICINALIS FLOWER EXTRACT, SODIUM HYDROXIDE]}
-  - {key: naturalia_micellar, barcode: "3700036902947", name: "Eau micellaire démaquillante", brand: Naturalia, category: cleanser, size: "250 ml", source: openbeautyfacts,
+  - {key: naturalia_micellar, barcode: "3700036902947", name: "Eau micellaire démaquillante", brand: Naturalia, category: cleanser, pack_size: "250 ml", source: openbeautyfacts,
      inci: [AQUA, GLYCERIN, ALOE BARBADENSIS LEAF JUICE POWDER, ALTHAEA OFFICINALIS ROOT EXTRACT, SODIUM PCA, CAPRYLYL/CAPRYL GLUCOSIDE, SODIUM BENZOATE, POTASSIUM SORBATE, CITRIC ACID, PARFUM, BENZYL ALCOHOL, CITRONELLOL, LIMONENE, LINALOOL]}
-  - {key: balea_sheet_mask, barcode: "4070765070989", name: "Tuchmaske Selfcare Moments", brand: Balea, category: mask, size: "1 St", source: openbeautyfacts,
+  - {key: balea_sheet_mask, barcode: "4070765070989", name: "Tuchmaske Selfcare Moments", brand: Balea, category: mask, pack_size: "1 St", source: openbeautyfacts,
      inci: [AQUA, GLYCERIN, PENTYLENE GLYCOL, HYDROXYACETOPHENONE, XANTHAN GUM, CAPRYLIC/CAPRIC TRIGLYCERIDE, SODIUM CITRATE, CITRIC ACID, SODIUM PHYTATE, SODIUM HYALURONATE, PARFUM, ALBIZIA JULIBRISSIN FLOWER EXTRACT]}
-  - {key: karite_purifying_mask, barcode: "6132321304810", name: "10 Mins Purifying Mask", brand: "Karité", category: mask, size: null, source: openbeautyfacts,
+  - {key: karite_purifying_mask, barcode: "6132321304810", name: "10 Mins Purifying Mask", brand: "Karité", category: mask, pack_size: null, source: openbeautyfacts,
      inci: [AQUA, PROPYLENE GLYCOL, GLYCERIN, SODIUM HYALURONATE, POLYSORBATE 20, IMIDAZOLIDINYL UREA, METHYLPARABEN, PARFUM, MALIC ACID, LACTIC ACID, SALICYLIC ACID, BAMBOO CHARCOAL]}
-  - {key: seomou_aloe_mask, barcode: "6974998720971", name: "Aloe Vera Nicotinamide Moisturizing Mask", brand: Seomou, category: mask, size: "25 ml", source: openbeautyfacts,
+  - {key: seomou_aloe_mask, barcode: "6974998720971", name: "Aloe Vera Nicotinamide Moisturizing Mask", brand: Seomou, category: mask, pack_size: "25 ml", source: openbeautyfacts,
      inci: [AQUA, GLYCERIN, PROPYLENE GLYCOL, HYDROXYACETOPHENONE, FULLERENES, HYALURONIC ACID, CENTELLA ASIATICA EXTRACT, XANTHAN GUM, DISODIUM EDTA, ALLANTOIN, PAEONIA LACTIFLORA ROOT EXTRACT, ALOE BARBADENSIS EXTRACT, NIACINAMIDE, PARFUM]}
-  - {key: anko_coconut_mask, barcode: "9341106912899", name: "OXX Coconut Face Mask", brand: Anko, category: mask, size: null, source: openbeautyfacts,
+  - {key: anko_coconut_mask, barcode: "9341106912899", name: "OXX Coconut Face Mask", brand: Anko, category: mask, pack_size: null, source: openbeautyfacts,
      inci: [AQUA, GLYCERIN, GLYCERETH-26, "1,2-HEXANEDIOL", HYDROXYACETOPHENONE, COCOS NUCIFERA (COCONUT) OIL, XANTHAN GUM, POLYSORBATE 20, ALLANTOIN, DISODIUM EDTA, PARFUM, COUMARIN]}
-  - {key: caremare_spirulina_mask, barcode: "4262351040302", name: "Spirulina Malachit Recharge Hydra Mask", brand: caremare, category: mask, size: "50 ml", source: openbeautyfacts,
+  - {key: caremare_spirulina_mask, barcode: "4262351040302", name: "Spirulina Malachit Recharge Hydra Mask", brand: caremare, category: mask, pack_size: "50 ml", source: openbeautyfacts,
      inci: [AQUA, PENTYLENE GLYCOL, GLYCERIN, SODIUM HYALURONATE, MALTODEXTRIN, MALACHITE EXTRACT, SODIUM CITRATE, CITRIC ACID, SPIRULINA PLATENSIS EXTRACT, TREHALOSE, SUCCINIC ACID]}
-  - {key: lubriderm_daily, barcode: "7702031244509", name: "Lubriderm Humectación Diaria", brand: "Johnson & Johnson", category: moisturizer, size: "400 ml", source: openbeautyfacts,
+  - {key: lubriderm_daily, barcode: "7702031244509", name: "Lubriderm Humectación Diaria", brand: "Johnson & Johnson", category: moisturizer, pack_size: "400 ml", source: openbeautyfacts,
      inci: [AQUA, PARAFFINUM LIQUIDUM, GLYCERIN, ISOPROPYL PALMITATE, CARBOMER, PHENOXYETHANOL, CETYL ALCOHOL, POTASSIUM CETYL PHOSPHATE, COCOGLYCERIDES, CAPRYLYL GLYCOL, SODIUM HYDROXIDE, PARFUM, AVENA SATIVA KERNEL OIL]}
-  - {key: sunozon_spray, barcode: "4305615827452", name: "Sonnenspray", brand: "Sun Ozon", category: sunscreen, size: "200 ml", source: openbeautyfacts,
+  - {key: sunozon_spray, barcode: "4305615827452", name: "Sonnenspray", brand: "Sun Ozon", category: sunscreen, pack_size: "200 ml", source: openbeautyfacts,
      inci: [ALCOHOL DENAT., C12-15 ALKYL BENZOATE, ISOPROPYL PALMITATE, GLYCERIN, ETHYLHEXYL STEARATE, BUTYL METHOXYDIBENZOYLMETHANE, ETHYLHEXYL TRIAZONE, ETHYLHEXYL SALICYLATE, AQUA, BIS-ETHYLHEXYLOXYPHENOL METHOXYPHENYL TRIAZINE, PARFUM, TOCOPHERYL ACETATE, PHENYLBENZIMIDAZOLE SULFONIC ACID, AMINOMETHYL PROPANOL]}
-  - {key: demo_hydrating_serum, barcode: null, name: "Demo Hydrating Serum (test entry)", brand: "Lumière demo", category: serum, size: "30 ml", source: curated,
+  - {key: demo_hydrating_serum, barcode: null, name: "Demo Hydrating Serum (test entry)", brand: "Lumière demo", category: serum, pack_size: "30 ml", source: curated,
      inci: [AQUA, GLYCERIN, NIACINAMIDE, SODIUM HYALURONATE, PENTYLENE GLYCOL, XANTHAN GUM, CITRIC ACID]}
 
 # ---------------------------------------------------------------------------------------------

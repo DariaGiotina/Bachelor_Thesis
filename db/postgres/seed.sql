@@ -361,7 +361,7 @@ INSERT INTO ingredient_flag (ingredient_id, flag) VALUES
   ('a4833fc1-860c-5caa-a622-107274becdea', 'exfoliating_acid');
 
 -- product: 15 rânduri
-INSERT INTO product (product_id, barcode, name, brand, category, size, source) VALUES
+INSERT INTO product (product_id, barcode, name, brand, category, pack_size, source) VALUES
   ('e077d1ba-8ad0-5815-b474-00dfe491e731', '3401575645851', 'Solution micellaire nettoyante-purifiante', 'Bioderma', 'cleanser', '500 ml', 'openbeautyfacts'),
   ('454aacd6-39fd-5882-9fd5-9b784f9e8462', '3401396991779', 'Sensibio H2O', 'Bioderma', 'cleanser', '500 ml', 'openbeautyfacts'),
   ('20eee9ca-0e9d-5a81-aab7-7fa68f8300e9', '3600542133425', 'Micellar Cleansing Water 3-in-1', 'Garnier', 'cleanser', '100 ml', 'openbeautyfacts'),
