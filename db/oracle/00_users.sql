@@ -53,6 +53,7 @@ SELECT USER AS utilizator, COUNT(*) AS drepturi_sistem FROM session_privs;
 CONNECT skincare_app/"&2"@&3
 SELECT USER AS utilizator, SYS_CONTEXT('USERENV', 'CURRENT_SCHEMA') AS schema_curenta;
 
+SET SERVEROUTPUT ON
 BEGIN
   EXECUTE IMMEDIATE 'CREATE TABLE t_privilege_test (x NUMBER)';
   RAISE_APPLICATION_ERROR(-20000, 'Eroare: SKINCARE_APP a putut crea un tabel');

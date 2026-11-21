@@ -2,6 +2,21 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-11-21: Oracle scripts run on a live server (Tasks O1, O3, O4 done)
+
+- **Server:** the official Oracle Database Free container on Docker Desktop. Exact release: Oracle AI Database 26ai Free, Release 23.26.4.0.0.
+- **Run:** users, then the schema script twice in a row, then the seed. Every step finished without an error.
+  - Users: `SKINCARE_APP` connects with `CURRENT_SCHEMA = SKINCARE`, and its `CREATE TABLE` attempt fails with ORA-01031, as intended.
+  - Schema: the second run rebuilds the same schema, so the script can be rerun. The planned drop of a referenced table fails with ORA-02449 both times.
+  - Seed: 917 rows in 27 tables.
+- **Check against the design:** the live schema matches the diagram's table list (27 tables, 123 columns, 29 foreign keys, no difference). Row counts equal the PostgreSQL seed, and no table or column name is an Oracle reserved word (`V$RESERVED_WORDS`).
+- **Bug found and fixed:** on the first run every accented letter in product names was stored as two replacement characters (`L'Oréal` became `L'Or��al`, 4 rows). SQL*Plus in the container had no `NLS_LANG`, so it read the UTF-8 scripts as 7-bit ASCII. The runner now sets `NLS_LANG=AMERICAN_AMERICA.AL32UTF8`, and the check now fails if any text column contains U+FFFD or if `L'Oréal Paris` is missing. The structure and row-count comparison could not catch this. After the fix: no broken characters.
+- **Small fix:** the "OK" line of the privilege test in `00_users.sql` was not printed after the reconnect, so server output is now turned on again just before the test.
+- **Thesis:** still unchanged; section 4.1 is rewritten in Task O8.
+
+## 2026-11-21: Oracle reference implementation, day 1: users, type mapping, schema script, seed (Tasks O1-O4)
+
+- **Written:** `db/oracle/00_users.sql` (users), `db/oracle/skincare.sql` (schema), `db/oracle/seed.sql` (917 rows), the Oracle column and mapping section of `db/data_dictionary.md`.
 ## 2026-11-21: Oracle reference implementation, day 1: users, type mapping, schema script, seed (Tasks O1-O4)
 
 - **Written:** `db/oracle/00_users.sql` (users), `db/oracle/skincare.sql` (schema), `db/oracle/seed.sql` (917 rows), the Oracle column and mapping section of `db/data_dictionary.md`.
