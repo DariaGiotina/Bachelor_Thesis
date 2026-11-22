@@ -31,7 +31,7 @@ Single reference for the app database. Every SQL `CHECK` of `db/oracle/skincare.
 
 - **Reserved words:** every name was checked against Oracle's reserved words (`V$RESERVED_WORDS` where `reserved = 'Y'`, and the list in the SQL Language Reference). Only `PRODUCT.size` collided (`SIZE` is reserved), so it became `pack_size` in every implementation and diagram. `FUNCTION` (`INGREDIENT_FUNCTION.function`) is accepted in SQL but reserved in PL/SQL, so PL/SQL code must write it as `"FUNCTION"`; `position`, `level`, `comment`, `date` and `mode` do not occur or are not reserved.
 - **Referential actions:** Oracle has `ON DELETE CASCADE` and `ON DELETE SET NULL`; a foreign key without an action rejects the delete, which is the `RESTRICT` of this dictionary. There is no `ON UPDATE`, and none is needed because keys never change.
-- **Specialization of PHOTO:** a trigger on each subclass checks `PHOTO.photo_kind` (disjoint). Oracle has no deferred triggers, so totality comes from the package `photo_api`, which writes the PHOTO row and its subclass row in one call; the application user has no `INSERT` on the three photo tables.
+- **Specialization of PHOTO:** a trigger on each subclass checks `PHOTO.photo_kind` (disjoint). Oracle has no deferred triggers; totality comes from two deferred SQL assertions (Oracle 23.26), and the package `photo_api` writes the PHOTO row and its subclass row in one call; the application user has no `INSERT` on the three photo tables.
 - **Users:** `SKINCARE` owns the schema; `SKINCARE_APP` (the backend) gets `SELECT, INSERT, UPDATE, DELETE` on the user tables and only `SELECT` on the reference tables (concerns, zones, questions, options, products, ingredients and their lists).
 
 ## Account and security
@@ -202,7 +202,7 @@ Every analysis has one row per model category (4 rows), and the probabilities ad
 | captured_at | TIMESTAMPTZ | TIMESTAMP WITH TIME ZONE, domain `d_utc_ts` | date | no | not in the future | `now()` | system | special |
 | photo_kind | VARCHAR(8) | VARCHAR2(8 CHAR) | string | no | `ANALYSIS`, `PROGRESS` | | system | special |
 
-Disjoint and total: a trigger checks that the subclass row matches `photo_kind`; in Oracle, totality comes from the package `photo_api`, which inserts the PHOTO row and its subclass row together (see *Oracle mapping*). In MongoDB both kinds live in one collection with `kind` and a `oneOf` validator.
+Disjoint and total: a trigger checks that the subclass row matches `photo_kind`; in Oracle, two deferred SQL assertions reject at commit any PHOTO row without its subclass row, and the app inserts photos only through the package `photo_api`, which writes both rows together (see *Oracle mapping*). PHOTO has no foreign key to the user, so deleting an analysis or an account goes through `photo_api.delete_analysis` or `erase_user`, which delete the photos first. In MongoDB both kinds live in one collection with `kind` and a `oneOf` validator.
 
 ### ANALYSIS_PHOTO
 

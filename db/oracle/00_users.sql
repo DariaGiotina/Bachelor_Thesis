@@ -28,7 +28,7 @@ CREATE USER skincare IDENTIFIED BY "&1"
   QUOTA UNLIMITED ON users;
 
 GRANT CREATE SESSION, CREATE TABLE, CREATE VIEW, CREATE SEQUENCE, CREATE PROCEDURE,
-      CREATE TRIGGER, CREATE DOMAIN
+      CREATE TRIGGER, CREATE DOMAIN, CREATE ASSERTION
    TO skincare;
 
 -- 3. Utilizatorul aplicației: se poate doar conecta; nu are spațiu de stocare și nu poate crea

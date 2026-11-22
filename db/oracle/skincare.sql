@@ -4,7 +4,8 @@
 --
 -- Sursa tabelelor, a tipurilor și a regulilor: db/data_dictionary.md (coloana Oracle și secțiunea
 -- „Oracle mapping”), diagrama docs/diagrams/skincare_eer.drawio și documentul de normalizare.
--- Ordinea de rulare: 00_users.sql (ca SYSTEM), apoi acest script și seed.sql (ca SKINCARE):
+-- Ordinea de rulare: 00_users.sql (ca SYSTEM), apoi, ca SKINCARE, acest script, plsql.sql,
+-- seed.sql, dml.sql și queries.sql (vezi db/README.md):
 --   sql skincare@//localhost:1521/FREEPDB1 @db/oracle/skincare.sql
 -- Scriptul este idempotent: șterge tot ce a creat înainte (DROP ... IF EXISTS), deci poate fi
 -- rulat de mai multe ori la rând. La prima eroare se oprește (WHENEVER SQLERROR).
@@ -23,6 +24,14 @@ WHENEVER SQLERROR EXIT FAILURE ROLLBACK
 --    CASCADE CONSTRAINTS șterge și cheile străine care indică spre tabel, PURGE nu mai trece
 --    tabelul prin coșul de reciclare (recycle bin). Domeniile se șterg după tabelele care le folosesc.
 -- =====================================================================================
+-- vederile din queries.sql (vederile nu țin date, se recreează)
+DROP VIEW IF EXISTS v_enabled_reminder;
+DROP VIEW IF EXISTS v_product_safety;
+DROP VIEW IF EXISTS v_user_profile;
+DROP VIEW IF EXISTS v_prediction_rank;
+DROP VIEW IF EXISTS v_analysis_result;
+
+-- tabelele (aserțiunile din plsql.sql dispar odată cu tabelele lor, prin CASCADE CONSTRAINTS)
 DROP TABLE IF EXISTS tmp_schema_demo_child CASCADE CONSTRAINTS PURGE;
 DROP TABLE IF EXISTS tmp_schema_demo CASCADE CONSTRAINTS PURGE;
 DROP TABLE IF EXISTS product_use CASCADE CONSTRAINTS PURGE;

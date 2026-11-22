@@ -2,6 +2,27 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-11-22: Oracle reference implementation, day 2: PL/SQL rules, data changes, queries, closing (Tasks O5-O8)
+
+- **Written:**
+  - `db/oracle/plsql.sql`: assertions, triggers, the `photo_api` package, account erasure and the JSON export.
+  - `db/oracle/dml.sql`: data changes and transactions.
+  - `db/oracle/queries.sql`: views and 37 numbered queries.
+  - `db/README.md`: run order, users, integrity rules and error codes.
+- **Specialization of PHOTO:** the installed release (23.26.4) supports SQL assertions: conditions over several tables that the database checks on every change. Two of them, deferred to `COMMIT`, now reject any photo without its subclass row. The trigger-plus-package design of the plan stays, for disjointness and as the only way the app can add photos.
+- **Design bug found:** PHOTO has no foreign key to the user, so deleting an account (or an analysis, or a log day) cascaded to the photo subclasses but left the PHOTO rows behind, with their storage keys. Two automatic fixes were tested and fail in Oracle:
+  - a compound trigger does not run its statement part for cascaded deletes;
+  - a row trigger on the owning table runs into the mutating-table error.
+
+  So deletion is explicit: `erase_user` marks the account as being deleted, removes the photos, then the account; `photo_api.delete_analysis` does the same for one analysis. The assertions reject a plain delete at commit, so no path can leave orphans.
+- **Refresh tokens:** a compound trigger allows at most one active token per session. It also locks the session row, so two concurrent rotations cannot both pass.
+- **Data changes:** the script works on a temporary user and erases it at the end, so the shared seed stays unchanged for the queries. 12 statements must fail with their expected error; all do. One surprise: 26ai reports a missing table privilege as ORA-41900, not ORA-01031, so the test accepts both.
+- **Queries:** 37 numbered queries with Romanian statements and expected row counts, covering every join type, set operators, every subquery form, grouping, `CASE`, relational division, `WITH`, window functions and `FETCH FIRST`. The views cover the derived attributes, plus one updatable view `WITH CHECK OPTION`. Two queries were rewritten after reading their results:
+  - Q20 was empty on the seed.
+  - Q28 scored every user with a single routine at 0% adherence, because it counted only days with both morning and evening ticks.
+- **Verified:** one runner command rebuilds everything from scratch on Oracle AI Database 26ai Free: users, schema twice, PL/SQL, seed, design check (no difference, 917 rows), DML (12/12 expected errors, nothing left of the temporary user) and queries (37/37 counts match).
+- **Thesis:** section 4.1 now names Oracle as the relational reference, with one paragraph on domains, triggers, assertions, transactions, packages and views; two Oracle references; Fig. 4.1-4.2 replaced with the `pack_size` diagrams; 61 pages. Also fixed: the WBS paragraph of Annex A cited a machine-learning paper ([65]) instead of the project-management book, which was listed but never cited.
+
 ## 2026-11-21: Oracle scripts run on a live server (Tasks O1, O3, O4 done)
 
 - **Server:** the official Oracle Database Free container on Docker Desktop. Exact release: Oracle AI Database 26ai Free, Release 23.26.4.0.0.
