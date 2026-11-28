@@ -22,17 +22,19 @@ The plan front-loads these four results. Nothing from week 3 starts before all f
 
 ## Week 1 (30.11-06.12): design and structure - about 12 h
 
-**Task M1: Local server and runner - TODO (2 h)**
+**Task M1: Local server and runner - DONE 28.11.2026 (2 h)**
 - Container `skincare-mongo` from `mongo:8.0` with a named volume and port 27017; replica set initiated once.
 - A runner outside the repository with the same steps as the Oracle one: `up`, `version`, `setup`, `seed`, `functions`, `queries`, `dml`, `check`, `all`.
 - **Done when:** `rs.status().ok` is 1, `db.version()` starts with 8.0 and a test transaction commits.
+- **Result:** Docker Desktop 29.7.2, MongoDB 8.0.38, container `skincare-mongo` started as replica set `rs0` (one member, `localhost:27017`), data in the named volume `skincare-mongo-data`, port published on 127.0.0.1 only (no authentication on this local, fictitious-data server), `db/` mounted read-only at `/opt/skincare`. Check: `rs.status().ok = 1`, version 8.0.38, a two-insert transaction commits and a transaction aborted on purpose leaves nothing behind (scratch database dropped afterwards). The replica set configuration survives removing and re-creating the container. The runner has all eight steps; steps whose scripts do not exist yet print "skipped", so `all` already runs end to end and grows with M3-M10.
 
-**Task M2: Workload and collection mapping (D2.1 + D2.2) - TODO (4 h)**
+**Task M2: Workload and collection mapping (D2.1 + D2.2) - DONE 28.11.2026 (4 h)**
 - List the operations of the app screens (login, refresh, new analysis, history, barcode lookup, product search, routine of the day, tick a product, calendar, progress photos, export, account deletion) and the entities each one reads together.
 - Map each of the 27 tables to one collection or to an array inside one, using the list of D2.2: `users` (with `skin_profile` and `reminders`), `consents`, `one_time_tokens`, `refresh_tokens`, `skin_analyses` (with `answers`, `predictions`, `zone_assessments`), `photos` (both subclasses, field `kind`), `questions` (with options), `skin_concerns`, `face_zones`, `products` (ordered `ingredients`, computed `safety_score`), `ingredients` (with `functions` and `flags`), `routines` (with `steps`; ROUTINE_SOURCE becomes the optional field `source_analysis_id`), `daily_logs` (with `product_uses`).
 - For each copied value: what is copied, why, how it stays correct and which BCNF decision it relaxes.
 - **Deliverable:** section "MongoDB mapping" in `db/data_dictionary.md`.
 - **Done when:** every table appears exactly once in the mapping, and every array has an upper bound.
+- **Result:** section "MongoDB mapping" in `db/data_dictionary.md`: 17 app operations with the entities read together, the collections touched and the serving index (reads outnumber writes about 10 to 1); 27 of 27 tables mapped once into 13 collections, every array bounded (the bound becomes `maxItems` in M3). The skin columns of APP_USER become the subdocument `skin_profile`, the account columns `account_status`, reminders an array of at most 2; TOKEN_FAMILY folds into `refresh_tokens` (`family_id` and `family_created_at` in each token; every seed family has a token, and a family is created with its first token, so none is lost). The seed will give 227 documents holding all 917 rows (the other 690 rows are array elements and embedded fields). Six deliberate copies, each with its reason, how it stays correct and the normalization rule it relaxes (`user_id` in photos and tokens, `inci_name` in products, product name and brand in routine steps, `safety_score` and `flag_summary`, photo references in analyses and log days); question text is not copied into answers. Two additions to the M4 index list: `consents {user_id: 1, consent_type: 1}` for the consent check before a photo upload. Thesis 4.1: one paragraph on the document model and the local server, two MongoDB manual references; 62 pages.
 
 **Task M3: Validators (D2.3, first half) - TODO (4 h)**
 - One file per collection, `db/mongo/schema/<collection>.json`: `bsonType`, `required`, `enum`, `minimum` / `maximum`, `pattern`, `minItems` / `maxItems`, `additionalProperties: false` at the top level, `oneOf` for the two photo kinds, a `description` on each rule.

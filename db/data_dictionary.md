@@ -4,7 +4,7 @@ Single reference for the app database. Every SQL `CHECK` of `db/oracle/skincare.
 
 ## Conventions
 
-- **Names:** tables and columns in English, `snake_case`, identical in the diagrams, the SQL script, the MongoDB documents and the API. MongoDB collection names are given in Task D2.2.
+- **Names:** tables and columns in English, `snake_case`, identical in the diagrams, the SQL script, the MongoDB documents and the API. MongoDB collection names and the place of every table are in *MongoDB mapping* below.
 - **Keys:** `UUID` keys (PostgreSQL `uuid`, default `gen_random_uuid()`; BSON `binData` subtype 4 with `uuidRepresentation="standard"`), the same values in both databases. Reference data uses natural keys (`concern_code`, `zone_code`) or a small integer (`question_id`).
 - **Time:** every moment is `TIMESTAMPTZ` stored in UTC (BSON `date`, always UTC). `DATE` columns are calendar days in the user's time zone (`APP_USER.time_zone`), stored in BSON as `date` at 00:00 UTC of that day. `TIME` is local wall-clock time `HH:MM` (BSON `string`).
 - **Numbers:** `SMALLINT` -> BSON `int`; `DECIMAL(5,4)` -> BSON `double` (comparisons in the parity test round to 4 decimals); `BOOLEAN` -> `bool`.
@@ -33,6 +33,110 @@ Single reference for the app database. Every SQL `CHECK` of `db/oracle/skincare.
 - **Referential actions:** Oracle has `ON DELETE CASCADE` and `ON DELETE SET NULL`; a foreign key without an action rejects the delete, which is the `RESTRICT` of this dictionary. There is no `ON UPDATE`, and none is needed because keys never change.
 - **Specialization of PHOTO:** a trigger on each subclass checks `PHOTO.photo_kind` (disjoint). Oracle has no deferred triggers; totality comes from two deferred SQL assertions (Oracle 23.26), and the package `photo_api` writes the PHOTO row and its subclass row in one call; the application user has no `INSERT` on the three photo tables.
 - **Users:** `SKINCARE` owns the schema; `SKINCARE_APP` (the backend) gets `SELECT, INSERT, UPDATE, DELETE` on the user tables and only `SELECT` on the reference tables (concerns, zones, questions, options, products, ingredients and their lists).
+
+## MongoDB mapping (Task M2, 28.11.2026)
+
+Terms. A *document* is one record in BSON (binary JSON): named fields whose values may be numbers, text, dates, nested documents (*subdocuments*) or *arrays* (ordered lists). A *collection* is a set of documents, the counterpart of a table, but without a fixed column list (the validators of Task M3 add one). *Embedding* stores child rows as an array or subdocument inside the parent document, so one read returns both; a *reference* stores only the key of a document in another collection, like a foreign key, and the two are read with two queries or a `$lookup` stage. The method follows the MongoDB manual: workload first, then relationships, then patterns ([data modeling](https://www.mongodb.com/docs/manual/data-modeling/), [embed or reference](https://www.mongodb.com/docs/manual/data-modeling/best-practices/)).
+
+### Workload (D2.1)
+
+Frequency is a rough estimate for one active user: *high* = several times per session, *medium* = once per day, *low* = a few times per month or less.
+
+| Operation | R/W | Frequency | Entities read or written together | Collection(s) | Index used |
+|---|---|---|---|---|---|
+| Log in by e-mail | R + W | medium | APP_USER (hash, account status), new TOKEN_FAMILY + REFRESH_TOKEN | `users`, `refresh_tokens` | unique `users.email` |
+| Refresh the access token | R + W | high | REFRESH_TOKEN, its family (revoke old, insert new in one transaction) | `refresh_tokens` | unique `token_hash`; `family_id` |
+| E-mail verification / password reset | R + W | low | ONE_TIME_TOKEN, APP_USER | `one_time_tokens`, `users` | unique `token_hash` |
+| Sign-up with consents | W | low | APP_USER + skin profile, CONSENT rows | `users`, `consents` | unique `users.email` |
+| New analysis | W | medium | SKIN_ANALYSIS + ANSWER + PREDICTION (+ ZONE_ASSESSMENT), PHOTO + ANALYSIS_PHOTO | `skin_analyses`, `photos` | `photos.object_key` (unique) |
+| History page (paginated) | R | medium | SKIN_ANALYSIS + top PREDICTION | `skin_analyses` | `{user_id: 1, created_at: -1}` |
+| Analysis detail / result screen | R | medium | SKIN_ANALYSIS, ANSWER, PREDICTION, ZONE_ASSESSMENT, analysis photos, SKIN_CONCERN text | `skin_analyses`, `photos`, `skin_concerns` | `_id`; `photos {user_id, kind}` |
+| Barcode lookup | R | high | PRODUCT + PRODUCT_INGREDIENT + INGREDIENT names, safety score | `products` | unique partial `barcode` |
+| Product text search | R | medium | PRODUCT (name, brand) | `products` | text index on name and brand |
+| Ingredient detail | R | medium | INGREDIENT + functions + flags | `ingredients` | unique `inci_name` / `_id` |
+| Routine of the day | R | high | latest ROUTINE per period + ROUTINE_STEP + product name and brand | `routines` | `{user_id: 1, period: 1}` |
+| Tick a product in the daily log | W | high | DAILY_LOG (created on the first tick of the day) + PRODUCT_USE | `daily_logs` | unique `{user_id: 1, log_date: 1}` (upsert) |
+| Calendar month | R | medium | DAILY_LOG days of a month + ticks | `daily_logs` | `{user_id: 1, log_date: 1}` (range) |
+| Progress-photo timeline | R | low | PHOTO + PROGRESS_PHOTO + log day | `photos`, `daily_logs` | `photos {user_id: 1, kind: 1}` |
+| Consent check before a photo upload | R | medium | active CONSENT of type `photo_processing` | `consents` | `{user_id: 1, consent_type: 1}` |
+| Data export (GDPR Art. 15/20) | R | low | everything owned by the user | all user collections | `user_id` in each |
+| Account deletion | W | low | everything owned by the user, in one transaction | all user collections | `user_id` in each |
+
+Reads dominate (about 10 reads per write); the only frequent writes are token rotation and daily-log ticks, both single-document or two-document operations.
+
+### Collections (D2.2)
+
+13 collections. Every table appears exactly once.
+
+| Table | Target (collection / path) | `_id` or key inside the array | Embed or reference, and why | Upper bound (rule; seed maximum) |
+|---|---|---|---|---|
+| APP_USER | `users` | `_id` = user_id | collection; skin columns grouped as subdocument `skin_profile` (`skin_type`, `main_concern`, `climate`), account columns as `account_status` (`email_verified_at`, `failed_logins`, `locked_until`, `deletion_requested_at`): the composite attributes of the EER come back | - |
+| REMINDER | `users.reminders[]` | `period` (unique in the array) | embed: read with the profile, at most one per period | 2 (one per period; 2) |
+| CONSENT | `consents` | `_id` = consent_id | reference (`user_id`): append-only proof written at different times, grows without a bound | - (4 per user in the seed) |
+| ONE_TIME_TOKEN | `one_time_tokens` | `_id` = token_id | reference: looked up by hash without the user, deleted by a TTL index | - |
+| TOKEN_FAMILY | `refresh_tokens.family_id` (+ `family_created_at`) | distinct `family_id` | folded into the token documents: a family is created together with its first token, so it is never empty (true for all 7 seed families) | - |
+| REFRESH_TOKEN | `refresh_tokens` | `_id` = token_id | collection: looked up by hash, deleted by a TTL index; one family can rotate many times in 30 days | - (2 per family in the seed) |
+| SKIN_ANALYSIS | `skin_analyses` | `_id` = analysis_id | collection, `user_id` reference | - (3 per user in the seed) |
+| ANSWER | `skin_analyses.answers[]` | (`question_id`, `option_value`) | embed: written once with the analysis, read on the result screen | 60 (sum of options of the 7 questions, 50 in the seed, rounded up; 9) |
+| PREDICTION | `skin_analyses.predictions[]` | `concern_code` | embed: always read with the analysis | 4 (one per model category; 4) |
+| ZONE_ASSESSMENT | `skin_analyses.zone_assessments[]` | `zone_code` | embed: read with the analysis | 6 (one per face zone; 2) |
+| QUESTION | `questions` | `_id` = question_id (int); `field_key` unique | collection, reference data | - |
+| QUESTION_OPTION | `questions.options[]` | `option_value` | embed: always read with the question, ordered by `position` | 99 (position 1-99; 12) |
+| FACE_ZONE | `face_zones` | `_id` = zone_code | collection, reference data | - |
+| SKIN_CONCERN | `skin_concerns` | `_id` = concern_code | collection, reference data (text shown on the result screen) | - |
+| PHOTO | `photos` | `_id` = photo_id | collection with field `kind` (`ANALYSIS` / `PROGRESS`): one collection for the specialization (polymorphic pattern), `user_id` copied for erasure and URL checks | - |
+| ANALYSIS_PHOTO | `photos` with `kind: "ANALYSIS"`: `analysis_id`, `shot_type`, `heatmap_key` | photo `_id` | same document as its PHOTO row (disjoint + total by construction) | 3 per analysis (dictionary rule, enforced by the function / backend; 3) |
+| PROGRESS_PHOTO | `photos` with `kind: "PROGRESS"`: `log_id`, `caption` | photo `_id` | same document as its PHOTO row | 1 per log day (UQ log_id) |
+| PRODUCT | `products` | `_id` = product_id | collection | - |
+| PRODUCT_INGREDIENT | `products.ingredients[]`, ordered by `position` | `ingredient_id` | embed: the INCI list is read with the product on every scan; `inci_name` copied | 200 (position 1-200; 14) |
+| INGREDIENT | `ingredients` | `_id` = ingredient_id; `inci_name` unique | collection: shared by many products, changed by curation | - |
+| INGREDIENT_FUNCTION | `ingredients.functions[]` (strings) | the value | embed: read with the ingredient | 42 (size of the value set; 4) |
+| INGREDIENT_FLAG | `ingredients.flags[]` (strings) | the value | embed: read with the ingredient | 8 (size of the value set; 1) |
+| ROUTINE | `routines` | `_id` = routine_id | collection, `user_id` reference; history kept | - |
+| ROUTINE_SOURCE | `routines.source_analysis_id` (optional) | - | field: the 1:0..1 relationship becomes an optional reference | 1 |
+| ROUTINE_STEP | `routines.steps[]`, ordered by `step_no` | `step_no` | embed: always read with the routine; product name and brand copied | 12 (step_no 1-12; 5) |
+| DAILY_LOG | `daily_logs` | `_id` = log_id; unique (`user_id`, `log_date`) | collection: one document per day, grows by one per day, so it cannot be an array in `users` | - (18 per user in the seed) |
+| PRODUCT_USE | `daily_logs.product_uses[]` | (`product_id`, `period`) | embed: written and read with the day | 60 (validator `maxItems`, far above two full routines of 12 steps; 7) |
+
+**Check:** 27 of 27 tables mapped once; every array has a stated upper bound, written as `maxItems` in the validators of Task M3. Seed counts (917 rows) after the mapping:
+
+| Collection | Documents | Rows inside (table: count) | Rows |
+|---|---|---|---|
+| `skin_concerns` | 4 | | 4 |
+| `face_zones` | 6 | | 6 |
+| `questions` | 7 | options 50 | 57 |
+| `ingredients` | 85 | functions 168, flags 14 | 267 |
+| `products` | 15 | ingredients 162 | 177 |
+| `users` | 7 | reminders 4 | 11 |
+| `one_time_tokens` | 3 | | 3 |
+| `consents` | 19 | | 19 |
+| `refresh_tokens` | 9 | families 7 (distinct `family_id`) | 16 |
+| `skin_analyses` | 8 | predictions 32, answers 51, zone assessments 2 | 93 |
+| `photos` | 14 | analysis-photo fields 11, progress-photo fields 3 | 28 |
+| `routines` | 6 | steps 18, sources 4 | 28 |
+| `daily_logs` | 44 | product uses 164 | 208 |
+| **Total** | **227** | **690** | **917** |
+
+### Copied values
+
+Each copy relaxes a normalization decision on purpose, for a read that happens far more often than the change.
+
+| Copied value | Why | How it stays correct | What it relaxes |
+|---|---|---|---|
+| `user_id` in `photos` | erasure and pre-signed URL checks without joining analyses and logs | immutable: a photo never changes owner | FD photo_id -> user_id holds only through analysis_id or log_id (transitive) |
+| `user_id` and `family_created_at` in each `refresh_tokens` document | TOKEN_FAMILY has no collection; erasure by `user_id` | written once from the family's first token, never changed | FD family_id -> user_id, created_at (the FN3 split of TOKEN_FAMILY is undone) |
+| `inci_name` in `products.ingredients[]` | the scan screen lists names without a `$lookup` | INCI names are fixed by CosIng; a rename runs one `updateMany` with `arrayFilters` | FD ingredient_id -> inci_name repeated per product (transitive) |
+| `name`, `brand` in `routines.steps[]` | the routine screen shows them without a `$lookup` | refreshed by the import job when a product changes; a deleted product sets `product_id`, `name`, `brand` to null (the `SET NULL` rule) | FD product_id -> name, brand (transitive) |
+| `safety_score`, `flag_summary` in `products` (computed pattern) | derived values read on every scan | recomputed for the affected products when an ingredient's score or flags change (job / function) | derived attributes removed in normalization are stored again |
+| `photo_ids[]` in `skin_analyses`, `progress_photo_id` in `daily_logs` | the result screen and the calendar find the photo keys in one read | written in the same transaction as the photo document, removed when the photo is deleted | duplicate of the reverse reference in `photos` |
+| not copied: question text and option labels in `answers`, concern names in `predictions` | reference data, joined only on the detail screen and in the export | - | answers keep only the keys, as in BCNF |
+
+### Cross-cutting choices
+
+- **Keys:** `_id` holds the same UUID values as the Oracle keys, as BSON binary subtype 4 (`UUID("...")` in mongosh, `uuidRepresentation="standard"` in PyMongo). Reference data keeps natural keys: `skin_concerns._id` = concern_code, `face_zones._id` = zone_code, `questions._id` = question_id (int) with a unique index on `field_key`.
+- **Versioning:** every document has `schema_version: 1`, so later shape changes can be migrated document by document ([schema versioning](https://www.mongodb.com/docs/manual/data-modeling/design-patterns/data-versioning/)).
+- **Time:** every moment is a BSON `date` in UTC; calendar days (`date_of_birth`, `log_date`) are dates at 00:00 UTC; `time_of_day` stays `HH:MM` text.
+- **Size:** the largest document is a product with 200 ingredients (about 200 x 120 bytes = 24 KB) or an analysis with 60 answers (under 5 KB), far below the 16 MB document limit ([anti-patterns](https://www.mongodb.com/docs/manual/data-modeling/design-antipatterns/)).
 
 ## Account and security
 
