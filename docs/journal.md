@@ -2,6 +2,23 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-11-28: Validators and setup script for MongoDB (Tasks M3, M4)
+
+- **Validators:** one `$jsonSchema` file per collection in `db/mongo/schema/` (13 files): required fields, value sets, ranges, patterns, maximum array sizes and no unknown fields, with a description on each rule that MongoDB shows in the error. 49 of the 52 Oracle CHECKs on these tables have a rule; `d_utc_ts` needs none (a BSON date is always UTC). The two photo kinds are told apart by `oneOf`. Each collection accepted a valid sample and rejected every invalid one with error 121 (44 invalid samples in all).
+- **What a validator cannot do:** compare two fields or documents, check that a referenced document exists (MongoDB has no foreign keys), know the current date, or see the UUID subtype. `db/mongo/schema/not_in_validators.md` lists these 44 rules, each with the place that enforces it: unique index, backend, transaction or seed check.
+- **Setup script:** `db/mongo/setup.js` creates or updates the 13 collections (`collMod` when they exist), 20 indexes and 4 views that mirror the Oracle views. Run twice in a row on an empty database without errors. `validator_samples.js` then shows four invalid documents rejected with 121.
+- **Decision, TTL indexes:** the indexes that delete expired tokens are created only on request (`withTtl`). The seed tokens expire before today, so on the demonstration database MongoDB would delete them within a minute and the row counts (917) would no longer match Oracle. The runner checks on a scratch database that the two TTL indexes are created correctly; the real database and Atlas get them by default.
+- **Thesis:** two sentences added to the MongoDB paragraph in 4.1 (validators, indexes, views).
+- **Next:** M5 seed (`seed.js` from the shared seed data, 917 rows in 227 documents).
+
+## 2026-11-28: Local MongoDB server and the document model (Tasks M1, M2)
+
+- **M1, server:** MongoDB 8.0.38 (the version Atlas Free runs) in Docker as a single-member replica set `rs0`, because multi-document transactions need a replica set. Data in a named volume, port open on 127.0.0.1 only, the `db/` folder mounted read-only. Check passed: `rs.status().ok = 1`, version 8.0.x, a test transaction commits and one aborted on purpose leaves nothing behind. The replica set configuration survives re-creating the container. The runner (outside the repository) already has every step of the plan; steps whose scripts do not exist yet are skipped.
+- **M2, mapping:** section "MongoDB mapping" in `db/data_dictionary.md`. It lists 17 app operations, and reads outnumber writes about 10 to 1. All 27 tables map exactly once into 13 collections. A child table read together with its parent and bounded in size becomes an embedded array: answers, predictions and zone assessments in `skin_analyses`, options in `questions`, the ingredient list in `products`, steps in `routines`, product uses in `daily_logs`, functions and flags in `ingredients`, reminders in `users`. Data that is unbounded or written separately keeps its own collection: consents, daily logs, tokens and photos. The PHOTO specialization becomes one collection with a `kind` field. TOKEN_FAMILY folds into `refresh_tokens`. The seed will give 227 documents holding the 917 rows.
+- **Why the copies:** six values are copied on purpose: `user_id` in photos and tokens, the INCI name in products, the product name in routine steps, the safety score and flag summary, and photo references. Each copy is documented with how it stays correct and which normalization rule it relaxes. Question text is not copied, because the result screen joins it from a small cached collection.
+- **Thesis:** one paragraph at the end of 4.1, two MongoDB manual references (renumbered), 62 pages.
+- **Next:** M3 validators, then M4 setup script, both due by 06.12.
+
 ## 2026-11-28: MongoDB implementation planned over four weeks (Tasks M1-M13)
 
 - **Written:** `docs/MongoDB_task_plan.md`, a dated plan for 30.11-27.12.2026 (about 46 h) that implements in MongoDB what Phase O implemented in Oracle: the same schema v1, seed data, numbered queries and functions. It schedules Tasks D2.1-D2.3, D3.1 (local part), D3.2 and D3.3 of the database plan, which now points to it.

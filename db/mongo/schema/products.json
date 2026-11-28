@@ -1,0 +1,175 @@
+{
+  "bsonType": "object",
+  "description": "A cosmetic product with its ordered ingredient list and computed safety values (tables PRODUCT and PRODUCT_INGREDIENT).",
+  "required": [
+    "_id",
+    "schema_version",
+    "name",
+    "brand",
+    "category",
+    "source",
+    "ingredients",
+    "safety_score",
+    "flag_summary"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "binData",
+      "description": "product_id (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "barcode": {
+      "bsonType": [
+        "string",
+        "null"
+      ],
+      "pattern": "^[0-9]{8,14}$",
+      "description": "GTIN digits (EAN-8, UPC-A, EAN-13, GTIN-14); absent or null when unknown; unique when present."
+    },
+    "name": {
+      "bsonType": "string",
+      "description": "Product name, 1-160 characters.",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "brand": {
+      "bsonType": "string",
+      "description": "Brand, 1-80 characters.",
+      "minLength": 1,
+      "maxLength": 80
+    },
+    "category": {
+      "bsonType": "string",
+      "enum": [
+        "cleanser",
+        "toner",
+        "serum",
+        "moisturizer",
+        "sunscreen",
+        "exfoliant",
+        "mask",
+        "eye_care",
+        "other"
+      ],
+      "description": "Product category."
+    },
+    "pack_size": {
+      "bsonType": [
+        "string",
+        "null"
+      ],
+      "maxLength": 20,
+      "description": "Quantity as printed (for example 150 ml), at most 20 characters; may be null."
+    },
+    "source": {
+      "bsonType": "string",
+      "enum": [
+        "curated",
+        "openbeautyfacts"
+      ],
+      "description": "Where the product came from."
+    },
+    "ingredients": {
+      "bsonType": "array",
+      "minItems": 0,
+      "maxItems": 200,
+      "items": {
+        "bsonType": "object",
+        "description": "One ingredient of the list.",
+        "required": [
+          "ingredient_id",
+          "inci_name",
+          "position"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "ingredient_id": {
+            "bsonType": "binData",
+            "description": "ingredient_id, reference to ingredients (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+          },
+          "inci_name": {
+            "bsonType": "string",
+            "description": "Copy of ingredients.inci_name, 1-160 characters.",
+            "minLength": 1,
+            "maxLength": 160
+          },
+          "position": {
+            "bsonType": "int",
+            "minimum": 1,
+            "maximum": 200,
+            "description": "Position on the INCI list, 1-200."
+          }
+        }
+      },
+      "description": "INCI list in label order (position 1-200); inci_name is a copy of the ingredient name for display."
+    },
+    "safety_score": {
+      "bsonType": [
+        "int",
+        "null"
+      ],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Computed: weighted mean of the ingredient scores (weight 1/position), integer 0-100; null when the product has no ingredient list."
+    },
+    "flag_summary": {
+      "bsonType": "object",
+      "description": "Computed: ingredients per band and the distinct flags of the ingredients.",
+      "required": [
+        "safe",
+        "caution",
+        "irritant",
+        "flags"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "safe": {
+          "bsonType": "int",
+          "minimum": 0,
+          "maximum": 200,
+          "description": "Number of ingredients with score >= 70."
+        },
+        "caution": {
+          "bsonType": "int",
+          "minimum": 0,
+          "maximum": 200,
+          "description": "Number of ingredients with score 40-69."
+        },
+        "irritant": {
+          "bsonType": "int",
+          "minimum": 0,
+          "maximum": 200,
+          "description": "Number of ingredients with score < 40."
+        },
+        "flags": {
+          "bsonType": "array",
+          "minItems": 0,
+          "maxItems": 8,
+          "items": {
+            "bsonType": "string",
+            "enum": [
+              "fragrance",
+              "fragrance_allergen",
+              "essential_oil",
+              "drying_alcohol",
+              "exfoliating_acid",
+              "retinoid",
+              "comedogenic",
+              "formaldehyde_releaser"
+            ],
+            "description": "An ingredient flag."
+          },
+          "description": "Distinct flags found among the ingredients.",
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

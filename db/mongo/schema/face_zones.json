@@ -1,0 +1,37 @@
+{
+  "bsonType": "object",
+  "description": "One of the six face zones (table FACE_ZONE). Reference data.",
+  "required": [
+    "_id",
+    "schema_version",
+    "zone_name"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "string",
+      "enum": [
+        "forehead",
+        "nose",
+        "left_cheek",
+        "right_cheek",
+        "chin",
+        "jawline"
+      ],
+      "description": "zone_code: one of the six face zones."
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "zone_name": {
+      "bsonType": "string",
+      "description": "Display name, 1-40 characters (unique, see the unique index).",
+      "minLength": 1,
+      "maxLength": 40
+    }
+  }
+}

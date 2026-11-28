@@ -1,0 +1,32 @@
+{
+  "bsonType": "object",
+  "description": "A photo of either kind: ANALYSIS (belongs to an analysis) or PROGRESS (belongs to a log day) (tables PHOTO, ANALYSIS_PHOTO, PROGRESS_PHOTO).",
+  "required": ["_id", "schema_version", "user_id", "object_key", "content_type", "captured_at", "kind"],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {"bsonType": "binData", "description": "photo_id, a UUID (binary subtype 4)."},
+    "schema_version": {"bsonType": "int", "enum": [1], "description": "Document shape version, 1 for now."},
+    "user_id": {"bsonType": "binData", "description": "Owner of the photo, copied for erasure and URL checks."},
+    "object_key": {"bsonType": "string", "maxLength": 255, "pattern": "^photos/[0-9a-f-]{36}$", "description": "Random key of the file in the object store, photos/ followed by 36 hex digits and hyphens."},
+    "content_type": {"enum": ["image/jpeg", "image/png", "image/webp"], "description": "File type: image/jpeg, image/png or image/webp."},
+    "captured_at": {"bsonType": "date", "description": "Moment the photo was taken (UTC)."},
+    "kind": {"enum": ["ANALYSIS", "PROGRESS"], "description": "Photo kind: ANALYSIS or PROGRESS."},
+    "analysis_id": {"bsonType": "binData", "description": "ANALYSIS only: the analysis the photo belongs to."},
+    "shot_type": {"enum": ["front", "left", "right"], "description": "ANALYSIS only: front, left or right."},
+    "heatmap_key": {"bsonType": ["string", "null"], "maxLength": 255, "pattern": "^heatmaps/[0-9a-f-]{36}$", "description": "ANALYSIS only: key of the Grad-CAM image, heatmaps/ followed by 36 hex digits and hyphens."},
+    "log_id": {"bsonType": "binData", "description": "PROGRESS only: the log day the photo belongs to."},
+    "caption": {"bsonType": ["string", "null"], "maxLength": 140, "description": "PROGRESS only: caption of at most 140 characters."}
+  },
+  "oneOf": [
+    {
+      "required": ["analysis_id", "shot_type"],
+      "properties": {"kind": {"enum": ["ANALYSIS"]}},
+      "not": {"anyOf": [{"required": ["log_id"]}, {"required": ["caption"]}]}
+    },
+    {
+      "required": ["log_id"],
+      "properties": {"kind": {"enum": ["PROGRESS"]}},
+      "not": {"anyOf": [{"required": ["analysis_id"]}, {"required": ["shot_type"]}, {"required": ["heatmap_key"]}]}
+    }
+  ]
+}

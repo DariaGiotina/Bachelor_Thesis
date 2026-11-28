@@ -1,0 +1,130 @@
+{
+  "bsonType": "object",
+  "description": "A skincare routine for one period with its ordered steps (tables ROUTINE, ROUTINE_STEP, ROUTINE_SOURCE).",
+  "required": [
+    "_id",
+    "schema_version",
+    "user_id",
+    "period",
+    "complexity_level",
+    "created_at",
+    "steps"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "binData",
+      "description": "routine_id (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "user_id": {
+      "bsonType": "binData",
+      "description": "owner, reference to users (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "period": {
+      "bsonType": "string",
+      "enum": [
+        "AM",
+        "PM"
+      ],
+      "description": "Period of the day: AM or PM (domain d_period of the Oracle schema)."
+    },
+    "complexity_level": {
+      "bsonType": "string",
+      "enum": [
+        "basic",
+        "intermediate",
+        "advanced"
+      ],
+      "description": "Routine complexity."
+    },
+    "created_at": {
+      "bsonType": "date",
+      "description": "Creation moment; the latest routine of a period is the current one (UTC)"
+    },
+    "source_analysis_id": {
+      "bsonType": [
+        "binData",
+        "null"
+      ],
+      "description": "optional reference to skin_analyses (table ROUTINE_SOURCE) (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "steps": {
+      "bsonType": "array",
+      "minItems": 0,
+      "maxItems": 12,
+      "items": {
+        "bsonType": "object",
+        "description": "One step.",
+        "required": [
+          "step_no",
+          "category",
+          "instruction",
+          "duration_sec"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "step_no": {
+            "bsonType": "int",
+            "minimum": 1,
+            "maximum": 12,
+            "description": "Step number, 1-12."
+          },
+          "product_id": {
+            "bsonType": [
+              "binData",
+              "null"
+            ],
+            "description": "chosen product, reference to products (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+          },
+          "name": {
+            "bsonType": [
+              "string",
+              "null"
+            ],
+            "maxLength": 160,
+            "description": "Copy of the product name; null when no product is chosen."
+          },
+          "brand": {
+            "bsonType": [
+              "string",
+              "null"
+            ],
+            "maxLength": 80,
+            "description": "Copy of the product brand; null when no product is chosen."
+          },
+          "category": {
+            "bsonType": "string",
+            "enum": [
+              "cleansing",
+              "prep",
+              "treatment",
+              "hydration",
+              "protection"
+            ],
+            "description": "Step category."
+          },
+          "instruction": {
+            "bsonType": "string",
+            "description": "Instruction shown to the user, at most 255 characters.",
+            "minLength": 1,
+            "maxLength": 255
+          },
+          "duration_sec": {
+            "bsonType": "int",
+            "minimum": 5,
+            "maximum": 900,
+            "description": "Duration in seconds, 5-900."
+          }
+        }
+      },
+      "description": "Steps in order (step_no 1-12)."
+    }
+  }
+}

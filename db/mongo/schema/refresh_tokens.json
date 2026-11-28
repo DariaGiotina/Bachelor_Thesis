@@ -1,0 +1,16 @@
+{
+  "bsonType": "object",
+  "description": "A refresh token with its login family (tables REFRESH_TOKEN + TOKEN_FAMILY).",
+  "required": ["_id", "schema_version", "family_id", "family_created_at", "user_id", "token_hash", "expires_at", "revoked"],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {"bsonType": "binData", "description": "token_id, a UUID (binary subtype 4)."},
+    "schema_version": {"bsonType": "int", "enum": [1], "description": "Document shape version, 1 for now."},
+    "family_id": {"bsonType": "binData", "description": "Login (session) family, a UUID shared by all tokens of one login."},
+    "family_created_at": {"bsonType": "date", "description": "Moment the family was created (UTC), copied from its first token."},
+    "user_id": {"bsonType": "binData", "description": "Owner of the family, the _id of a document in users."},
+    "token_hash": {"bsonType": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256 of the token, 64 lower-case hex digits."},
+    "expires_at": {"bsonType": "date", "description": "Moment the token stops working (UTC), issue time plus 30 days; a TTL index removes the document later."},
+    "revoked": {"bsonType": "bool", "description": "true once the token was rotated or its family revoked."}
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "bsonType": "object",
+  "description": "A single-use token sent by e-mail for verification or password reset (table ONE_TIME_TOKEN).",
+  "required": ["_id", "schema_version", "user_id", "purpose", "token_hash", "created_at", "expires_at"],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {"bsonType": "binData", "description": "token_id, a UUID (binary subtype 4)."},
+    "schema_version": {"bsonType": "int", "enum": [1], "description": "Document shape version, 1 for now."},
+    "user_id": {"bsonType": "binData", "description": "Owner of the token, the _id of a document in users."},
+    "purpose": {"enum": ["email_verification", "password_reset"], "description": "Purpose: email_verification or password_reset."},
+    "token_hash": {"bsonType": "string", "pattern": "^[0-9a-f]{64}$", "description": "SHA-256 of the token, 64 lower-case hex digits."},
+    "created_at": {"bsonType": "date", "description": "Moment the token was issued (UTC)."},
+    "expires_at": {"bsonType": "date", "description": "Moment the token stops working (UTC); a TTL index removes the document later."},
+    "used_at": {"bsonType": ["date", "null"], "description": "Moment the token was used, null or absent while unused."}
+  }
+}

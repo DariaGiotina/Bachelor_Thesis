@@ -1,0 +1,42 @@
+{
+  "bsonType": "object",
+  "description": "One of the four categories of the exported skin-concern model (table SKIN_CONCERN). Reference data.",
+  "required": [
+    "_id",
+    "schema_version",
+    "name",
+    "description"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "string",
+      "enum": [
+        "acne",
+        "eczema_dermatitis",
+        "redness_rosacea",
+        "normal_other"
+      ],
+      "description": "concern_code: one of the four model categories, in model order."
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "name": {
+      "bsonType": "string",
+      "description": "Display name, 1-60 characters (unique, see the unique index).",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "description": {
+      "bsonType": "string",
+      "description": "Plain-language text, informational, never a diagnosis; at most 1,000 characters.",
+      "minLength": 1,
+      "maxLength": 1000
+    }
+  }
+}

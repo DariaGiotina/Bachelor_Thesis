@@ -1,0 +1,65 @@
+{
+  "bsonType": "object",
+  "description": "A user account: profile, skin profile, account status and at most two reminders (table APP_USER + REMINDER).",
+  "required": ["_id", "schema_version", "email", "password_hash", "first_name", "last_name", "date_of_birth", "skin_profile", "language", "time_zone", "created_at", "account_status"],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {"bsonType": "binData", "description": "user_id, a UUID (binary subtype 4)."},
+    "schema_version": {"bsonType": "int", "enum": [1], "description": "Document shape version, 1 for now."},
+    "email": {"bsonType": "string", "minLength": 3, "maxLength": 254, "pattern": "^[^@A-Z]+@[^@A-Z]+$", "description": "E-mail address stored in lower case, 3-254 characters, exactly one @."},
+    "password_hash": {"bsonType": "string", "maxLength": 255, "pattern": "^\\$argon2id\\$", "description": "Argon2id hash in PHC format, starts with $argon2id$, at most 255 characters."},
+    "first_name": {"bsonType": "string", "minLength": 1, "maxLength": 80, "pattern": "^\\S(.*\\S)?$", "description": "First name, 1-80 characters, no leading or trailing space."},
+    "last_name": {"bsonType": "string", "minLength": 1, "maxLength": 80, "pattern": "^\\S(.*\\S)?$", "description": "Last name, 1-80 characters, no leading or trailing space."},
+    "date_of_birth": {"bsonType": "date", "description": "Calendar day of birth, a date at 00:00 UTC."},
+    "skin_profile": {
+      "bsonType": "object",
+      "description": "Self-reported skin profile (special-category data).",
+      "required": ["skin_type", "main_concern", "climate"],
+      "additionalProperties": false,
+      "properties": {
+        "skin_type": {"enum": ["normal", "dry", "oily", "combination", "sensitive"], "description": "Skin type: normal, dry, oily, combination or sensitive."},
+        "main_concern": {"enum": ["acne", "redness", "dryness", "oiliness_pores", "sensitivity", "hyperpigmentation", "signs_of_aging", "none"], "description": "Main self-reported concern, one of the eight allowed values."},
+        "climate": {"enum": ["temperate", "humid", "dry", "cold"], "description": "Climate: temperate, humid, dry or cold."}
+      }
+    },
+    "language": {"enum": ["ro", "en"], "description": "Interface language: ro or en."},
+    "time_zone": {"bsonType": "string", "maxLength": 64, "pattern": "^[A-Za-z_]+(/[A-Za-z0-9_+-]+)*$", "description": "IANA time-zone name, for example Europe/Bucharest, at most 64 characters."},
+    "created_at": {"bsonType": "date", "description": "Moment the account was created (UTC)."},
+    "account_status": {
+      "bsonType": "object",
+      "description": "Account state: verification, failed logins, lock and deletion marker.",
+      "required": ["failed_logins"],
+      "additionalProperties": false,
+      "properties": {
+        "email_verified_at": {"bsonType": ["date", "null"], "description": "Moment the e-mail was verified, null or absent until then."},
+        "failed_logins": {"bsonType": "int", "minimum": 0, "maximum": 100, "description": "Failed logins in a row, 0-100."},
+        "locked_until": {"bsonType": ["date", "null"], "description": "End of the login lock, null or absent when not locked."},
+        "deletion_requested_at": {"bsonType": ["date", "null"], "description": "Marker of a running account deletion, null or absent otherwise."}
+      }
+    },
+    "reminders": {
+      "bsonType": "array",
+      "maxItems": 2,
+      "description": "At most two reminders, one per period (AM, PM).",
+      "items": {
+        "bsonType": "object",
+        "description": "One reminder: period, local time and on/off switch; AM between 04:00 and 11:59, PM between 12:00 and 23:59.",
+        "required": ["period", "time_of_day", "enabled"],
+        "additionalProperties": false,
+        "properties": {
+          "period": {"enum": ["AM", "PM"], "description": "Period: AM or PM."},
+          "time_of_day": {"bsonType": "string", "pattern": "^([01][0-9]|2[0-3]):[0-5][0-9]$", "description": "Local time HH:MM, 00:00-23:59."},
+          "enabled": {"bsonType": "bool", "description": "true when the reminder is switched on."}
+        },
+        "oneOf": [
+          {
+            "properties": {"period": {"enum": ["AM"]}, "time_of_day": {"bsonType": "string", "pattern": "^(0[4-9]|1[01]):[0-5][0-9]$"}}
+          },
+          {
+            "properties": {"period": {"enum": ["PM"]}, "time_of_day": {"bsonType": "string", "pattern": "^(1[2-9]|2[0-3]):[0-5][0-9]$"}}
+          }
+        ]
+      }
+    }
+  }
+}

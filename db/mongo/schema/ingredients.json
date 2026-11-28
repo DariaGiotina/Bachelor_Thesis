@@ -1,0 +1,122 @@
+{
+  "bsonType": "object",
+  "description": "A cosmetic ingredient with its functions and flags (tables INGREDIENT, INGREDIENT_FUNCTION, INGREDIENT_FLAG). Reference data.",
+  "required": [
+    "_id",
+    "schema_version",
+    "inci_name",
+    "plain_meaning",
+    "score",
+    "functions",
+    "flags"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "binData",
+      "description": "ingredient_id (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "inci_name": {
+      "bsonType": "string",
+      "description": "INCI name as in CosIng, written in upper case (no lower-case ASCII letters), 1-160 characters (unique).",
+      "minLength": 1,
+      "maxLength": 160,
+      "pattern": "^[^a-z]+$"
+    },
+    "plain_meaning": {
+      "bsonType": "string",
+      "description": "Own plain-language explanation, at most 255 characters.",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "score": {
+      "bsonType": "int",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "Score 0-100, higher = fewer reasons for caution (domain d_score)."
+    },
+    "functions": {
+      "bsonType": "array",
+      "minItems": 0,
+      "maxItems": 42,
+      "items": {
+        "bsonType": "string",
+        "enum": [
+          "abrasive",
+          "absorbent",
+          "antimicrobial",
+          "antioxidant",
+          "antiperspirant",
+          "antistatic",
+          "astringent",
+          "binding",
+          "bleaching",
+          "buffering",
+          "chelating",
+          "cleansing",
+          "colorant",
+          "denaturant",
+          "deodorant",
+          "emollient",
+          "emulsifying",
+          "emulsion_stabilising",
+          "exfoliating",
+          "film_forming",
+          "foam_boosting",
+          "gel_forming",
+          "hair_conditioning",
+          "humectant",
+          "keratolytic",
+          "masking",
+          "moisturising",
+          "opacifying",
+          "perfuming",
+          "plasticiser",
+          "preservative",
+          "refreshing",
+          "skin_conditioning",
+          "skin_protecting",
+          "smoothing",
+          "solvent",
+          "soothing",
+          "surfactant",
+          "tonic",
+          "uv_absorber",
+          "uv_filter",
+          "viscosity_controlling"
+        ],
+        "description": "A CosIng function name."
+      },
+      "description": "CosIng functions of the ingredient (value set of 42), no repeats.",
+      "uniqueItems": true
+    },
+    "flags": {
+      "bsonType": "array",
+      "minItems": 0,
+      "maxItems": 8,
+      "items": {
+        "bsonType": "string",
+        "enum": [
+          "fragrance",
+          "fragrance_allergen",
+          "essential_oil",
+          "drying_alcohol",
+          "exfoliating_acid",
+          "retinoid",
+          "comedogenic",
+          "formaldehyde_releaser"
+        ],
+        "description": "An ingredient flag."
+      },
+      "description": "Reasons for caution (value set of 8), no repeats.",
+      "uniqueItems": true
+    }
+  }
+}

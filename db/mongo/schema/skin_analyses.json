@@ -1,0 +1,68 @@
+{
+  "bsonType": "object",
+  "description": "One skin analysis with its answers, predictions and zone findings (tables SKIN_ANALYSIS, ANSWER, PREDICTION, ZONE_ASSESSMENT).",
+  "required": ["_id", "schema_version", "user_id", "created_at", "model_version", "status", "predictions"],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {"bsonType": "binData", "description": "analysis_id, a UUID (binary subtype 4)."},
+    "schema_version": {"bsonType": "int", "enum": [1], "description": "Document shape version, 1 for now."},
+    "user_id": {"bsonType": "binData", "description": "Owner of the analysis, the _id of a document in users."},
+    "created_at": {"bsonType": "date", "description": "Moment the analysis was made (UTC)."},
+    "model_version": {"bsonType": "string", "pattern": "^skin_concern_dinov2@[0-9a-f]{16}$", "description": "Model name followed by the first 16 hex digits of the model file hash."},
+    "status": {"enum": ["answered", "uncertain", "unusual_photo"], "description": "Result: answered, uncertain or unusual_photo."},
+    "ood_score": {"bsonType": ["double", "int", "null"], "minimum": 0, "maximum": 2, "description": "Distance of the photo to the training photos, 0-2; null or absent for a model without the out-of-scope filter."},
+    "answers": {
+      "bsonType": "array",
+      "maxItems": 60,
+      "description": "Ticked questionnaire options, one element per option, at most 60.",
+      "items": {
+        "bsonType": "object",
+        "description": "One ticked option of one question.",
+        "required": ["question_id", "option_value"],
+        "additionalProperties": false,
+        "properties": {
+          "question_id": {"bsonType": "int", "minimum": 1, "maximum": 999, "description": "Question number, 1-999."},
+          "option_value": {"bsonType": "string", "pattern": "^[A-Za-z0-9_]{1,60}$", "description": "Option code, 1-60 letters, digits or underscores."}
+        }
+      }
+    },
+    "predictions": {
+      "bsonType": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "description": "Exactly four predictions, one per model category.",
+      "items": {
+        "bsonType": "object",
+        "description": "Calibrated probability of one model category.",
+        "required": ["concern_code", "probability"],
+        "additionalProperties": false,
+        "properties": {
+          "concern_code": {"enum": ["acne", "eczema_dermatitis", "redness_rosacea", "normal_other"], "description": "Model category: acne, eczema_dermatitis, redness_rosacea or normal_other."},
+          "probability": {"bsonType": ["double", "int"], "minimum": 0, "maximum": 1, "description": "Probability between 0 and 1."}
+        }
+      }
+    },
+    "zone_assessments": {
+      "bsonType": "array",
+      "maxItems": 6,
+      "description": "Findings per face zone, at most one per zone (six zones).",
+      "items": {
+        "bsonType": "object",
+        "description": "What was seen in one face zone.",
+        "required": ["zone_code", "finding", "severity"],
+        "additionalProperties": false,
+        "properties": {
+          "zone_code": {"enum": ["forehead", "nose", "left_cheek", "right_cheek", "chin", "jawline"], "description": "Face zone: forehead, nose, left_cheek, right_cheek, chin or jawline."},
+          "finding": {"bsonType": "string", "minLength": 1, "maxLength": 80, "description": "Short description of the finding, 1-80 characters."},
+          "severity": {"enum": ["mild", "moderate", "pronounced"], "description": "Severity: mild, moderate or pronounced."}
+        }
+      }
+    },
+    "photo_ids": {
+      "bsonType": "array",
+      "maxItems": 3,
+      "description": "Ids of the analysis photos, at most three, copied from photos.",
+      "items": {"bsonType": "binData", "description": "photo_id, a UUID."}
+    }
+  }
+}

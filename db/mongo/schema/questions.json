@@ -1,0 +1,92 @@
+{
+  "bsonType": "object",
+  "description": "A questionnaire question with its answer options (tables QUESTION and QUESTION_OPTION). Reference data.",
+  "required": [
+    "_id",
+    "schema_version",
+    "field_key",
+    "text",
+    "answer_type",
+    "options"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "int",
+      "minimum": 1,
+      "maximum": 999,
+      "description": "question_id, 1-999; also the display order."
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "field_key": {
+      "bsonType": "string",
+      "description": "Key used by the questionnaire encoder: lower-case letters, digits and _, starting with a letter, 2-40 characters (unique).",
+      "minLength": 1,
+      "maxLength": 40,
+      "pattern": "^[a-z][a-z0-9_]{1,39}$"
+    },
+    "text": {
+      "bsonType": "string",
+      "description": "Question shown in the app (English, SCIN wording), at most 255 characters.",
+      "minLength": 1,
+      "maxLength": 255
+    },
+    "answer_type": {
+      "bsonType": "string",
+      "enum": [
+        "single",
+        "multi",
+        "ordinal"
+      ],
+      "description": "Answer type: single, multi or ordinal."
+    },
+    "options": {
+      "bsonType": "array",
+      "minItems": 1,
+      "maxItems": 99,
+      "items": {
+        "bsonType": "object",
+        "description": "One answer option.",
+        "required": [
+          "option_value",
+          "label",
+          "position",
+          "is_red_flag"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "option_value": {
+            "bsonType": "string",
+            "description": "Option code, 1-60 letters, digits or _ (SCIN codes kept as in the dataset).",
+            "minLength": 1,
+            "maxLength": 60,
+            "pattern": "^[A-Za-z0-9_]{1,60}$"
+          },
+          "label": {
+            "bsonType": "string",
+            "description": "Text shown for the option, at most 120 characters.",
+            "minLength": 1,
+            "maxLength": 120
+          },
+          "position": {
+            "bsonType": "int",
+            "minimum": 1,
+            "maximum": 99,
+            "description": "Position inside the question, 1-99 (rank for ordinal questions)."
+          },
+          "is_red_flag": {
+            "bsonType": "bool",
+            "description": "true = the app shows the see-a-doctor message whatever the model says."
+          }
+        }
+      },
+      "description": "Answer options of this question, ordered by position; at most 99 (position 1-99)."
+    }
+  }
+}

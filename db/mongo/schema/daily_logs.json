@@ -1,0 +1,82 @@
+{
+  "bsonType": "object",
+  "description": "One day of the user's log with the products ticked that day (tables DAILY_LOG and PRODUCT_USE).",
+  "required": [
+    "_id",
+    "schema_version",
+    "user_id",
+    "log_date",
+    "product_uses"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {
+      "bsonType": "binData",
+      "description": "log_id (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "schema_version": {
+      "bsonType": "int",
+      "enum": [
+        1
+      ],
+      "description": "Version of the document shape, 1 for schema v1 (allows document-by-document migration later)."
+    },
+    "user_id": {
+      "bsonType": "binData",
+      "description": "owner, reference to users (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "log_date": {
+      "bsonType": "date",
+      "description": "Calendar day of the user, stored as a date at 00:00 UTC (UTC)"
+    },
+    "notes": {
+      "bsonType": [
+        "string",
+        "null"
+      ],
+      "maxLength": 2000,
+      "description": "Free text, at most 2,000 characters; handled as special-category data."
+    },
+    "progress_photo_id": {
+      "bsonType": [
+        "binData",
+        "null"
+      ],
+      "description": "progress photo of the day, reference to photos (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+    },
+    "product_uses": {
+      "bsonType": "array",
+      "minItems": 0,
+      "maxItems": 60,
+      "items": {
+        "bsonType": "object",
+        "description": "One tick.",
+        "required": [
+          "product_id",
+          "period",
+          "used_at"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "bsonType": "binData",
+            "description": "ticked product, reference to products (UUID, binary subtype 4; the subtype cannot be checked by $jsonSchema)"
+          },
+          "period": {
+            "bsonType": "string",
+            "enum": [
+              "AM",
+              "PM"
+            ],
+            "description": "Period of the day: AM or PM (domain d_period of the Oracle schema)."
+          },
+          "used_at": {
+            "bsonType": "date",
+            "description": "Moment the product was ticked (UTC)"
+          }
+        }
+      },
+      "description": "Products ticked that day, one per (product, period); at most 60."
+    }
+  }
+}

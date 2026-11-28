@@ -1,0 +1,15 @@
+{
+  "bsonType": "object",
+  "description": "One consent granted by a user; append-only proof of consent (table CONSENT).",
+  "required": ["_id", "schema_version", "user_id", "consent_type", "policy_version", "granted_at"],
+  "additionalProperties": false,
+  "properties": {
+    "_id": {"bsonType": "binData", "description": "consent_id, a UUID (binary subtype 4)."},
+    "schema_version": {"bsonType": "int", "enum": [1], "description": "Document shape version, 1 for now."},
+    "user_id": {"bsonType": "binData", "description": "Owner of the consent, the _id of a document in users."},
+    "consent_type": {"enum": ["privacy_policy", "photo_processing", "health_data", "reminders"], "description": "Consent type: privacy_policy, photo_processing, health_data or reminders."},
+    "policy_version": {"bsonType": "string", "maxLength": 20, "pattern": "^[0-9]+\\.[0-9]+$", "description": "Policy version such as 1.0, at most 20 characters."},
+    "granted_at": {"bsonType": "date", "description": "Moment the consent was given (UTC)."},
+    "withdrawn_at": {"bsonType": ["date", "null"], "description": "Moment the consent was withdrawn, null or absent while active."}
+  }
+}
