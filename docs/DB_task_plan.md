@@ -137,6 +137,8 @@ Oracle replaces PostgreSQL as the relational reference implementation. Phase D1 
 
 ## Phase D2: Document model (MongoDB design)
 
+**Scheduled 2026-11-28:** D2.1-D2.3, D3.1 (local part), D3.2 and D3.3 run from 30.11 to 27.12.2026 as Tasks M1-M13 of `docs/MongoDB_task_plan.md`, which also fixes where the MongoDB function lives. The task texts below stay as the full requirements.
+
 **Task D2.1: Workload and access patterns - TODO (4 h)**
 - From the Figma screens and the planned endpoints: every read and write operation (login by e-mail, refresh by token hash, create analysis, paginated history, analysis detail, barcode lookup, product text search, ingredient detail, today's routine, tick a product in the daily log, calendar month, progress-photo timeline, consent check before a photo upload, data export, account deletion) with frequency, read/write ratio and the entities read together.
 - Follows the MongoDB modelling method: workload first, then relationships, then patterns ([data modeling](https://www.mongodb.com/docs/manual/data-modeling/)).

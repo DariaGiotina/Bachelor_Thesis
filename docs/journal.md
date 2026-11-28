@@ -2,6 +2,16 @@
 
 Running log of decisions and why. Newest first.
 
+## 2026-11-28: MongoDB implementation planned over four weeks (Tasks M1-M13)
+
+- **Written:** `docs/MongoDB_task_plan.md`, a dated plan for 30.11-27.12.2026 (about 46 h) that implements in MongoDB what Phase O implemented in Oracle: the same schema v1, seed data, numbered queries and functions. It schedules Tasks D2.1-D2.3, D3.1 (local part), D3.2 and D3.3 of the database plan, which now points to it.
+- **Minimum result by 13.12:** collections with validators, indexes and views; the shared seed; at least 10 queries with the same counts as their Oracle twins (Q01, Q02, Q03, Q04, Q07, Q11, Q12, Q17, Q25, Q33, each using a different MongoDB construct); the function `exportUserJson`. These come first, so weeks 3 and 4 hold only extra queries, data changes and transactions, checks, documentation and buffer.
+- **Decisions:**
+  - Local server: Docker `mongo:8.0`, the version Atlas Free runs, as a single-member replica set, because transactions need one. The image includes `mongosh`, so nothing is installed.
+  - Keys: the same UUIDs as in Oracle, so results can be compared directly.
+  - The function is a JavaScript function in a mongosh script that runs one aggregation on the server. Server-side JavaScript is not an option: Atlas Free does not run it, and `$function`, `$accumulator` and `$where` are deprecated since MongoDB 8.0.
+- **Nothing implemented yet;** the thesis gets section 4.3 in week 4 (Task M12).
+
 ## 2026-11-22: Oracle reference implementation, day 2: PL/SQL rules, data changes, queries, closing (Tasks O5-O8)
 
 - **Written:**
@@ -35,9 +45,6 @@ Running log of decisions and why. Newest first.
 - **Small fix:** the "OK" line of the privilege test in `00_users.sql` was not printed after the reconnect, so server output is now turned on again just before the test.
 - **Thesis:** still unchanged; section 4.1 is rewritten in Task O8.
 
-## 2026-11-21: Oracle reference implementation, day 1: users, type mapping, schema script, seed (Tasks O1-O4)
-
-- **Written:** `db/oracle/00_users.sql` (users), `db/oracle/skincare.sql` (schema), `db/oracle/seed.sql` (917 rows), the Oracle column and mapping section of `db/data_dictionary.md`.
 ## 2026-11-21: Oracle reference implementation, day 1: users, type mapping, schema script, seed (Tasks O1-O4)
 
 - **Written:** `db/oracle/00_users.sql` (users), `db/oracle/skincare.sql` (schema), `db/oracle/seed.sql` (917 rows), the Oracle column and mapping section of `db/data_dictionary.md`.
